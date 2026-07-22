@@ -1,0 +1,54 @@
+package com.nhnacademy.ruleengine.domain.flow.entity;
+
+import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+@Entity
+@Table(name = "nodes")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class Node {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "node_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "flow_id", nullable = false)
+    private Flow flow;
+
+    @Column(name = "node_name", nullable = false, length = 50)
+    private String nodeName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "node_type", nullable = false, length = 20)
+    private NodeType nodeType;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String nodeConfig;
+
+    @Column(name = "cooldown_sec")
+    private Integer cooldownSec;
+
+    public Node(Flow flow, String nodeName, NodeType nodeType, String nodeConfig, Integer cooldownSec) {
+        this.flow = flow;
+        this.nodeName = nodeName;
+        this.nodeType = nodeType;
+        this.nodeConfig = nodeConfig;
+        this.cooldownSec = cooldownSec;
+    }
+
+    public void update(String nodeName, NodeType nodeType, String nodeConfig, Integer cooldownSec) {
+        if (nodeName != null) this.nodeName = nodeName;
+        if (nodeType != null) this.nodeType = nodeType;
+        if (nodeConfig != null) this.nodeConfig = nodeConfig;
+        if (cooldownSec != null) this.cooldownSec = cooldownSec;
+    }
+}
