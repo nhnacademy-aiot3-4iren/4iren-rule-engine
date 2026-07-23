@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.request;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public record FlowUpdateRequest(
         @NotBlank
-        String name,
+        String flowName,
 
         String description,
 
@@ -24,13 +25,13 @@ public record FlowUpdateRequest(
         Boolean isActive,
 
         @NotEmpty
-        List<Node> nodes,
+        List<NodeInfo> nodes,
 
         @NotEmpty
-        List<Connection> connections,
+        List<ConnectionInfo> connections,
 
         @NotNull
-        List<FlowSchedule> schedules
+        List<FlowScheduleInfo> schedules
 ) {
 
 }

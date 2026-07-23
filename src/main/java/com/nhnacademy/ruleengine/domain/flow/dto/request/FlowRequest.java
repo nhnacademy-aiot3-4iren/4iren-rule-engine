@@ -4,7 +4,7 @@ package com.nhnacademy.ruleengine.domain.flow.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record FlowResponse (
+public record FlowRequest(
         @NotNull
         Long flowId,
         @NotBlank

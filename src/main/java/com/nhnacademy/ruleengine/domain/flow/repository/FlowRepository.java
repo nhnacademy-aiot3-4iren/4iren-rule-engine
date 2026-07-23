@@ -7,14 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FlowRepository extends JpaRepository<Flow, Long > {
-    List<Flow> findByIsTemplate(Boolean isTemplate);
-    List<Flow> findByRoomId(Long roomId);
 
-    List<Flow> findAllByRoomIdAndIsTemplateFalse(Long roomId);
+    List<Flow> findAllByRoomId(Long roomId);
 
-    Optional<Flow> findByFlowIdAndRoomIdAndIsTemplateFalse(Long flowId, Long roomId);
-
-    List<Flow> findAllByIsTemplateTrue();
-
-    Optional<Flow> findByFlowIdAndIsTemplateTrue(Long flowId);
+    List<Flow> findAllByIsTemplate(boolean isTemplate);
 }

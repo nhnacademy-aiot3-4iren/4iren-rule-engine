@@ -3,10 +3,10 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Builder
+@Getter
 @Entity
 @Table(name = "flow_template_sensor_types")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

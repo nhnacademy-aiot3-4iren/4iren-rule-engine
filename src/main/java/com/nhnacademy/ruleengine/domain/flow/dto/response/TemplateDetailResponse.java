@@ -1,13 +1,18 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.response;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
+import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.List;
-
+@Builder
 public record TemplateDetailResponse (
         @NotNull
         Long templateId,
@@ -15,17 +20,20 @@ public record TemplateDetailResponse (
         String templateName,
         String description,
         @NotEmpty
-        List<Node> nodes,
+        List<NodeResponse> nodes,
         @NotEmpty
-        List<Connection> connections
+        List<ConnectionResponse> connections
 ){
-    static TemplateDetailResponse of(
-            Long templateId,
-            String templateName,
-            String description,
+    public static TemplateDetailResponse from(
+            Flow flowTempalte,
             List<Node> nodes,
             List<Connection> connections
     ) {
-        return new TemplateDetailResponse(templateId, templateName, description, nodes, connections);
+        return TemplateDetailResponse.builder()
+                .templateId(flowTempalte.getId())
+                .templateName(flowTempalte.getFlowName())
+                .description(flowTempalte.getDescription())
+                .nodes(NodeResponse.fromList(nodes))
+                .connections(ConnectionResponse.fromList(connections)).build();
     }
 }

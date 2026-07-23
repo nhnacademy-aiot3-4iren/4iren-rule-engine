@@ -2,11 +2,10 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Builder
+@Getter
 @Entity
 @Table(
         name = "connections",

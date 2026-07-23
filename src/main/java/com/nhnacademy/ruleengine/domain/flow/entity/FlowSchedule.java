@@ -1,16 +1,16 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
+@Builder
+@Getter
 @Entity
-@Table("flow_schedules")
+@Table(name = "flow_schedules")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FlowSchedule {

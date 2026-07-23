@@ -1,12 +1,17 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.response;
 
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
+import com.nhnacademy.ruleengine.domain.flow.entity.FlowTemplateSensorType;
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.List;
+import java.util.Map;
 
+@Builder
 public record TemplateResponse(
         @NotNull
         Long templateId,
@@ -16,12 +21,29 @@ public record TemplateResponse(
         @NotEmpty
         List<SensorType> sensorTypes
 ) {
-    public static TemplateResponse of(
-            Long templateId,
-            String templateName,
-            String description,
-            List<SensorType> sensorTypes
+    public static TemplateResponse from(
+            Flow flowTemplate,   List<SensorType> sensorType
     ){
-        return new TemplateResponse(templateId, templateName, description, sensorTypes);
+        return TemplateResponse.builder()
+                .templateId(flowTemplate.getId())
+                .templateName(flowTemplate.getFlowName())
+                .description(flowTemplate.getDescription())
+                .sensorTypes(sensorType).build();
+    }
+
+    public static List<TemplateResponse> fromList(
+        List<Flow> flowTemplates, Map<Long, List<SensorType>> sensorTypesByFlowId
+    ){
+        return flowTemplates.stream()
+                .map(f ->{
+                    List<SensorType> sensorTypeList = sensorTypesByFlowId.get(f.getId());
+
+                    return TemplateResponse.builder()
+                            .templateId(f.getId())
+                            .templateName(f.getFlowName())
+                            .description(f.getDescription())
+                            .sensorTypes(sensorTypeList)
+                            .build();
+                }).toList();
     }
 }

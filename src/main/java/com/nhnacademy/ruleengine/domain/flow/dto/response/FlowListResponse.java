@@ -8,7 +8,7 @@ public record FlowListResponse(
         @NotNull
         List<FlowResponse> flowResponseList
 ) {
-    static FlowListResponse of(
+    public static FlowListResponse of(
             List<FlowResponse> flowResponseList
     ){
         return new FlowListResponse(flowResponseList);

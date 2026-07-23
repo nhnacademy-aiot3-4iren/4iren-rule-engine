@@ -2,13 +2,11 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
+@Builder
+@Getter
 @Entity
 @Table(name = "nodes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

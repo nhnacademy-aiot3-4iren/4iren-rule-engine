@@ -1,5 +1,8 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.request;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.FlowScheduleInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -24,13 +27,13 @@ public record FlowCreateRequest(
         Boolean isActive,
 
         @NotNull
-        List<FlowSchedule> schedules,
+        List<FlowScheduleInfo> schedules,
 
         @NotEmpty
-        List<Node> nodes,
+        List<NodeInfo> nodes,
 
-        @NotEmpty
-        List<Connection> connections
+        @NotNull
+        List<ConnectionInfo> connections
 ) {
 
 }

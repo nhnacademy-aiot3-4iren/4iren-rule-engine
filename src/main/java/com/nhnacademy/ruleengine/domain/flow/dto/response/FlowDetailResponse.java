@@ -1,15 +1,21 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.response;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.FlowScheduleResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import jakarta.validation.constraints.Negative;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record FlowDetailResponse (
         @NotNull
         Long flowId,
@@ -24,23 +30,29 @@ public record FlowDetailResponse (
         boolean hasSchedule,
 
         @NotNull
-        List<FlowSchedule> schedules,
+        List<FlowScheduleResponse> schedules,
         @NotEmpty
-        List<Node> nodes,
+        List<NodeResponse> nodes,
         @Negative
-        List<Connection> connections
+        List<ConnectionResponse> connections
 ){
-    static FlowDetailResponse of(
-            Long flowId,
-            Long roomId,
-            String flowName,
-            String description,
-            boolean isActive,
+
+    public static FlowDetailResponse from(
+            Flow flow,
             boolean hasSchedule,
             List<FlowSchedule> schedules,
             List<Node> nodes,
             List<Connection> connections
     ){
-        return new FlowDetailResponse(flowId, roomId, flowName, description, isActive,hasSchedule, schedules, nodes, connections);
+        return FlowDetailResponse.builder()
+                .flowId(flow.getId())
+                .roomId(flow.getRoomId())
+                .flowName(flow.getFlowName())
+                .description(flow.getDescription())
+                .isActive(flow.getIsActive())
+                .hasSchedule(hasSchedule)
+                .schedules(FlowScheduleResponse.fromList(schedules))
+                .nodes(NodeResponse.fromList(nodes))
+                .connections(ConnectionResponse.fromList(connections)).build();
     }
 }
