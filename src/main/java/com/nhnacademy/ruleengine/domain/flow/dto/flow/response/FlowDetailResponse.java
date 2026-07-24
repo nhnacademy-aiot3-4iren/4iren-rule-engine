@@ -12,7 +12,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -21,20 +23,25 @@ public record FlowDetailResponse (
         Long flowId,
         @NotNull
         Long roomId,
+        @Length(max = 50)
         @NotBlank
         String flowName,
+        @Length(max = 255)
         String description,
         @NotNull
         boolean isActive,
         @NotNull
         boolean hasSchedule,
-
-        @NotNull
-        List<FlowScheduleResponse> schedules,
         @NotEmpty
         List<NodeResponse> nodes,
-        @Negative
-        List<ConnectionResponse> connections
+        @NotNull
+        List<FlowScheduleResponse> schedules,
+        @NotNull
+        List<ConnectionResponse> connections,
+        @NotNull
+        LocalDateTime createdAt,
+
+        LocalDateTime updatedAt
 ){
 
     public static FlowDetailResponse from(

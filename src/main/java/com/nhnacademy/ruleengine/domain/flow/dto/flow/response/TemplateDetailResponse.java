@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 @Builder
@@ -16,7 +17,9 @@ public record TemplateDetailResponse (
         @NotNull
         Long templateId,
         @NotBlank
+        @Length(max = 50)
         String templateName,
+        @Length(max = 255)
         String description,
         @NotEmpty
         List<NodeResponse> nodes,

@@ -30,6 +30,7 @@ public class Node {
     private NodeType nodeType;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "node_config", nullable = false)
     private String nodeConfig;
 
     @Column(name = "cooldown_sec")

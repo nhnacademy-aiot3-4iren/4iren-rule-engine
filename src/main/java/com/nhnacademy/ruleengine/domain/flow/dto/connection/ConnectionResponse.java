@@ -2,16 +2,22 @@ package com.nhnacademy.ruleengine.domain.flow.dto.connection;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
 public record ConnectionResponse (
+        @NotNull
         Long connectionId,
+        @NotNull
         Long flowId,
+        @NotNull
         Long sourceNodeId,
+        @NotNull
         Long targetNodeId,
+
         ConditionResult conditionResult
 ){
     public static List<ConnectionResponse> fromList(List<Connection> connections) {

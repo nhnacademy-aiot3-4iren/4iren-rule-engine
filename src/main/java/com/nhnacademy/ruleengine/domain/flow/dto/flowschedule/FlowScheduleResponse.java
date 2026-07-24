@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.time.DayOfWeek;
@@ -9,9 +10,13 @@ import java.util.List;
 
 @Builder
 public record FlowScheduleResponse (
+        @NotNull
         Long scheduleId,
+        @NotNull
         DayOfWeek dayOfWeek,
+        @NotNull
         LocalTime startTime,
+        @NotNull
         LocalTime endTime
 ){
     public static FlowScheduleResponse from(FlowSchedule schedule){

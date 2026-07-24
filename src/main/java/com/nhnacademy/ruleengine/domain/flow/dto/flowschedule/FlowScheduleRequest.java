@@ -1,12 +1,16 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 public record FlowScheduleRequest(
-        Long scheduleId,
+        @NotNull
         DayOfWeek dayOfWeek,
+        @NotNull
         LocalTime startTime,
+        @NotNull
         LocalTime endTime
 ) {
 }
