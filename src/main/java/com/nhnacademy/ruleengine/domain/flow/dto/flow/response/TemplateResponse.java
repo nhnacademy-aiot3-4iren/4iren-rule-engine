@@ -1,7 +1,6 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.flow.entity.FlowTemplateSensorType;
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

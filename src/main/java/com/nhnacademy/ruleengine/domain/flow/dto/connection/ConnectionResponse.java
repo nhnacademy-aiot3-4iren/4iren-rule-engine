@@ -1,8 +1,7 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.flow.dto.connection;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
-import jakarta.validation.constraints.Negative;
 import lombok.Builder;
 
 import java.util.List;

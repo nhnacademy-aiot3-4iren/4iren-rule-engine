@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

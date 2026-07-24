@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.flow.dto.node;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;

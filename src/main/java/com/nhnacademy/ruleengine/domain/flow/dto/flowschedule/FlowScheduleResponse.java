@@ -1,8 +1,7 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
 import lombok.Builder;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

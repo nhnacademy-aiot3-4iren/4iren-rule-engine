@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import jakarta.validation.constraints.NotBlank;

@@ -1,11 +1,10 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionResponse;
-import com.nhnacademy.ruleengine.domain.flow.dto.NodeResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
-import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

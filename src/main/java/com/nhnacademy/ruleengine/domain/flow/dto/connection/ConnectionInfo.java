@@ -1,8 +1,6 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.flow.dto.connection;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
-import lombok.Data;
-import lombok.Getter;
 
 
 public record ConnectionInfo(

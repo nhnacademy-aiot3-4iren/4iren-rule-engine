@@ -1,8 +1,8 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionResponse;
-import com.nhnacademy.ruleengine.domain.flow.dto.FlowScheduleResponse;
-import com.nhnacademy.ruleengine.domain.flow.dto.NodeResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
