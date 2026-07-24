@@ -1,10 +1,19 @@
 package com.nhnacademy.ruleengine.domain.flow.service.impl;
 
-import com.nhnacademy.ruleengine.common.exception.FlowNotFoundException;
-import com.nhnacademy.ruleengine.domain.flow.dto.*;
-import com.nhnacademy.ruleengine.domain.flow.dto.request.FlowCreateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.request.FlowUpdateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.response.*;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
+import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
+import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
@@ -15,10 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
@@ -47,6 +55,7 @@ public class FlowServiceImpl implements FlowService {
         saveNodes(savedFlow, request.nodes() );
         saveSchedules(savedFlow, request.schedules());
         saveConnections(savedFlow, request.connections());
+        //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함1.
 
         return FlowCreateResponse.of(savedFlow.getId());
     }
@@ -63,9 +72,12 @@ public class FlowServiceImpl implements FlowService {
 
         Flow savedFlow = flowRepository.save(flow);
 
-        saveNodes(savedFlow, request.nodes() );
+        saveNodes(savedFlow, request.nodes());
         saveSchedules(savedFlow, request.schedules());
         saveConnections(savedFlow, request.connections());
+
+        //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함2.
+
 
         return FlowCreateResponse.of(savedFlow.getId());
     }
@@ -75,12 +87,12 @@ public class FlowServiceImpl implements FlowService {
         List<Flow> flowList = flowRepository.findAllByRoomId(roomId);
 
         if(flowList.isEmpty()){
-            FlowListResponse.of(List.of());
+            return FlowListResponse.of(List.of());
         }
 
         List<FlowResponse> response = flowList.stream()
                 .map(f -> FlowResponse.from(
-                        f, flowScheduleRepository.getReferenceById(f.getId()) != null)
+                        f, flowScheduleRepository.existsById(f.getId()))
                 )
                 .toList();
 
@@ -89,7 +101,7 @@ public class FlowServiceImpl implements FlowService {
 
     @Override
     public FlowDetailResponse getFlowDetail(Long roomId, Long flowId) {
-        Flow flow = flowRepository.findById(flowId).orElseThrow(()->new FlowNotFoundException(flowId));
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()-> new FlowNotFoundException(flowId));
 
         List<FlowSchedule> flowSchedules = flowScheduleRepository.findAllByFlowId(flowId);
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
@@ -110,7 +122,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public TemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
         Flow tempalteFlow = flowRepository.findById(templateFlowId)
-                .orElseThrow( () -> new FlowNotFoundException(templateFlowId));
+                .orElseThrow(() -> new FlowNotFoundException(templateFlowId));
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
@@ -121,21 +133,23 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
-        Flow flow = flowRepository.findById(flowId)
-                .orElseThrow( () -> new FlowNotFoundException(flowId));
+        Flow flow = flowRepository.findById(flowId).orElseThrow( () -> new FlowNotFoundException(flowId));
 
         flow.update(request.flowName(),request.description(), request.isActive());
 
-        nodeRepository.deleteAllByFlowId(flowId);
-        connectionRepository.deleteAllByFlowId(flowId);
-        flowScheduleRepository.deleteAllByFlowId(flowId);
+//        nodeRepository.deleteAllByFlowId(flowId);
+//        connectionRepository.deleteAllByFlowId(flowId);
+//        flowScheduleRepository.deleteAllByFlowId(flowId);
 
-        saveNodes(flow, request.nodes());
-        saveConnections(flow, request.connections());
-        saveSchedules(flow, request.schedules());
+        updateNodes(flow, request.nodes());
+        updateConnections(flow, request.connections());
+        updateSchedules(flow, request.schedules());
 
 
+        //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함3.
 
+        //TODO 변경 내용만 바꿀수 있도록 바꾸기
+//
 //        //node
 //        //1, 3 -> 2, 3
 //        //업데이트 전 노드 리스트
@@ -170,36 +184,13 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public void deleteFlow(Long roomId, Long flowId) {
+        if(!flowRepository.existsByIdAndRoomId(flowId, roomId)){
+            throw new UnauthorizedFlowAccessException(flowId, roomId);
+        }
         flowRepository.deleteById(flowId);
-        if(flowRepository.existsById(flowId)){
-            //TODO 예외 처리
-        }
     }
 
-    private void saveConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections) {
-        if(connections.isEmpty()){
-            return;
-        }
-
-        List<Connection> connectionList = connections.stream()
-                .map(c -> {
-                    if(!nodeRepository.existsById(c.sourceNodeId()) || !nodeRepository.existsById(c.targetNodeId())) {
-                        //TODO 예외 처리
-
-                    }
-                        return Connection.builder()
-                                .flow(savedFlow)
-                                .sourceNode(nodeRepository.getReferenceById(c.sourceNodeId()))
-                                .targetNode(nodeRepository.getReferenceById(c.targetNodeId()))
-                                .conditionResult(c.conditionResult()).build();
-                })
-                .toList();
-
-        List<Connection> savedConnectionList = connectionRepository.saveAll(connectionList);
-
-    }
-
-    private void saveNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
+    private void saveNodes(Flow savedFlow, @NotEmpty List<NodeRequest> nodes) {
 
         List<Node> nodeList = nodes.stream()
                 .map(n -> Node.builder()
@@ -214,7 +205,40 @@ public class FlowServiceImpl implements FlowService {
 
     }
 
-    private void saveSchedules(Flow savedFlow, @NotNull List<FlowScheduleInfo> schedules) {
+    private void saveConnections(Flow savedFlow, @NotNull List<ConnectionRequest> connections) {
+        if(connections.isEmpty()){
+            return;
+        }
+        Set<Long> nodeIdsInFlow = nodeRepository.findAllByFlowId(savedFlow.getId()).stream()
+                .map(Node :: getId)
+                .collect(Collectors.toSet());
+
+        List<Connection> connectionList = connections.stream()
+                .map(c -> {
+                    if(!nodeRepository.existsById(c.sourceNodeId()) || !nodeRepository.existsById(c.targetNodeId())) {
+                        throw new InvalidConnectionException(c.sourceNodeId(), c.targetNodeId());
+                    }
+                    if(nodeIdsInFlow.contains(c.sourceNodeId())){
+                        throw new InvalidNodeException(c.sourceNodeId());
+                    }if(nodeIdsInFlow.contains(c.targetNodeId())){
+                        throw new InvalidNodeException(c.targetNodeId());
+
+                    }
+
+                        return Connection.builder()
+                                .flow(savedFlow)
+                                .sourceNode(nodeRepository.getReferenceById(c.sourceNodeId()))
+                                .targetNode(nodeRepository.getReferenceById(c.targetNodeId()))
+                                .conditionResult(c.conditionResult()).build();
+                })
+                .toList();
+
+        List<Connection> savedConnectionList = connectionRepository.saveAll(connectionList);
+
+    }
+
+
+    private void saveSchedules(Flow savedFlow, @NotNull List<FlowScheduleRequest> schedules) {
         if(schedules.isEmpty()){
             return;
         }
@@ -228,6 +252,19 @@ public class FlowServiceImpl implements FlowService {
                 .toList();
 
         List<FlowSchedule> savedScheduleList = flowScheduleRepository.saveAll(scheduleList);
+    }
+
+
+//TODO 추가 구현 해야함
+
+    private void updateNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
+    }
+
+    private void updateConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections) {
+    }
+
+
+    private void updateSchedules(Flow savedFlow, @NotNull List<FlowScheduleInfo> schedules) {
     }
 
     private Map<Long, List<SensorType>> getSensorTypesByFlowId(List<Flow> templateFlows){

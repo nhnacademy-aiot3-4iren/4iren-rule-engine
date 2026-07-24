@@ -1,8 +1,8 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.request.FlowCreateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.request.FlowUpdateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.response.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
 
 public interface FlowService {
     //플로우 생성
