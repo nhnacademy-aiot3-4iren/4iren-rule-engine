@@ -22,4 +22,7 @@ public record NodeInfo(
         int cooldownSec
 
 ) {
+        public boolean isNew() {
+                return nodeId == null || nodeId < 0;
+        }
 }

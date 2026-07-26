@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,48 +138,13 @@ public class FlowServiceImpl implements FlowService {
 
         flow.update(request.flowName(),request.description(), request.isActive());
 
-//        nodeRepository.deleteAllByFlowId(flowId);
-//        connectionRepository.deleteAllByFlowId(flowId);
-//        flowScheduleRepository.deleteAllByFlowId(flowId);
-
+        //update
         updateNodes(flow, request.nodes());
-        updateConnections(flow, request.connections());
+        updateConnections(flow, request.connections(), updateNodes(flow, request.nodes()));
         updateSchedules(flow, request.schedules());
 
 
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함3.
-
-        //TODO 변경 내용만 바꿀수 있도록 바꾸기
-//
-//        //node
-//        //1, 3 -> 2, 3
-//        //업데이트 전 노드 리스트
-//        List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
-//
-//        List<Long> ids = nodes.stream()
-//                .map(n -> n.getId())
-//                .toList();
-//
-//
-//        //업데이트 후 노드 리스트
-//        List<Long> updateNodeIds = request.nodes().stream()
-//                .map(n ->n.nodeId())
-//                .toList();
-//
-//        //삭제해야할 노드 리스트
-//        List<Long> deleteNodesIds = ids.stream()
-//                .filter(id -> !updateNodeIds.contains(id))
-//                .toList();
-//
-//        //추가해야 할 노드 리스트
-//        List<Long> addNodeIds = updateNodeIds.stream()
-//                .filter(u -> !ids.contains(u))
-//                .toList();
-//
-//        nodeRepository.saveAll()
-//
-//        //connection
-//        List<Connection>  connections;
     }
 
     @Transactional
@@ -256,15 +222,88 @@ public class FlowServiceImpl implements FlowService {
 
 
 //TODO 추가 구현 해야함
+    private Map<Long, Long> updateNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
+        //node
+        //
+        List<Long> requestIds = nodes.stream()
+                .map(NodeInfo::nodeId)
+                .toList();
 
-    private void updateNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
+        //업데이트 전 노드 아이디 리스트
+        List<Long> existingIds = nodeRepository.findAllByFlowId(savedFlow.getId()).stream()
+                .map(n -> n.getId())
+                .toList();
+
+        //수정 안된 기존 노드(양수)
+        List<Long> requestExistingIds = nodes.stream()
+                .filter(n -> !n.isNew())
+                .map(n ->n.nodeId())
+                .toList();
+
+        //삭제해야할 노드
+        List<Long> deleteNodesIds = existingIds.stream()
+                .filter(id -> !requestExistingIds.contains(id))
+                .toList();
+        nodeRepository.deleteAllById(deleteNodesIds);
+
+        // 기존 노드 수정
+        Map<Long, Node> existingNodeMap = nodeRepository.findAllById(requestExistingIds)
+                .stream()
+                .collect(Collectors.toMap(Node::getId, n -> n));
+
+        nodes.stream()
+                .filter(n -> !n.isNew())
+                .forEach(n -> existingNodeMap.get(n.nodeId()).update(n));
+
+        // 신규 노드 저장 & 임시id → 실제id 매핑
+        // key: 임시id(음수), value: 실제 저장된 id
+        Map<Long, Long> tempIdMap = new HashMap<>();
+
+        nodes.stream()
+                .filter(NodeInfo::isNew)
+                .forEach(n -> {
+                    Node saved = nodeRepository.save(Node.create(savedFlow, n));
+                    tempIdMap.put(n.nodeId(), saved.getId());
+                });
+
+        return tempIdMap;
     }
 
-    private void updateConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections) {
+    private void updateConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections, Map<Long, Long> tempIdMap) {
+
+        // connection은 전체 교체
+        // 노드 구조가 바뀌면 어차피 재구성되는 경우가 많고
+        // id 유지할 이유가 없음
+        connectionRepository.deleteAllByFlowId(savedFlow.getId());
+
+        List<Connection> newConnections = connections.stream()
+                .map(c -> {
+                    // 음수(임시id)면 실제 id로 변환
+                    Long sourceId = c.sourceNodeId() < 0
+                            ? tempIdMap.get(c.sourceNodeId())
+                            : c.sourceNodeId();
+
+                    Long targetId = c.targetNodeId() < 0
+                            ? tempIdMap.get(c.targetNodeId())
+                            : c.targetNodeId();
+
+                    return Connection.create(savedFlow, nodeRepository.getReferenceById(sourceId),nodeRepository.getReferenceById(targetId), c.conditionResult());
+                })
+                .toList();
+
+        connectionRepository.saveAll(newConnections);
     }
 
 
     private void updateSchedules(Flow savedFlow, @NotNull List<FlowScheduleInfo> schedules) {
+        // schedule도 전체 교체
+        flowScheduleRepository.deleteAllByFlowId(savedFlow.getId());
+
+        List<FlowSchedule> newSchedules = schedules.stream()
+                .map(s -> FlowSchedule.create(savedFlow, s))
+                .toList();
+
+        flowScheduleRepository.saveAll(newSchedules);
     }
 
     private Map<Long, List<SensorType>> getSensorTypesByFlowId(List<Flow> templateFlows){

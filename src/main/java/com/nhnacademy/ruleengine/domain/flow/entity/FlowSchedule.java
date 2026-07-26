@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +39,11 @@ public class FlowSchedule {
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public static FlowSchedule create(Flow flow, FlowScheduleInfo flowScheduleInfo){
+        return FlowSchedule.builder()
+                .flow(flow).dayOfWeek(flowScheduleInfo.dayOfWeek()).startTime(flowScheduleInfo.startTime()).endTime(flowScheduleInfo.endTime()).build();
     }
 
 }

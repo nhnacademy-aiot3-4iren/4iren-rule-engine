@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,11 +44,19 @@ public class Node {
         this.nodeConfig = nodeConfig;
         this.cooldownSec = cooldownSec;
     }
+    public static Node create(Flow flow, NodeInfo nodeInfo){
+        return Node.builder().flow(flow)
+                .nodeName(nodeInfo.nodeName())
+                .nodeType(nodeInfo.nodeType())
+                .nodeConfig(nodeInfo.nodeConfig())
+                .cooldownSec(nodeInfo.cooldownSec())
+                .build();
+    }
 
-    public void update(String nodeName, NodeType nodeType, String nodeConfig, Integer cooldownSec) {
-        if (nodeName != null) this.nodeName = nodeName;
-        if (nodeType != null) this.nodeType = nodeType;
-        if (nodeConfig != null) this.nodeConfig = nodeConfig;
-        if (cooldownSec != null) this.cooldownSec = cooldownSec;
+    public void update(NodeInfo nodeInfo) {
+        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
+        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
+        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
+        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
     }
 }

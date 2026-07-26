@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Builder
@@ -47,5 +48,10 @@ public class Connection {
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
         this.conditionResult =conditionResult;
+    }
+
+    public static Connection create(Flow flow, Node sourceNode, Node targetNode, ConditionResult conditionResult){
+        return Connection.builder()
+                .flow(flow).sourceNode(sourceNode).targetNode(targetNode).conditionResult(conditionResult).build();
     }
 }
