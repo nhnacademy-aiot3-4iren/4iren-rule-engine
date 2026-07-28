@@ -1,0 +1,185 @@
+@baseUrl = http://localhost:8080
+@roomId = 101
+@flowId = 1
+@templateId = 1
+@contentType = application/json
+
+###1. 플로우 목록 조회
+GET {{baseUrl}}/api/rooms/{{roomId}}/flows
+Accept: {{contentType}}
+
+### 2. 플로우 상세 조회
+GET {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
+Accept: {{contentType}}
+
+### 3. 강의실 별 템플릿 플로우 제안 목록 조회
+GET {{baseUrl}}/api/rooms/{{roomId}}/flows/templates
+Accept: {{contentType}}
+
+### 4. 템플릿 플로우 상세 조회
+GET {{baseUrl}}/api/rooms/{{roomId}}/flows/templates/{{templateId}}
+Accept: {{contentType}}
+
+### 5. 플로우 생성 - THRESHOLD + ALERT 예시
+POST {{baseUrl}}/api/rooms/{{roomId}}/flows
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "flowName": "CO2 임계치 알림 플로우",
+  "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
+  "isActive": true,
+  "schedules": [
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00"
+    },
+    {
+      "dayOfWeek": "TUESDAY",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00"
+    }
+  ],
+  "nodes": [
+    {
+      "tempNodeId" : -1,
+      "nodeName": "CO2 임계치 조건",
+      "nodeType": "THRESHOLD",
+      "cooldownSec": 60,
+      "nodeConfig": "{\"sensorType\": \"CO2\", \"operator\": \"GTE\", \"threshold\": 1000, \"unit\": \"PPM\", \"validDurationSec\": 60, \"x\": 120, \"y\": 180}"
+
+    },
+    {
+      "tempNodeId" : -2,
+      "nodeName": "텔레그램 알림",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
+      "nodeConfig": "{\"channel\": \"TELEGRAM\", \"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 높습니다.\",\"dedupWindowSec\": 300,\"x\": 420,\"y\": 180}"
+    }
+  ],
+  "connections": [
+    {
+      "sourceNodeId": -1,
+      "targetNodeId": -2,
+      "conditionResult": "TRUE"
+    }
+  ]
+}
+
+### 6. 템플릿으로 플로우 생성
+# 주의:
+# - 현재 API 스펙상 nodes, connections를 같이 받도록 되어 있음
+# - templateId 기반 생성인데 body까지 같이 받는 구조
+
+POST {{baseUrl}}/api/rooms/{{roomId}}/flows/templates/{{templateId}}
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "flowName": "템플릿 기반 환기 플로우",
+  "description": "템플릿을 기반으로 생성한 플로우",
+  "isActive": true,
+  "schedules": [
+    {
+      "dayOfWeek": "WEDNESDAY",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00"
+    }
+  ],
+  "nodes": [
+    {
+      "tempNodeId" : -1,
+      "nodeName": "CO2 평균값 조건",
+      "nodeType": "AVERAGE",
+      "cooldownSec": 120,
+      "nodeConfig": "{\"sensorType\": \"CO2\",\"operator\": \"GTE\",\"average\": 1200,\"windowSec\": 600,\"unit\": \"PPM\",\"x\": 100,\"y\": 150}"
+    },
+    {
+      "tempNodeId" : -2,
+      "nodeName": "로그 저장",
+      "nodeType": "LOGGING",
+      "cooldownSec": 60,
+      "nodeConfig": "{\"logLevel\": \"WARN\",\"messageTemplate\": \"[WARN] CO2 평균치 초과\",\"x\": 400,\"y\": 150}"
+    }
+  ],
+  "connections": [
+    {
+      "sourceNodeId": -1,
+      "targetNodeId": -2,
+      "conditionResult": "TRUE"
+    }
+  ]
+}
+
+### 7. 플로우 수정
+PUT {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "flowId": 1,
+  "flowName": "수정된 CO2 알림 플로우",
+  "description": "CO2 임계치 초과 시 알림 + 로그 저장",
+  "isActive": true,
+  "nodes": [
+    {
+      "nodeId": 1,
+      "nodeName": "CO2 임계치 조건",
+      "nodeType": "THRESHOLD",
+      "cooldownSec": 60,
+      "nodeConfig": "{\"sensorType\": \"CO2\",\"operator\": \"GTE\",\"threshold\": 1200,\"unit\": \"PPM\",\"validDurationSec\": 60,\"x\": 100,\"y\": 150}"
+    },
+    {
+      "nodeId": 2,
+      "nodeName": "텔레그램 알림",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
+      "nodeConfig": "{\"channel\": \"TELEGRAM\",\"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 1200ppm 이상입니다.\",\"dedupWindowSec\": 300,\"x\": 380,\"y\": 120}"
+    },
+    {
+      "nodeId": -1,
+      "nodeName": "로그 저장",
+      "nodeType": "LOGGING",
+      "cooldownSec": 60,
+      "nodeConfig": "{\"logLevel\": \"INFO\",\"messageTemplate\": \"[RULE] CO2 초과 감지\",\"x\": 380, \"y\": 240}"
+    }
+  ],
+  "connections": [
+    {
+      "sourceNodeId": 1,
+      "targetNodeId": 2,
+      "conditionResult": "TRUE"
+    },
+    {
+      "sourceNodeId": 1,
+      "targetNodeId": -1,
+      "conditionResult": "TRUE"
+    }
+  ],
+  "schedules": [
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00"
+    },
+    {
+      "dayOfWeek": "FRIDAY",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00"
+    }
+  ]
+}
+
+### 8. 플로우 삭제
+DELETE {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
+Accept: {{contentType}}
+
+### 9. 플로우 활성화/비활성화 (보류 기능)
+PATCH {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}/active
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "isActive": false
+}
