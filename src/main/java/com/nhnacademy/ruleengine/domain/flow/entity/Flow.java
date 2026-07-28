@@ -47,12 +47,15 @@ public class Flow {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Node> nodes = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Connection> connections = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FlowSchedule> schedules = new ArrayList<>();
 
