@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record ConnectionRequest (
 
         @NotNull
-        Long flowId,
-        @NotNull
         Long sourceNodeId,
         @NotNull
         Long targetNodeId,

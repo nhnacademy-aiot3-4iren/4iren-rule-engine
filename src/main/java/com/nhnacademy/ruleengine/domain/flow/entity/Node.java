@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @Getter
 @Entity
@@ -31,11 +35,17 @@ public class Node {
     private NodeType nodeType;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "node_config", nullable = false)
+    @Column(name = "node_config", nullable = false, columnDefinition = "json")
     private String nodeConfig;
 
     @Column(name = "cooldown_sec")
     private Integer cooldownSec;
+
+    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> outgoingConnections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> incomingConnections = new ArrayList<>();
 
     public Node(Flow flow, String nodeName, NodeType nodeType, String nodeConfig, Integer cooldownSec) {
         this.flow = flow;
@@ -54,9 +64,9 @@ public class Node {
     }
 
     public void update(NodeInfo nodeInfo) {
-        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
-        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
-        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
-        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
+        if (nodeInfo.nodeName() != null) this.nodeName = nodeInfo.nodeName();
+        if (nodeInfo.nodeType() != null) this.nodeType = nodeInfo.nodeType();
+        if (nodeInfo.nodeConfig() != null) this.nodeConfig = nodeInfo.nodeConfig();
+        if (nodeInfo.cooldownSec() != null) this.cooldownSec = nodeInfo.cooldownSec();
     }
 }
