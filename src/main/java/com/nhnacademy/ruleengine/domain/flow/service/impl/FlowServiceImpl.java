@@ -3,7 +3,6 @@ package com.nhnacademy.ruleengine.domain.flow.service.impl;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
-import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionRequest;
@@ -23,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
+@Validated
 public class FlowServiceImpl implements FlowService {
 
     private final FlowRepository flowRepository;
@@ -53,9 +54,9 @@ public class FlowServiceImpl implements FlowService {
 
         Flow savedFlow = flowRepository.save(flow);
 
-        saveNodes(savedFlow, request.nodes() );
+        Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
+        saveConnections(savedFlow, request.connections(),tempIdMap);
         saveSchedules(savedFlow, request.schedules());
-        saveConnections(savedFlow, request.connections());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함1.
 
         return FlowCreateResponse.of(savedFlow.getId());
@@ -73,12 +74,10 @@ public class FlowServiceImpl implements FlowService {
 
         Flow savedFlow = flowRepository.save(flow);
 
-        saveNodes(savedFlow, request.nodes());
+        Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes());
+        saveConnections(savedFlow, request.connections(), tempIdMap);
         saveSchedules(savedFlow, request.schedules());
-        saveConnections(savedFlow, request.connections());
-
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함2.
-
 
         return FlowCreateResponse.of(savedFlow.getId());
     }
@@ -139,11 +138,9 @@ public class FlowServiceImpl implements FlowService {
         flow.update(request.flowName(),request.description(), request.isActive());
 
         //update
-        updateNodes(flow, request.nodes());
-        updateConnections(flow, request.connections(), updateNodes(flow, request.nodes()));
+        Map<Long, Long> tempIdMap = updateNodes(flow, request.nodes());
+        updateConnections(flow, request.connections(),tempIdMap);
         updateSchedules(flow, request.schedules());
-
-
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함3.
     }
 
@@ -156,45 +153,47 @@ public class FlowServiceImpl implements FlowService {
         flowRepository.deleteById(flowId);
     }
 
-    private void saveNodes(Flow savedFlow, @NotEmpty List<NodeRequest> nodes) {
 
-        List<Node> nodeList = nodes.stream()
-                .map(n -> Node.builder()
-                        .flow(savedFlow)
-                        .nodeName(n.nodeName())
-                        .nodeType(n.nodeType())
-                        .nodeConfig(n.nodeConfig())
-                        .cooldownSec(n.cooldownSec()).build())
-                .toList();
+    private Map<Long, Long> saveNodes(Flow savedFlow, @NotEmpty List<NodeRequest> nodes) {
+        Map<Long, Long> tempIdMap = new HashMap<>();
 
-        List<Node> savedNodeList = nodeRepository.saveAll(nodeList);
+        nodes.stream()
+                .forEach(n -> {
+                    Node savedNode = nodeRepository.save(
+                            Node.builder()
+                            .flow(savedFlow)
+                            .nodeName(n.nodeName())
+                            .nodeType(n.nodeType())
+                            .nodeConfig(n.nodeConfig())
+                            .cooldownSec(n.cooldownSec()).build()
+                    );
+                    tempIdMap.put(n.tempNodeId(), savedNode.getId());
+                });
 
+        return tempIdMap;
     }
 
-    private void saveConnections(Flow savedFlow, @NotNull List<ConnectionRequest> connections) {
+    private void saveConnections(Flow savedFlow, @NotNull List<ConnectionRequest> connections, Map<Long, Long> tempIdMap) {
         if(connections.isEmpty()){
             return;
         }
-        Set<Long> nodeIdsInFlow = nodeRepository.findAllByFlowId(savedFlow.getId()).stream()
-                .map(Node :: getId)
-                .collect(Collectors.toSet());
+        Set<Long> savedNodeIds = tempIdMap.values().stream().collect(Collectors.toSet());
+
 
         List<Connection> connectionList = connections.stream()
                 .map(c -> {
-                    if(!nodeRepository.existsById(c.sourceNodeId()) || !nodeRepository.existsById(c.targetNodeId())) {
-                        throw new InvalidConnectionException(c.sourceNodeId(), c.targetNodeId());
-                    }
-                    if(nodeIdsInFlow.contains(c.sourceNodeId())){
-                        throw new InvalidNodeException(c.sourceNodeId());
-                    }if(nodeIdsInFlow.contains(c.targetNodeId())){
-                        throw new InvalidNodeException(c.targetNodeId());
+                    Long sourceId = tempIdMap.get(c.sourceNodeId());
+                    Long targetId = tempIdMap.get(c.targetNodeId());
 
+                    if (sourceId == null || targetId == null ||
+                            !savedNodeIds.contains(sourceId) || !savedNodeIds.contains(targetId)) {
+                        throw new InvalidConnectionException(sourceId, targetId);
                     }
 
                         return Connection.builder()
                                 .flow(savedFlow)
-                                .sourceNode(nodeRepository.getReferenceById(c.sourceNodeId()))
-                                .targetNode(nodeRepository.getReferenceById(c.targetNodeId()))
+                                .sourceNode(nodeRepository.getReferenceById(sourceId))
+                                .targetNode(nodeRepository.getReferenceById(targetId))
                                 .conditionResult(c.conditionResult()).build();
                 })
                 .toList();
@@ -221,23 +220,22 @@ public class FlowServiceImpl implements FlowService {
     }
 
 
-//TODO 추가 구현 해야함
     private Map<Long, Long> updateNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
         //node
-        //
         List<Long> requestIds = nodes.stream()
                 .map(NodeInfo::nodeId)
                 .toList();
 
         //업데이트 전 노드 아이디 리스트
-        List<Long> existingIds = nodeRepository.findAllByFlowId(savedFlow.getId()).stream()
-                .map(n -> n.getId())
+        List<Long> existingIds = nodeRepository.findAllByFlowId(
+                savedFlow.getId()).stream()
+                .map(Node::getId)
                 .toList();
 
-        //수정 안된 기존 노드(양수)
+        //삭제 되지 않은 기존 노드 아이디 리스트(양수) TODO node_config 수정 고려해야함
         List<Long> requestExistingIds = nodes.stream()
                 .filter(n -> !n.isNew())
-                .map(n ->n.nodeId())
+                .map(NodeInfo :: nodeId)
                 .toList();
 
         //삭제해야할 노드
@@ -253,7 +251,15 @@ public class FlowServiceImpl implements FlowService {
 
         nodes.stream()
                 .filter(n -> !n.isNew())
-                .forEach(n -> existingNodeMap.get(n.nodeId()).update(n));
+                .forEach(n -> {
+                    Node node = existingNodeMap.get(n.nodeId());
+                    if(node != null){
+                        node.update(n);
+                    }else{
+                        throw new InvalidNodeException(n.nodeId());
+                    }
+                });
+
 
         // 신규 노드 저장 & 임시id → 실제id 매핑
         // key: 임시id(음수), value: 실제 저장된 id
@@ -272,9 +278,9 @@ public class FlowServiceImpl implements FlowService {
     private void updateConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections, Map<Long, Long> tempIdMap) {
 
         // connection은 전체 교체
-        // 노드 구조가 바뀌면 어차피 재구성되는 경우가 많고
-        // id 유지할 이유가 없음
+        //TODO 노드 구조가 바뀌면 어차피 재구성되는 경우가 많음 -> connection id 없이 소스노드/타겟노드 id로 복합키 PK도 괜찮을듯
         connectionRepository.deleteAllByFlowId(savedFlow.getId());
+        connectionRepository.flush();
 
         List<Connection> newConnections = connections.stream()
                 .map(c -> {
@@ -296,7 +302,7 @@ public class FlowServiceImpl implements FlowService {
 
 
     private void updateSchedules(Flow savedFlow, @NotNull List<FlowScheduleInfo> schedules) {
-        // schedule도 전체 교체
+        // schedule 전체 교체
         flowScheduleRepository.deleteAllByFlowId(savedFlow.getId());
 
         List<FlowSchedule> newSchedules = schedules.stream()

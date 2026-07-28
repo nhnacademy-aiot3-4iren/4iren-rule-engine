@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 public record NodeInfo(
-//        @NotNull
-        Long nodeId,
+        @NotNull
+        Long nodeId,//양수: 기존에 있던 노드, 음수: 새로 생성된 노드의 임시 아이디 -> 재할당
         @NotNull
         Long flowId,
         @NotBlank
@@ -19,10 +19,10 @@ public record NodeInfo(
         @NotNull
         String nodeConfig,
 
-        int cooldownSec
+        Integer cooldownSec
 
 ) {
         public boolean isNew() {
-                return nodeId == null || nodeId < 0;
+                return nodeId < 0;
         }
 }
