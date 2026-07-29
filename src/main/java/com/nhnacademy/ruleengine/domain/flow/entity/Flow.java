@@ -9,6 +9,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -44,6 +46,19 @@ public class Flow {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Node> nodes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Connection> connections = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<FlowSchedule> schedules = new ArrayList<>();
+
 
     //템플릿일경우  room_id, is_active null
 

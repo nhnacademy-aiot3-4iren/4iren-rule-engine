@@ -38,7 +38,7 @@ public record FlowDetailResponse (
         List<ConnectionResponse> connections,
 
         LocalDateTime createdAt,
-
+        @NotNull
         LocalDateTime updatedAt
 ){
 
@@ -58,6 +58,8 @@ public record FlowDetailResponse (
                 .hasSchedule(hasSchedule)
                 .schedules(FlowScheduleResponse.fromList(schedules))
                 .nodes(NodeResponse.fromList(nodes))
-                .connections(ConnectionResponse.fromList(connections)).build();
+                .connections(ConnectionResponse.fromList(connections))
+                .createdAt(flow.getCreatedAt())
+                .updatedAt(flow.getUpdatedAt()).build();
     }
 }

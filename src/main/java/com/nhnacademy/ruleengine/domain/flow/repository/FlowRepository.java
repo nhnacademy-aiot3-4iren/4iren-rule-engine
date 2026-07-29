@@ -16,4 +16,5 @@ public interface FlowRepository extends JpaRepository<Flow, Long > {
     List<Flow> findAllByRoomId(Long roomId);
 
     List<Flow> findAllByIsTemplate(boolean isTemplate);
+
 }

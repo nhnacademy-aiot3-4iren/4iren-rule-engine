@@ -8,6 +8,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @Getter
 @Entity
@@ -39,6 +43,12 @@ public class Node {
 
     @Column(name = "cooldown_sec")
     private Integer cooldownSec;
+
+    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> outgoingConnections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> incomingConnections = new ArrayList<>();
 
     public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
         this.flow = flow;
