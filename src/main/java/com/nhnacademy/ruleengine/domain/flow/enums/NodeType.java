@@ -9,9 +9,8 @@ public enum NodeType {
     DURATION("지속시간"),
 
     //action
-    ALERT("알람(텔레그램)"),
-    LOGGING("로그 저장");
-
+    ALERT("알람(텔레그램)")
+    ;
     private final String description;
 
     NodeType(String description) {

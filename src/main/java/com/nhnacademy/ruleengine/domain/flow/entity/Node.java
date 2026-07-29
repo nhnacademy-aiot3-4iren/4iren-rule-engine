@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -32,12 +33,12 @@ public class Node {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "node_config", nullable = false)
-    private String nodeConfig;
+    private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")
     private Integer cooldownSec;
 
-    public Node(Flow flow, String nodeName, NodeType nodeType, String nodeConfig, Integer cooldownSec) {
+    public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
         this.flow = flow;
         this.nodeName = nodeName;
         this.nodeType = nodeType;

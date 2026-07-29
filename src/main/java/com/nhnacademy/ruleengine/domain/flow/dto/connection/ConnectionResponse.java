@@ -9,13 +9,12 @@ import java.util.List;
 
 @Builder
 public record ConnectionResponse (
-        @NotNull
         Long connectionId,
-        @NotNull
+
         Long flowId,
-        @NotNull
+
         Long sourceNodeId,
-        @NotNull
+
         Long targetNodeId,
 
         ConditionResult conditionResult

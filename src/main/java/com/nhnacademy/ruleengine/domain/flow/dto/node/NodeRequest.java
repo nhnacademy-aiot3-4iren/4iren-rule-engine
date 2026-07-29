@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.node;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
@@ -10,7 +11,7 @@ public record NodeRequest(
         @Length(max = 20)
         NodeType nodeType,
         @NotNull
-        String nodeConfig,
+        NodeConfig nodeConfig,
         int cooldownSec
 ) {
 }
