@@ -29,18 +29,6 @@ Accept: {{contentType}}
   "flowName": "CO2 임계치 알림 플로우",
   "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
   "isActive": true,
-  "schedules": [
-    {
-      "dayOfWeek": "MONDAY",
-      "startTime": "09:00:00",
-      "endTime": "18:00:00"
-    },
-    {
-      "dayOfWeek": "TUESDAY",
-      "startTime": "09:00:00",
-      "endTime": "18:00:00"
-    }
-  ],
   "nodes": [
     {
       "tempNodeId": -1,
@@ -238,18 +226,6 @@ Accept: {{contentType}}
       "sourceNodeId": 1,
       "targetNodeId": -1,
       "conditionResult": "TRUE"
-    }
-  ],
-  "schedules": [
-    {
-      "dayOfWeek": "MONDAY",
-      "startTime": "09:00:00",
-      "endTime": "18:00:00"
-    },
-    {
-      "dayOfWeek": "FRIDAY",
-      "startTime": "09:00:00",
-      "endTime": "17:00:00"
     }
   ]
 }

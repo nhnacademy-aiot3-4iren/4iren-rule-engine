@@ -25,8 +25,8 @@ public record FlowCreateRequest(
         @NotNull
         Boolean isActive,
 
-        @NotNull
-        List<FlowScheduleRequest> schedules,
+//        @NotNull
+//        List<FlowScheduleRequest> schedules,
 
         @NotEmpty
         List<NodeRequest> nodes,

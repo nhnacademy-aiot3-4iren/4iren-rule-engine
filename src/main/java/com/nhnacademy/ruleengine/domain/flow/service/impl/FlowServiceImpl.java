@@ -56,7 +56,7 @@ public class FlowServiceImpl implements FlowService {
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
-        saveSchedules(savedFlow, request.schedules());
+//        saveSchedules(savedFlow, request.schedules());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함1.
 
         return FlowCreateResponse.of(savedFlow.getId());
@@ -76,7 +76,7 @@ public class FlowServiceImpl implements FlowService {
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes());
         saveConnections(savedFlow, request.connections(), tempIdMap);
-        saveSchedules(savedFlow, request.schedules());
+//        saveSchedules(savedFlow, request.schedules());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함2.
 
         return FlowCreateResponse.of(savedFlow.getId());
@@ -140,7 +140,7 @@ public class FlowServiceImpl implements FlowService {
         //update
         Map<Long, Long> tempIdMap = updateNodes(flow, request.nodes());
         updateConnections(flow, request.connections(),tempIdMap);
-        updateSchedules(flow, request.schedules());
+//        updateSchedules(flow, request.schedules());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함3.
     }
 

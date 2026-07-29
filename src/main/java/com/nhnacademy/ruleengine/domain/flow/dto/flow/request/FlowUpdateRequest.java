@@ -26,10 +26,10 @@ public record FlowUpdateRequest(
         List<NodeInfo> nodes,
 
         @NotNull
-        List<ConnectionInfo> connections,
+        List<ConnectionInfo> connections
 
-        @NotNull
-        List<FlowScheduleInfo> schedules
+//        @NotNull
+//        List<FlowScheduleInfo> schedules
 ) {
 
 }
