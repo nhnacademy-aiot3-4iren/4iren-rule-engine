@@ -22,7 +22,7 @@ public record AlertNodeConfig(
     AlertChannel channel,
 
     @NotBlank
-    String chatid,
+    String chatId,
 
     @NotBlank
     String messageTemplate,

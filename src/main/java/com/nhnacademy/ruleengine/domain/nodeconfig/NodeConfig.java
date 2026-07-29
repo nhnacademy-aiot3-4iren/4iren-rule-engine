@@ -14,7 +14,8 @@ import java.time.Duration;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "nodeType"
+        property = "nodeType",
+        visible = true
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ThresholdNodeConfig.class, name = "THRESHOLD"),

@@ -43,19 +43,35 @@ Accept: {{contentType}}
   ],
   "nodes": [
     {
-      "tempNodeId" : -1,
+      "tempNodeId": -1,
       "nodeName": "CO2 임계치 조건",
       "nodeType": "THRESHOLD",
       "cooldownSec": 60,
-      "nodeConfig": "{\"sensorType\": \"CO2\", \"operator\": \"GTE\", \"threshold\": 1000, \"unit\": \"PPM\", \"validDurationSec\": 60, \"x\": 120, \"y\": 180}"
-
+      "nodeConfig": {
+        "nodeType": "THRESHOLD",
+        "sensorType": "CO2",
+        "operator": "GTE",
+        "threshold": 1000,
+        "unit": "PPM",
+        "validDurationSec": 60,
+        "x": 120,
+        "y": 180
+      }
     },
     {
-      "tempNodeId" : -2,
+      "tempNodeId": -2,
       "nodeName": "텔레그램 알림",
       "nodeType": "ALERT",
       "cooldownSec": 300,
-      "nodeConfig": "{\"channel\": \"TELEGRAM\", \"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 높습니다.\",\"dedupWindowSec\": 300,\"x\": 420,\"y\": 180}"
+      "nodeConfig": {
+        "nodeType": "ALERT",
+        "channel": "TELEGRAM",
+        "chatId": "123456789",
+        "messageTemplate": "[경고] CO2 농도가 높습니다.",
+        "dedupWindowSec": 300,
+        "x": 420,
+        "y": 180
+      }
     }
   ],
   "connections": [
@@ -66,6 +82,51 @@ Accept: {{contentType}}
     }
   ]
 }
+
+
+###
+#{
+#  "flowName": "CO2 임계치 알림 플로우",
+#  "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
+#  "isActive": true,
+#  "schedules": [
+#    {
+#      "dayOfWeek": "MONDAY",
+#      "startTime": "09:00:00",
+#      "endTime": "18:00:00"
+#    },
+#    {
+#      "dayOfWeek": "TUESDAY",
+#      "startTime": "09:00:00",
+#      "endTime": "18:00:00"
+#    }
+#  ],
+#  "nodes": [
+#    {
+#      "tempNodeId" : -1,
+#      "nodeName": "CO2 임계치 조건",
+#      "nodeType": "THRESHOLD",
+#      "cooldownSec": 60,
+#      "nodeConfig": "{\"sensorType\": \"CO2\", \"operator\": \"GTE\", \"threshold\": 1000, \"unit\": \"PPM\", \"validDurationSec\": 60, \"x\": 120, \"y\": 180}"
+#
+#    },
+#    {
+#      "tempNodeId" : -2,
+#      "nodeName": "텔레그램 알림",
+#      "nodeType": "ALERT",
+#      "cooldownSec": 300,
+#      "nodeConfig": "{\"channel\": \"TELEGRAM\", \"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 높습니다.\",\"dedupWindowSec\": 300,\"x\": 420,\"y\": 180}"
+#    }
+#  ],
+#  "connections": [
+#    {
+#      "sourceNodeId": -1,
+#      "targetNodeId": -2,
+#      "conditionResult": "TRUE"
+#    }
+#  ]
+#}
+###
 
 ### 6. 템플릿으로 플로우 생성
 # 주의:

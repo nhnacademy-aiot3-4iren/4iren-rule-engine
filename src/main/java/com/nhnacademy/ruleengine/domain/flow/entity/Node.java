@@ -3,6 +3,7 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -31,8 +32,9 @@ public class Node {
     @Column(name = "node_type", nullable = false, length = 20)
     private NodeType nodeType;
 
-    @JdbcTypeCode(SqlTypes.JSON)
+//    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "node_config", nullable = false)
+    @Convert(converter = NodeConfigConverter.class)
     private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")

@@ -19,7 +19,7 @@ public record FlowResponse(
         boolean hasSchedule,
 
         //TODO schedules 필요할 수 있음
-        //List<FlowSchduleRespone> schedules
+//        List<FlowSchduleRespone> schedules,
 
         boolean isActive,
 
