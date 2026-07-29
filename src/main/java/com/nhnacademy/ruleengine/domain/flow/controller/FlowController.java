@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.flow.controller;
 
-
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
@@ -76,15 +75,17 @@ public class FlowController {
             @PathVariable("flow_id") Long flowId,
             @Valid @RequestBody FlowUpdateRequest request) {
         flowService.updateFlow(roomId, flowId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    // 플로우 삭제
+    //플로우 삭제
     @DeleteMapping("/{flow_id}")
     public ResponseEntity<Void> deleteFlow(
             @PathVariable("room_id") Long roomId,
             @PathVariable("flow_id") Long flowId) {
         flowService.deleteFlow(roomId, flowId);
+
         return ResponseEntity.noContent().build();
     }
+
 }

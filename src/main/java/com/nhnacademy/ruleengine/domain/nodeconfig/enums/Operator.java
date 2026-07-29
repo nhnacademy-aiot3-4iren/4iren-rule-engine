@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.common.enums;
+package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 import lombok.Getter;
 

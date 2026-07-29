@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.common.enums;
+package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 public enum AlertChannel {
     TELEGRAM("텔레그램");

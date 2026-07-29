@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.impl;
 
-import com.nhnacademy.ruleengine.common.enums.GradiantDirection;
-import com.nhnacademy.ruleengine.common.enums.Operator;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.GradiantDirection;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;

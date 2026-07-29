@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.impl;
 
-import com.nhnacademy.ruleengine.common.enums.AlertChannel;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
 import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.validation.constraints.NotBlank;
