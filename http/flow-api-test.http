@@ -185,25 +185,47 @@ Accept: {{contentType}}
   "isActive": true,
   "nodes": [
     {
-      "nodeId": 1,
+      "tempNodeId": -1,
       "nodeName": "CO2 임계치 조건",
       "nodeType": "THRESHOLD",
       "cooldownSec": 60,
-      "nodeConfig": "{\"sensorType\": \"CO2\",\"operator\": \"GTE\",\"threshold\": 1200,\"unit\": \"PPM\",\"validDurationSec\": 60,\"x\": 100,\"y\": 150}"
+      "nodeConfig": {
+        "nodeType": "THRESHOLD",
+        "sensorType": "CO2",
+        "operator": "GTE",
+        "threshold": 1000,
+        "unit": "PPM",
+        "validDurationSec": 60,
+        "x": 120,
+        "y": 180
+      }
     },
     {
-      "nodeId": 2,
+      "tempNodeId": -2,
       "nodeName": "텔레그램 알림",
       "nodeType": "ALERT",
       "cooldownSec": 300,
-      "nodeConfig": "{\"channel\": \"TELEGRAM\",\"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 1200ppm 이상입니다.\",\"dedupWindowSec\": 300,\"x\": 380,\"y\": 120}"
+      "nodeConfig": {
+        "nodeType": "ALERT",
+        "channel": "TELEGRAM",
+        "chatId": "123456789",
+        "messageTemplate": "[경고] CO2 농도가 높습니다.",
+        "dedupWindowSec": 300,
+        "x": 421,
+        "y": 180
+      }
     },
     {
       "nodeId": -1,
       "nodeName": "로그 저장",
       "nodeType": "LOGGING",
       "cooldownSec": 60,
-      "nodeConfig": "{\"logLevel\": \"INFO\",\"messageTemplate\": \"[RULE] CO2 초과 감지\",\"x\": 380, \"y\": 240}"
+      "nodeConfig": {
+        "logLevel": "INFO",
+        "messageTemplate":
+        "[RULE] CO2 초과 감지",
+        "x": 380, "y": 240
+      }
     }
   ],
   "connections": [
