@@ -10,21 +10,19 @@ import java.time.LocalDateTime;
 
 @Builder
 public record FlowResponse(
-        @NotNull
         Long flowId,
-        @NotBlank
-        @Length(max = 50)
+
         String flowName,
-        @Length(max = 255)
+
         String description,
-        @NotNull
+
         boolean hasSchedule,
 
         //TODO schedules 필요할 수 있음
         //List<FlowSchduleRespone> schedules
-        @NotNull
+
         boolean isActive,
-        @NotNull
+
         LocalDateTime createdAt,
 
         LocalDateTime updatedAt

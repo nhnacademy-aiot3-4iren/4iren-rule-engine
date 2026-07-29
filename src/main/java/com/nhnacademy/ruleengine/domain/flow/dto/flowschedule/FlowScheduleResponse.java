@@ -10,13 +10,12 @@ import java.util.List;
 
 @Builder
 public record FlowScheduleResponse (
-        @NotNull
         Long scheduleId,
-        @NotNull
+
         DayOfWeek dayOfWeek,
-        @NotNull
+
         LocalTime startTime,
-        @NotNull
+
         LocalTime endTime
 ){
     public static FlowScheduleResponse from(FlowSchedule schedule){

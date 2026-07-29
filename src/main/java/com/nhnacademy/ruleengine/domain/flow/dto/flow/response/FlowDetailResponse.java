@@ -19,26 +19,24 @@ import java.util.List;
 
 @Builder
 public record FlowDetailResponse (
-        @NotNull
         Long flowId,
-        @NotNull
+
         Long roomId,
-        @Length(max = 50)
-        @NotBlank
+
         String flowName,
-        @Length(max = 255)
+
         String description,
-        @NotNull
+
         boolean isActive,
-        @NotNull
+
         boolean hasSchedule,
-        @NotEmpty
+
         List<NodeResponse> nodes,
-        @NotNull
+
         List<FlowScheduleResponse> schedules,
-        @NotNull
+
         List<ConnectionResponse> connections,
-        @NotNull
+
         LocalDateTime createdAt,
 
         LocalDateTime updatedAt

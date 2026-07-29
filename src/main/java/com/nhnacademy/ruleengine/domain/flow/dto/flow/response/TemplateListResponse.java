@@ -10,7 +10,6 @@ import java.util.Map;
 
 @Builder
 public record TemplateListResponse(
-        @NotNull
         List<TemplateResponse> templateResponseList
 ) {
     public static TemplateListResponse from(

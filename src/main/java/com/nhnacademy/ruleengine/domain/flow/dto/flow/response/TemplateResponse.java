@@ -13,14 +13,12 @@ import java.util.Map;
 
 @Builder
 public record TemplateResponse(
-        @NotNull
         Long templateId,
-        @Length(max = 50)
-        @NotBlank
+
         String templateName,
-        @Length(max = 255)
+
         String description,
-        @NotEmpty
+
         List<SensorType> sensorTypes
 ) {
     public static TemplateResponse from(
