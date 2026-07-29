@@ -9,18 +9,18 @@ import org.hibernate.validator.constraints.Length;
 public record NodeInfo(
         @NotNull
         Long nodeId,//양수: 기존에 있던 노드, 음수: 새로 생성된 노드의 임시 아이디 -> 재할당
-        @NotNull
-        Long flowId,
         @NotBlank
         @Length(max = 50)
         String nodeName,
         @NotNull
         @Length(max = 20)
         NodeType nodeType,
-        @NotNull
-        NodeConfig nodeConfig,
 
-        Integer cooldownSec
+        Integer cooldownSec,
+
+        @NotNull
+        NodeConfig nodeConfig
+
 
 ) {
         public boolean isNew() {

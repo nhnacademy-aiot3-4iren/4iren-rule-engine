@@ -49,7 +49,7 @@ public class FlowServiceImpl implements FlowService {
                 .roomId(roomId)
                 .flowName(request.flowName())
                 .description(request.description())
-                .isActive(request.isActive())
+                .isActive(true)
                 .isTemplate(false).build();
 
         Flow savedFlow = flowRepository.save(flow);
@@ -69,7 +69,7 @@ public class FlowServiceImpl implements FlowService {
                 .roomId(roomId)
                 .flowName(request.flowName())
                 .description(request.description())
-                .isActive(request.isActive())
+                .isActive(true)
                 .isTemplate(false).build();
 
         Flow savedFlow = flowRepository.save(flow);

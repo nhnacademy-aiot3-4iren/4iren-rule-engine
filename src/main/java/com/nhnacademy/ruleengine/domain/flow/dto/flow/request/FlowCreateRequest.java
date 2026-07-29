@@ -22,9 +22,6 @@ public record FlowCreateRequest(
         @Length(max = 255)
         String description,
 
-        @NotNull
-        Boolean isActive,
-
 //        @NotNull
 //        List<FlowScheduleRequest> schedules,
 

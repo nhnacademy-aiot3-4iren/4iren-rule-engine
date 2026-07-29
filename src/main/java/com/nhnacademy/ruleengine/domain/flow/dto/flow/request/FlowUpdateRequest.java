@@ -13,9 +13,11 @@ import java.util.List;
 public record FlowUpdateRequest(
         @NotNull
         Long flowId,
+
         @Length(max = 50)
         @NotBlank
         String flowName,
+
         @Length(max = 255)
         String description,
 

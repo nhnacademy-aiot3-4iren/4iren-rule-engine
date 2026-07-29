@@ -28,7 +28,6 @@ Accept: {{contentType}}
 {
   "flowName": "CO2 임계치 알림 플로우",
   "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
-  "isActive": true,
   "nodes": [
     {
       "tempNodeId": -1,
@@ -71,51 +70,6 @@ Accept: {{contentType}}
   ]
 }
 
-
-###
-#{
-#  "flowName": "CO2 임계치 알림 플로우",
-#  "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
-#  "isActive": true,
-#  "schedules": [
-#    {
-#      "dayOfWeek": "MONDAY",
-#      "startTime": "09:00:00",
-#      "endTime": "18:00:00"
-#    },
-#    {
-#      "dayOfWeek": "TUESDAY",
-#      "startTime": "09:00:00",
-#      "endTime": "18:00:00"
-#    }
-#  ],
-#  "nodes": [
-#    {
-#      "tempNodeId" : -1,
-#      "nodeName": "CO2 임계치 조건",
-#      "nodeType": "THRESHOLD",
-#      "cooldownSec": 60,
-#      "nodeConfig": "{\"sensorType\": \"CO2\", \"operator\": \"GTE\", \"threshold\": 1000, \"unit\": \"PPM\", \"validDurationSec\": 60, \"x\": 120, \"y\": 180}"
-#
-#    },
-#    {
-#      "tempNodeId" : -2,
-#      "nodeName": "텔레그램 알림",
-#      "nodeType": "ALERT",
-#      "cooldownSec": 300,
-#      "nodeConfig": "{\"channel\": \"TELEGRAM\", \"chatId\": \"123456789\",\"messageTemplate\": \"[경고] CO2 농도가 높습니다.\",\"dedupWindowSec\": 300,\"x\": 420,\"y\": 180}"
-#    }
-#  ],
-#  "connections": [
-#    {
-#      "sourceNodeId": -1,
-#      "targetNodeId": -2,
-#      "conditionResult": "TRUE"
-#    }
-#  ]
-#}
-###
-
 ### 6. 템플릿으로 플로우 생성
 # 주의:
 # - 현재 API 스펙상 nodes, connections를 같이 받도록 되어 있음
@@ -128,28 +82,37 @@ Accept: {{contentType}}
 {
   "flowName": "템플릿 기반 환기 플로우",
   "description": "템플릿을 기반으로 생성한 플로우",
-  "isActive": true,
-  "schedules": [
-    {
-      "dayOfWeek": "WEDNESDAY",
-      "startTime": "09:00:00",
-      "endTime": "18:00:00"
-    }
-  ],
   "nodes": [
     {
       "tempNodeId" : -1,
       "nodeName": "CO2 평균값 조건",
       "nodeType": "AVERAGE",
       "cooldownSec": 120,
-      "nodeConfig": "{\"sensorType\": \"CO2\",\"operator\": \"GTE\",\"average\": 1200,\"windowSec\": 600,\"unit\": \"PPM\",\"x\": 100,\"y\": 150}"
+      "nodeConfig": {
+        "nodeType": "AVERAGE",
+        "sensorType": "CO2",
+        "operator": "GTE",
+        "average": 1200,
+        "windowSec": 600,
+        "unit": "PPM",
+        "x": 100,
+        "y": 150
+      }
     },
     {
-      "tempNodeId" : -2,
-      "nodeName": "로그 저장",
-      "nodeType": "LOGGING",
-      "cooldownSec": 60,
-      "nodeConfig": "{\"logLevel\": \"WARN\",\"messageTemplate\": \"[WARN] CO2 평균치 초과\",\"x\": 400,\"y\": 150}"
+      "tempNodeId": -2,
+      "nodeName": "텔레그램 알림",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
+      "nodeConfig": {
+        "nodeType": "ALERT",
+        "channel": "TELEGRAM",
+        "chatId": "123456789",
+        "messageTemplate": "[경고] CO2 농도가 높습니다.",
+        "dedupWindowSec": 300,
+        "x": 421,
+        "y": 180
+      }
     }
   ],
   "connections": [
@@ -173,7 +136,7 @@ Accept: {{contentType}}
   "isActive": true,
   "nodes": [
     {
-      "tempNodeId": -1,
+      "nodeId": 1,
       "nodeName": "CO2 임계치 조건",
       "nodeType": "THRESHOLD",
       "cooldownSec": 60,
@@ -189,7 +152,7 @@ Accept: {{contentType}}
       }
     },
     {
-      "tempNodeId": -2,
+      "nodeId": 2,
       "nodeName": "텔레그램 알림",
       "nodeType": "ALERT",
       "cooldownSec": 300,
@@ -205,14 +168,17 @@ Accept: {{contentType}}
     },
     {
       "nodeId": -1,
-      "nodeName": "로그 저장",
-      "nodeType": "LOGGING",
-      "cooldownSec": 60,
+      "nodeName": "텔레그램 알림2",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
       "nodeConfig": {
-        "logLevel": "INFO",
-        "messageTemplate":
-        "[RULE] CO2 초과 감지",
-        "x": 380, "y": 240
+        "nodeType": "ALERT",
+        "channel": "TELEGRAM",
+        "chatId": "123456789",
+        "messageTemplate": "[경고] CO2 농도가 높습니다.",
+        "dedupWindowSec": 300,
+        "x": 421,
+        "y": 180
       }
     }
   ],
@@ -233,12 +199,3 @@ Accept: {{contentType}}
 ### 8. 플로우 삭제
 DELETE {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
 Accept: {{contentType}}
-
-### 9. 플로우 활성화/비활성화 (보류 기능)
-PATCH {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}/active
-Content-Type: {{contentType}}
-Accept: {{contentType}}
-
-{
-  "isActive": false
-}
