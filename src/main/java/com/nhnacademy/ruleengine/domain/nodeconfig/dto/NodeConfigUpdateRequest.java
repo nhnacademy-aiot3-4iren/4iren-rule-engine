@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 public record NodeConfigUpdateRequest(
         @NonNull
-        Long tempNodeId,
+        Long nodeId,
 
         @NotNull
         NodeType nodeType,
