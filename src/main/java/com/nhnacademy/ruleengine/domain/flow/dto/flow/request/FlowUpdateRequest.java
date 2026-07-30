@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow.request;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
-import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

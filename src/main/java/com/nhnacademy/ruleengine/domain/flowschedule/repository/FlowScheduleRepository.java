@@ -1,7 +1,6 @@
-package com.nhnacademy.ruleengine.domain.flow.repository;
+package com.nhnacademy.ruleengine.domain.flowschedule.repository;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

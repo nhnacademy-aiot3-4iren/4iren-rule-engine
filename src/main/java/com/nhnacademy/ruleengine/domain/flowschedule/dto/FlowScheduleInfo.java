@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
+package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -14,5 +14,4 @@ public record FlowScheduleInfo(
         @NotNull
         LocalTime endTime
 ) {
-
 }

@@ -1,18 +1,14 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionResponse;
-import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleResponse;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleResponse;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
-import jakarta.validation.constraints.Negative;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.List;

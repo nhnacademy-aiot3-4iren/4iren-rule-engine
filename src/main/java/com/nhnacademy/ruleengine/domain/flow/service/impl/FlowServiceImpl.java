@@ -9,14 +9,14 @@ import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
-import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleInfo;
-import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleRequest;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
 import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,6 @@ public class FlowServiceImpl implements FlowService {
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
-//        saveSchedules(savedFlow, request.schedules());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함1.
 
         return FlowCreateResponse.of(savedFlow.getId());
@@ -76,9 +75,8 @@ public class FlowServiceImpl implements FlowService {
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes());
         saveConnections(savedFlow, request.connections(), tempIdMap);
-//        saveSchedules(savedFlow, request.schedules());
         //TODO 이어지지 않은 노드나 순환 연결된 노드 검증 필요함2.
-
+        //TODO isTemplate 검증 필요
         return FlowCreateResponse.of(savedFlow.getId());
     }
 
@@ -203,21 +201,7 @@ public class FlowServiceImpl implements FlowService {
     }
 
 
-    private void saveSchedules(Flow savedFlow, @NotNull List<FlowScheduleRequest> schedules) {
-        if(schedules.isEmpty()){
-            return;
-        }
 
-        List<FlowSchedule> scheduleList = schedules.stream()
-                .map(s-> FlowSchedule.builder()
-                        .flow(savedFlow)
-                        .dayOfWeek(s.dayOfWeek())
-                        .startTime(s.startTime())
-                        .endTime(s.endTime()).build())
-                .toList();
-
-        List<FlowSchedule> savedScheduleList = flowScheduleRepository.saveAll(scheduleList);
-    }
 
 
     private Map<Long, Long> updateNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
@@ -301,16 +285,6 @@ public class FlowServiceImpl implements FlowService {
     }
 
 
-    private void updateSchedules(Flow savedFlow, @NotNull List<FlowScheduleInfo> schedules) {
-        // schedule 전체 교체
-        flowScheduleRepository.deleteAllByFlowId(savedFlow.getId());
-
-        List<FlowSchedule> newSchedules = schedules.stream()
-                .map(s -> FlowSchedule.create(savedFlow, s))
-                .toList();
-
-        flowScheduleRepository.saveAll(newSchedules);
-    }
 
     private Map<Long, List<SensorType>> getSensorTypesByFlowId(List<Flow> templateFlows){
         List<FlowTemplateSensorType> allFlowTemplateSensorTypes = flowTemplateSensorTypeRespository.findAllByFlowIn(templateFlows);

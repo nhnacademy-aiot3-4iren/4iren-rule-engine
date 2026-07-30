@@ -1,7 +1,6 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flowschedule;
+package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.FlowSchedule;
-import jakarta.validation.constraints.NotNull;
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import lombok.Builder;
 
 import java.time.DayOfWeek;

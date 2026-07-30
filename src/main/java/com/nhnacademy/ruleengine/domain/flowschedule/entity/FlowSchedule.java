@@ -1,10 +1,11 @@
-package com.nhnacademy.ruleengine.domain.flow.entity;
+package com.nhnacademy.ruleengine.domain.flowschedule.entity;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.flowschedule.FlowScheduleInfo;
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
@@ -41,9 +42,9 @@ public class FlowSchedule {
         this.endTime = endTime;
     }
 
-    public static FlowSchedule create(Flow flow, FlowScheduleInfo flowScheduleInfo){
+    public static FlowSchedule create(Flow flow, FlowScheduleCreateRequest request){
         return FlowSchedule.builder()
-                .flow(flow).dayOfWeek(flowScheduleInfo.dayOfWeek()).startTime(flowScheduleInfo.startTime()).endTime(flowScheduleInfo.endTime()).build();
+                .flow(flow).dayOfWeek(request.dayOfWeek()).startTime(request.startTime()).endTime(request.endTime()).build();
     }
 
 }
