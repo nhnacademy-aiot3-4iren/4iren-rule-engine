@@ -1,8 +1,8 @@
-package com.nhnacademy.ruleengine.domain.flowschedule.dto;
+package com.nhnacademy.ruleengine.domain.nodeconfig.dto;
 
 import java.util.Map;
 
-public record DeviceResponse(
+public record DevNSensorTypeInfo(
         Long roomId,
         String devEui,
         String deviceName,
