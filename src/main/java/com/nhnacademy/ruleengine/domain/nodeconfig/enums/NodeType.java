@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.enums;
+package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 
 public enum NodeType {

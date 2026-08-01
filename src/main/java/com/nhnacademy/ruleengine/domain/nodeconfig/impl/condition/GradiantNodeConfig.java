@@ -1,13 +1,15 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.impl;
+package com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition;
 
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.GradiantDirection;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
-import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record AverageNodeConfig(
+public record GradiantNodeConfig(
+
         @NotNull
         NodeType nodeType,
 
@@ -19,17 +21,18 @@ public record AverageNodeConfig(
 
         @NotNull
         SensorType sensorType,
-
         @NotNull
         Operator operator,
-
         @NotNull
-        Double average,
-
+        double gradiant,
         @NotNull
         @Positive
         Integer windowSec,
 
-        String unit
-) implements NodeConfig {
+        String unit,
+
+        GradiantDirection direction,
+
+        String targetSensor
+)implements NodeConfig {
 }

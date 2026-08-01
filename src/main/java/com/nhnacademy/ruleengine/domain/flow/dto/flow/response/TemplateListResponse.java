@@ -1,8 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
-import jakarta.validation.constraints.NotNull;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import lombok.Builder;
 
 import java.util.List;

@@ -1,14 +1,13 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.impl;
+package com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
-import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record DurationNodeConfig(
-
+public record AverageNodeConfig(
         @NotNull
         NodeType nodeType,
 
@@ -25,13 +24,12 @@ public record DurationNodeConfig(
         Operator operator,
 
         @NotNull
-        Double threshold,
+        Double average,
 
         @NotNull
         @Positive
-        Integer durationSec,
+        Integer windowSec,
 
         String unit
-
 ) implements NodeConfig {
 }
