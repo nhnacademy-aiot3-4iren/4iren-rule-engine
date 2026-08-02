@@ -2,34 +2,45 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.service.impl;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.NodeNotFoundException;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
-import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DevNSensorTypeInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeDefaultConfigResponse;
+import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.external.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class NodeConfigServiceImpl implements NodeConfigService {
     private final NodeRepository nodeRepository;
+    private final SensorStaticMetaService sensorStaticMetaService;
+    //노드 상세 조회(node_config)
+    //nodeId가 음수면 nodeConfig null, nodeType이 행동노드면 sensorStaticMetaList null
+
+
+
     @Override
-    public NodeConfigResponse getNodeConfigDetail(Long nodeId) {
-        Node node = nodeRepository.findById(nodeId).orElseThrow(()->new NodeNotFoundException(nodeId));
-        return  NodeConfigResponse.from(node);
+    public NodeConfigResponse getNodeConfigNMeta(Long roomId, Long nodeId, NodeType nodeType) {
+        NodeConfig nodeConfig = null;
+
+        if(nodeId > 0) {
+            Node node = nodeRepository.findById(nodeId).orElseThrow(() -> new NodeNotFoundException(nodeId));
+            nodeConfig = node.getNodeConfig();
+        }
+
+        List<SensorStaticMeta> sensorStaticMetaList = nodeType.isActionNode()
+                ? null
+                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
+
+        return NodeConfigResponse.of(nodeId,nodeConfig, sensorStaticMetaList);
     }
-
-    @Override
-    public NodeDefaultConfigResponse getNodeDefaultConfig(NodeType nodeType, DevNSensorTypeInfo devNSensorTypeInfoInfo) {
-
-
-
-        return null;
-    }
-    //노드 상세 조회 및 설정(node_config)
-    //+ 센서 타입별 기본설정 제공 및 노드 저장시 검증
-    //
 
 }

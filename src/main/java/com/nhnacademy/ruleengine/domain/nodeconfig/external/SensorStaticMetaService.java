@@ -19,6 +19,7 @@ public class SensorStaticMetaService{
     public List<SensorStaticMeta> getSensorStaticMetaList(Long roomId){
         List<ExternalRoomDeviceInfo> devices = roomDeviceCacheService.getRoomDevices(roomId);
 
+
         Map<SensorType, String> unitBySensorType = new EnumMap<>(SensorType.class);//센서 타입별 유닛 매핑
         Map<SensorType, List<DeviceInfo>> deviceOptionsBySensorType = new EnumMap<>(SensorType.class);//센서타입별 기기 정보 매핑
 

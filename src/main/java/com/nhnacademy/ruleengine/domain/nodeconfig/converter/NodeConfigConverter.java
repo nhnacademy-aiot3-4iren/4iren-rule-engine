@@ -1,10 +1,10 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 @Converter
 @Component

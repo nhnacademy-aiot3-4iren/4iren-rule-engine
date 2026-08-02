@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
 
-import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import jakarta.persistence.*;
 import lombok.*;
 
