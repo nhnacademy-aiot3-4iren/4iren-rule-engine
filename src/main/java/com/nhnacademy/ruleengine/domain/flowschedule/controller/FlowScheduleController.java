@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/rooms/{room_id}/flow/{flow_id}/schedules")
+@RequestMapping("/api/rooms/{room-id}/flow/{flow-id}/schedules")
 @RequiredArgsConstructor
 public class FlowScheduleController {
     private final FlowScheduleService flowScheduleService;
@@ -20,8 +20,8 @@ public class FlowScheduleController {
     //플로우 스케줄 생성
     @PostMapping
     public ResponseEntity<FlowScheduleCreateResponse> create(
-            @PathVariable("room_id") Long roomId,
-            @PathVariable("flow_id") Long flowId,
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("flow-id") Long flowId,
             @RequestBody @Valid FlowScheduleCreateRequest request
             ){
 
@@ -32,27 +32,27 @@ public class FlowScheduleController {
     //특정 플로우의 스케줄 목록 조회
     @GetMapping
     public ResponseEntity<FlowScheduleListResponse> getList(
-            @PathVariable("room_id") Long roomId,
-            @PathVariable("flow_id") Long flowId
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("flow-id") Long flowId
     ){
         return ResponseEntity.ok(flowScheduleService.getFlowScheduleList( flowId));
     }
 
     //특정 플로우 스케줄 상세 조회
-    @GetMapping("/{schedule_id}")
+    @GetMapping("/{schedule-id}")
     public ResponseEntity<FlowScheduleResponse> getDetail(
-            @PathVariable("room_id") Long roomId,
-            @PathVariable("flow_id") Long flowId,
-            @PathVariable("schedule_id") Long scheduleId
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("flow-id") Long flowId,
+            @PathVariable("schedule-id") Long scheduleId
     ){
         return ResponseEntity.ok(flowScheduleService.getFlowScheduleDetail(scheduleId));
     }
 
-    @DeleteMapping("/{schedule_id}")
+    @DeleteMapping("/{schedule-id}")
     public ResponseEntity<Void> delete(
-            @PathVariable("room_id") Long roomId,
-            @PathVariable("flow_id") Long flowId,
-            @PathVariable("schedule_id") Long scheduleId
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("flow-id") Long flowId,
+            @PathVariable("schedule-id") Long scheduleId
     ){
         flowScheduleService.deleteFlowSchedule( scheduleId);
         return ResponseEntity.noContent().build();
