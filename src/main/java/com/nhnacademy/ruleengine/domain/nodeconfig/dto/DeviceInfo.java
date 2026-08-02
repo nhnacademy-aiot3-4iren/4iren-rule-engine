@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.dto;
 
 public record DeviceInfo(
-        Long devEui,
+        String devEui,
         String deviceName
 ) {
 }
