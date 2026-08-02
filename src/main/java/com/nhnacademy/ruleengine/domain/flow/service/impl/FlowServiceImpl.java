@@ -12,7 +12,7 @@ import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
-import com.nhnacademy.ruleengine.domain.flow.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
@@ -216,7 +216,7 @@ public class FlowServiceImpl implements FlowService {
                 .map(Node::getId)
                 .toList();
 
-        //삭제 되지 않은 기존 노드 아이디 리스트(양수) TODO node_config 수정 고려해야함
+        //삭제 되지 않은 기존 노드 아이디 리스트(양수)
         List<Long> requestExistingIds = nodes.stream()
                 .filter(n -> !n.isNew())
                 .map(NodeInfo :: nodeId)
@@ -261,7 +261,7 @@ public class FlowServiceImpl implements FlowService {
 
     private void updateConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections, Map<Long, Long> tempIdMap) {
 
-        // connection은 전체 교체
+        // connection 전체 교체
         //TODO 노드 구조가 바뀌면 어차피 재구성되는 경우가 많음 -> connection id 없이 소스노드/타겟노드 id로 복합키 PK도 괜찮을듯
         connectionRepository.deleteAllByFlowId(savedFlow.getId());
         connectionRepository.flush();
