@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.dto.external;
+package com.nhnacademy.ruleengine.domain.nodeconfig.external;
 
 import java.util.Map;
 
