@@ -21,6 +21,10 @@ public record GradiantNodeConfig(
 
         @NotNull
         SensorType sensorType,
+
+        @NotNull
+        String targetDeviceEui,
+
         @NotNull
         Operator operator,
         @NotNull
@@ -29,10 +33,8 @@ public record GradiantNodeConfig(
         @Positive
         Integer windowSec,
 
-        String unit,
+        @NotNull
+        GradiantDirection direction
 
-        GradiantDirection direction,
-
-        String targetSensor
 )implements NodeConfig {
 }

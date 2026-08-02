@@ -21,6 +21,9 @@ public record AverageNodeConfig(
         SensorType sensorType,
 
         @NotNull
+        String targetDeviceEui,
+
+        @NotNull
         Operator operator,
 
         @NotNull
@@ -28,8 +31,8 @@ public record AverageNodeConfig(
 
         @NotNull
         @Positive
-        Integer windowSec,
+        Integer windowSec
 
-        String unit
+
 ) implements NodeConfig {
 }

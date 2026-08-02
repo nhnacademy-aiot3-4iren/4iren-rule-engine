@@ -2,11 +2,11 @@ package com.nhnacademy.ruleengine.domain.nodeconfig;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.impl.AlertNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.impl.AverageNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.impl.GradiantNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.impl.ThresholdNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.impl.action.AlertNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition.AverageNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition.GradiantNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition.ThresholdNodeConfig;
 
 import java.time.Duration;
 
