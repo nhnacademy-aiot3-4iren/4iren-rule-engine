@@ -78,7 +78,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
                 .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementSensorType>
                         .map(sensorType -> Map.entry(//Stream<Map.Entry<SensorType, DeviceInfo>>
                                 measurementSensorTypeMapper.toSensorType(sensorType).orElseThrow(()->new SensorTypeNotFoundException(sensorType)),
-                                DeviceInfo.from(room.devEui(), room.deviceName())
+                                DeviceInfo.of(room.devEui(), room.deviceName())
                         ))
                 ).collect(Collectors.groupingBy(//Map<SensorType, List<DeviceInfo>>
                         Map.Entry::getKey,
