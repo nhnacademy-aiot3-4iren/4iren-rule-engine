@@ -1,14 +1,10 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeMetaResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface NodeConfigService {
 
     //nodeId 있을때 nodeConfig 조회
