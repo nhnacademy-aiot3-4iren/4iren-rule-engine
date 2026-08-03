@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionResponse;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleResponse;

@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow.request;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;

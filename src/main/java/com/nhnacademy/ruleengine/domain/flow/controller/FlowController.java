@@ -1,8 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.controller;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;

@@ -1,6 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
-
-import jakarta.validation.constraints.NotNull;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 public record FlowCreateResponse (
         Long flowId

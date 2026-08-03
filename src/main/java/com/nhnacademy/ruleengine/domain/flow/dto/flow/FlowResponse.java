@@ -1,10 +1,7 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow.response;
+package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 

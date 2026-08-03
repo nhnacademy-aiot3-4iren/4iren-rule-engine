@@ -6,9 +6,7 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionExcep
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowCreateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.request.FlowUpdateRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.response.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
