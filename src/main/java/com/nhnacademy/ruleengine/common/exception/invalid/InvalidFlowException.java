@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.invalid;
 
-public class InvalidFlowException extends RuntimeException {
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class InvalidFlowException extends BusinessException {
     public InvalidFlowException(Long flowId) {
-        super("Invalid Flow: " + flowId);
+        super(ErrorCode.INVALID_FLOW);
     }
 }

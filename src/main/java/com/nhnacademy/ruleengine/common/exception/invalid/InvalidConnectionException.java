@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.invalid;
 
-public class InvalidConnectionException extends RuntimeException {
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+
+public class InvalidConnectionException extends BusinessException {
     public InvalidConnectionException(Long sourceNodeId, Long targetNodeId) {
-        super("Invalid Connection sourceNodeId:"+ sourceNodeId + " targetNodeId: " + targetNodeId);
+        super(ErrorCode.INVALID_CONNECTION);
     }
 }
