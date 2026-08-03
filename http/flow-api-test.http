@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8080
 @roomId = 101
-@flowId = 1
+@flowId = 2
 @templateId = 1
 @contentType = application/json
 
@@ -37,6 +37,7 @@ Accept: {{contentType}}
       "nodeConfig": {
         "nodeType": "THRESHOLD",
         "sensorType": "CO2",
+        "targetDeviceEui" : "24e124126d152862",
         "operator": "GTE",
         "threshold": 1000,
         "unit": "PPM",
@@ -58,6 +59,7 @@ Accept: {{contentType}}
         "dedupWindowSec": 300,
         "x": 420,
         "y": 180
+
       }
     }
   ],
@@ -71,10 +73,6 @@ Accept: {{contentType}}
 }
 
 ### 6. 템플릿으로 플로우 생성
-# 주의:
-# - 현재 API 스펙상 nodes, connections를 같이 받도록 되어 있음
-# - templateId 기반 생성인데 body까지 같이 받는 구조
-
 POST {{baseUrl}}/api/rooms/{{roomId}}/flows/templates/{{templateId}}
 Content-Type: {{contentType}}
 Accept: {{contentType}}

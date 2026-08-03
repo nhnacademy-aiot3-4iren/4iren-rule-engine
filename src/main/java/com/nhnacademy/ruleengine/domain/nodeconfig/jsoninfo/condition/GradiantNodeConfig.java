@@ -1,13 +1,15 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition;
+package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition;
 
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.GradiantDirection;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
-import jakarta.validation.constraints.NotEmpty;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-public record DurationNodeConfig(
+public record GradiantNodeConfig(
+
         @NotNull
         NodeType nodeType,
 
@@ -27,11 +29,14 @@ public record DurationNodeConfig(
         Operator operator,
 
         @NotNull
-        Double threshold,
+        double gradiant,
 
         @NotNull
-        Integer durationSec
+        @Positive
+        Integer windowSec
 
+//        @NotNull
+//        GradiantDirection direction
 
-) implements NodeConfig {
+)implements NodeConfig {
 }

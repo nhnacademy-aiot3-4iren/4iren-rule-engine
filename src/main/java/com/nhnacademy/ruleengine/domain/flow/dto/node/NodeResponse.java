@@ -2,7 +2,7 @@ package com.nhnacademy.ruleengine.domain.flow.dto.node;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import lombok.Builder;
 
 import java.util.List;

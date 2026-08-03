@@ -1,9 +1,9 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.impl.condition;
+package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

@@ -1,9 +1,8 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.impl.action;
+package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
-import jakarta.validation.constraints.Max;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,12 +22,10 @@ public record AlertNodeConfig(
     AlertChannel channel,
 
     @NotBlank
-    String chatId,//TODO notification api명세 확인하기
-
-    @NotBlank
-    String messageTemplate,
+    String messageTemplate,//
 
     @Positive
     Integer dedupWindowSec
 ) implements NodeConfig {
+
 }
