@@ -1,0 +1,48 @@
+@baseUrl = http://localhost:8080
+@roomId = 101
+
+### 1) 신규 조건 노드 생성용 화면 조회 - nodeId <= 0, sensor meta 포함
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/-1?nodeType=THRESHOLD
+Accept: application/json
+
+###
+
+### 2) 신규 조건 노드 생성용 화면 조회 - 평균 노드
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/-1?nodeType=AVERAGE
+Accept: application/json
+
+###
+
+### 3) 기존 조건 노드 상세 조회 - nodeId > 0
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/1?nodeType=THRESHOLD
+Accept: application/json
+
+###
+
+### 4) 기존 액션 노드 상세 조회 - sensorStaticMetaList는 null이어야 함
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/2?nodeType=ALERT
+Accept: application/json
+
+###
+
+### 5) 신규 액션 노드 생성용 화면 조회 - nodeConfig null, sensorStaticMetaList null
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/-1?nodeType=ALERT
+Accept: application/json
+
+###
+
+### 6) 존재하지 않는 nodeId 조회 - 404 기대
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/999999?nodeType=THRESHOLD
+Accept: application/json
+
+###
+
+### 7) 잘못된 nodeType - 400 기대
+GET {{baseUrl}}/api/rooms/{{roomId}}/node-config/-1?nodeType=INVALID_TYPE
+Accept: application/json
+
+###
+
+### 8) roomId가 잘못된 경우 - sensor meta 조회 실패 여부 확인
+GET {{baseUrl}}/api/rooms/999999/node-config/-1?nodeType=THRESHOLD
+Accept: application/json
