@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.unauthorized;
 
-public class UnauthorizedFlowAccessException extends RuntimeException {
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class UnauthorizedFlowAccessException extends BusinessException {
     public UnauthorizedFlowAccessException(Long flowId, Long roomId) {
-        super("Unauthoriwed Flow: " + flowId + "In roomId: " +roomId );
+        super(ErrorCode.UNAUTHORIZED_FLOW_ACCESS );
     }
 }

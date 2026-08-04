@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.notfound;
 
-public class SensorTypeNotFoundException extends RuntimeException {
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class SensorTypeNotFoundException extends BusinessException {
     public SensorTypeNotFoundException(String externalSensorType) {
-        super( "MeasurementType Not Found: "+ externalSensorType);
+        super( "SensorType Not Found: "+ externalSensorType);
     }
 }

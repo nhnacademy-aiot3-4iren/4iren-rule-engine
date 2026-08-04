@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.infra.redis;
+package com.nhnacademy.ruleengine.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
