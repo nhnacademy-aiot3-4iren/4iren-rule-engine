@@ -32,13 +32,14 @@ public class FlowController {
     }
 
     //강의실 별 템플릿 플로우 제안 목록
-    //TODO 테플릿 도메인에 있어야함(추루 Template CRUD 만들게 되면 수정)
+    //TODO 테플릿 도메인에 있어야함(추후 Template CRUD 만들게 되면 수정)
     @GetMapping("/templates")
     public ResponseEntity<TemplateListResponse> getFlowTemplateList(@PathVariable("room-id") Long roomId) {
         TemplateListResponse response = flowService.getFlowTemplateList(roomId);
         return ResponseEntity.ok(response);
     }
 
+    //TODO 테플릿 도메인에 있어야함(추후 Template CRUD 만들게 되면 수정)
     //템플릿 플로우 상세 조회 및 플로우 생성 폼 화면
     @GetMapping("/templates/{template-id}")
     public ResponseEntity<TemplateDetailResponse> getTemplateFlowDetail(
