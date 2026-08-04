@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionRequest;
-import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
+import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
+import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,10 +21,10 @@ public record FlowCreateRequest(
 //        List<FlowScheduleRequest> schedules,
 
         @NotEmpty
-        List<NodeRequest> nodes,
+        List<NodeInfo> nodes,
 
         @NotNull
-        List<ConnectionRequest> connections
+        List<ConnectionInfo> connections
 ) {
 
 }

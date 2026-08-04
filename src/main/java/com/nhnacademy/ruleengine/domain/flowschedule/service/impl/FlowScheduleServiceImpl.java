@@ -25,7 +25,7 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
 
     @Override
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
-        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()->new FlowNotFoundException(flowId));
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()->new FlowNotFoundException());
 
         FlowSchedule flowSchedule = FlowSchedule.create(flow, request);
         FlowSchedule savedFlowSchedule = flowScheduleRepository.save(flowSchedule);
