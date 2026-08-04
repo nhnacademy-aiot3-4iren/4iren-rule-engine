@@ -7,7 +7,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
-import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.common.redis.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.*;
 public class NodeConfigServiceImpl implements NodeConfigService {
     private final NodeRepository nodeRepository;
     private final SensorStaticMetaService sensorStaticMetaService;
+    private final NodeConfigValidatorRegistry validatorRegistry;
     //노드 상세 조회(node_config)
     //nodeId가 음수면 nodeConfig null, nodeType이 행동노드면 sensorStaticMetaList null
 
@@ -37,6 +39,25 @@ public class NodeConfigServiceImpl implements NodeConfigService {
                 : sensorStaticMetaService.getSensorStaticMetaList(roomId);
 
         return NodeConfigResponse.of(nodeId,nodeConfig, sensorStaticMetaList);
+    }
+
+    @Override
+    public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
+
+        // 액션 노드는 sensorMeta 조회 불필요
+        List<SensorStaticMeta> sensorMetas = request.nodeConfig().nodeType().isActionNode()
+                ? List.of()
+                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
+
+        List<String> errors = validatorRegistry.validate(
+                request.nodeConfig().nodeType(),
+                request.nodeConfig(),
+                sensorMetas
+        );
+
+        return errors.isEmpty()
+                ? NodeConfigValidationResponse.success()
+                : NodeConfigValidationResponse.failure(errors);
     }
 
 }
