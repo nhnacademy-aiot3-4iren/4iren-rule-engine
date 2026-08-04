@@ -23,9 +23,9 @@ public enum ErrorCode {
     FLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "FLOW_NOT_FOUND", "Flow를 찾을 수 없습니다."),
     FLOW_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "FLOW_SCHEDULE_NOT_FOUND", "Flow Schedule을 찾을 수 없습니다."),
     NODE_NOT_FOUND(HttpStatus.NOT_FOUND, "NODE_NOT_FOUND", "Node를 찾을 수 없습니다."),
-    SENSOR_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "SENSOR_TYPE_NOT_FOUND", "Sensor Type을 찾을 수 없습니다."),
+    MEASUREMENT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEASUREMENT_TYPE_NOT_FOUND", "Measurement Type을 찾을 수 없습니다."),
     FLOW_TEMPLATE_NOT_FOUND(HttpStatus.NOT_FOUND,"FLOW_TEMPLATE_NOT_FOUND", "Flow Template를 찾을 수 없습니다."),
-
+    NODE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "NODE_TYPE_NOT_FOUND", "NodeType을 찾을 수 없습니다."),
 
     //409 conflict
     CONNECTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "CONNECTION_ALREADY_EXISTS", "이미 존재하는 Connection입니다."),
