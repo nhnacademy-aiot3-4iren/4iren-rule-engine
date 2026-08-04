@@ -1,9 +1,8 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.GradiantDirection;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,7 +19,7 @@ public record GradiantNodeConfig(
         Integer y,
 
         @NotNull
-        SensorType sensorType,
+        MeasurementType measurementType,
 
         @NotNull
         String targetDeviceEui,

@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,11 +24,11 @@ public class FlowTemplateSensorType {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sensor_type", nullable = false, length = 20)
-    private SensorType sensorType;
+    private MeasurementType measurementType;
 
 
-    public FlowTemplateSensorType(Flow flow, SensorType sensorType) {
+    public FlowTemplateSensorType(Flow flow, MeasurementType measurementType) {
         this.flow = flow;
-        this.sensorType = sensorType;
+        this.measurementType = measurementType;
     }
 }

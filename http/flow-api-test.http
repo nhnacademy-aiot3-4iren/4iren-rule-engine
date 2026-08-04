@@ -36,7 +36,7 @@ Accept: {{contentType}}
       "cooldownSec": 60,
       "nodeConfig": {
         "nodeType": "THRESHOLD",
-        "sensorType": "CO2",
+        "measurementType": "CO2",
         "targetDeviceEui" : "24e124126d152862",
         "operator": "GTE",
         "threshold": 1000,
@@ -88,7 +88,7 @@ Accept: {{contentType}}
       "cooldownSec": 120,
       "nodeConfig": {
         "nodeType": "AVERAGE",
-        "sensorType": "CO2",
+        "measurementType": "CO2",
         "operator": "GTE",
         "average": 1200,
         "windowSec": 600,
@@ -140,7 +140,7 @@ Accept: {{contentType}}
       "cooldownSec": 60,
       "nodeConfig": {
         "nodeType": "THRESHOLD",
-        "sensorType": "CO2",
+        "measurementType": "CO2",
         "operator": "GTE",
         "threshold": 1000,
         "unit": "PPM",

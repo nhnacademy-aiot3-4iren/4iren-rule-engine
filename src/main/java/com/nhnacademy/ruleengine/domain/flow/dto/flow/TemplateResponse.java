@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import lombok.Builder;
 
 import java.util.List;
@@ -15,30 +15,30 @@ public record TemplateResponse(
 
         String description,
 
-        List<SensorType> sensorTypes
+        List<MeasurementType> measurementTypes
 ) {
     public static TemplateResponse from(
-            Flow flowTemplate,   List<SensorType> sensorType
+            Flow flowTemplate,   List<MeasurementType> measurementType
     ){
         return TemplateResponse.builder()
                 .templateId(flowTemplate.getId())
                 .templateName(flowTemplate.getFlowName())
                 .description(flowTemplate.getDescription())
-                .sensorTypes(sensorType).build();
+                .measurementTypes(measurementType).build();
     }
 
     public static List<TemplateResponse> fromList(
-        List<Flow> flowTemplates, Map<Long, List<SensorType>> sensorTypesByFlowId
+        List<Flow> flowTemplates, Map<Long, List<MeasurementType>> sensorTypesByFlowId
     ){
         return flowTemplates.stream()
                 .map(f ->{
-                    List<SensorType> sensorTypeList = sensorTypesByFlowId.get(f.getId());
+                    List<MeasurementType> measurementTypeList = sensorTypesByFlowId.get(f.getId());
 
                     return TemplateResponse.builder()
                             .templateId(f.getId())
                             .templateName(f.getFlowName())
                             .description(f.getDescription())
-                            .sensorTypes(sensorTypeList)
+                            .measurementTypes(measurementTypeList)
                             .build();
                 }).toList();
     }

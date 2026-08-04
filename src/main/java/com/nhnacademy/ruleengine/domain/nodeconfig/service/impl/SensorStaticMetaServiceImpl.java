@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.notfound.SensorTypeNotFoundExc
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.external.MeasurementSensorTypeMapper;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.cache.RoomDeviceCacheService;
@@ -30,11 +30,11 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 
         List<SensorStaticMeta> sensorStaticMetaList = new ArrayList<>();
 
-        Map<SensorType, List<DeviceInfo>> deviceInfoBySensorType = getDeviceInfoBySensorType(roomDeviceInfoList);
-        Map<SensorType, String> unitBySensorType = getUnitBySensorType(roomDeviceInfoList);
+        Map<MeasurementType, List<DeviceInfo>> deviceInfoBySensorType = getDeviceInfoBySensorType(roomDeviceInfoList);
+        Map<MeasurementType, String> unitBySensorType = getUnitBySensorType(roomDeviceInfoList);
 
-        for(SensorType sensorType: deviceInfoBySensorType.keySet()){
-            sensorStaticMetaList.add(SensorStaticMeta.of(sensorType, unitBySensorType.get(sensorType), deviceInfoBySensorType.get(sensorType)));
+        for(MeasurementType measurementType : deviceInfoBySensorType.keySet()){
+            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitBySensorType.get(measurementType), deviceInfoBySensorType.get(measurementType)));
         }
 
         return sensorStaticMetaList;
@@ -48,19 +48,19 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
         return List.of();
     }
     @Override
-    public List<SensorType> getSensorTypeOptionsInRoom(Long roomId) {
+    public List<MeasurementType> getSensorTypeOptionsInRoom(Long roomId) {
         List<ExternalRoomDeviceInfo> devices = roomDeviceCacheService.getRoomDevices(roomId);
         return List.of();
     }
 
-    private Map<SensorType, String> getUnitBySensorType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
+    private Map<MeasurementType, String> getUnitBySensorType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().entrySet().stream())
                 .collect(Collectors.toMap(
                         entry -> measurementSensorTypeMapper.toSensorType(entry.getKey()).orElseThrow(()->new SensorTypeNotFoundException(entry.getKey())),
                         Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue,
-                        () -> new EnumMap<>(SensorType.class)
+                        () -> new EnumMap<>(MeasurementType.class)
                 ));
 
 
@@ -69,20 +69,20 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 //                        e->measurementSensorTypeMapper.toSensorType(e.getKey()).orElseThrow(()->new SensorTypeNotFoundException(e.getKey())),
 //                        e->e.getValue(),
 //                        (oldValue, newValue) -> oldValue,
-//                        ()-> new EnumMap<>(SensorType.class)
+//                        ()-> new EnumMap<>(MeasurementType.class)
 //                ));
     }
 
-    private Map<SensorType, List<DeviceInfo>> getDeviceInfoBySensorType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
+    private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoBySensorType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementSensorType>
-                        .map(sensorType -> Map.entry(//Stream<Map.Entry<SensorType, DeviceInfo>>
+                        .map(sensorType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>
                                 measurementSensorTypeMapper.toSensorType(sensorType).orElseThrow(()->new SensorTypeNotFoundException(sensorType)),
                                 DeviceInfo.of(room.devEui(), room.deviceName())
                         ))
-                ).collect(Collectors.groupingBy(//Map<SensorType, List<DeviceInfo>>
+                ).collect(Collectors.groupingBy(//Map<MeasurementType, List<DeviceInfo>>
                         Map.Entry::getKey,
-                        ()-> new EnumMap<>(SensorType.class),
+                        ()-> new EnumMap<>(MeasurementType.class),
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())
                 ));
     }
@@ -92,8 +92,8 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 //        List<ExternalRoomDeviceInfo> devices = roomDeviceCacheService.getRoomDevices(roomId);
 //
 //
-//        Map<SensorType, String> unitBySensorType = new EnumMap<>(SensorType.class);//센서 타입별 유닛 매핑
-//        Map<SensorType, List<DeviceInfo>> deviceInfoBySensorType = new EnumMap<>(SensorType.class);//센서타입별 기기 정보 매핑
+//        Map<MeasurementType, String> unitBySensorType = new EnumMap<>(MeasurementType.class);//센서 타입별 유닛 매핑
+//        Map<MeasurementType, List<DeviceInfo>> deviceInfoBySensorType = new EnumMap<>(MeasurementType.class);//센서타입별 기기 정보 매핑
 //
 //        for (ExternalRoomDeviceInfo device : devices) {
 //            Map<String, String> measurement = device.measurement();
@@ -107,11 +107,11 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 //                String unit = entry.getValue();
 //
 //                measurementSensorTypeMapper.toSensorType(measurementKey)
-//                        .ifPresent(sensorType -> {
-//                            unitBySensorType.putIfAbsent(sensorType, unit);
+//                        .ifPresent(measurementType -> {
+//                            unitBySensorType.putIfAbsent(measurementType, unit);
 //
 //                            deviceInfoBySensorType
-//                                    .computeIfAbsent(sensorType, key -> new ArrayList<>())
+//                                    .computeIfAbsent(measurementType, key -> new ArrayList<>())
 //                                    .add(new DeviceInfo(device.devEui(), device.deviceName()));
 //                        });
 //            }
@@ -123,7 +123,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 //                        unitBySensorType.get(entry.getKey()),
 //                        dedupeDeviceOptions(entry.getValue())
 //                ))
-//                .sorted(Comparator.comparing(meta -> meta.sensorType().name()))
+//                .sorted(Comparator.comparing(meta -> meta.measurementType().name()))
 //                .toList();
 //    }
 //

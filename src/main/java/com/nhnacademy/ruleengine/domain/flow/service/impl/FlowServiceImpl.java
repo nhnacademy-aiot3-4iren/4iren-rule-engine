@@ -10,7 +10,7 @@ import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeRequest;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
@@ -110,7 +110,7 @@ public class FlowServiceImpl implements FlowService {
     public TemplateListResponse getFlowTemplateList(Long roomId) {
         List<Flow> templateFlow = flowRepository.findAllByIsTemplate(true);
 
-        Map<Long,List<SensorType>> sensorTypes = getSensorTypesByFlowId(templateFlow);
+        Map<Long,List<MeasurementType>> sensorTypes = getSensorTypesByFlowId(templateFlow);
 
         return TemplateListResponse.from(templateFlow, sensorTypes);
     }
@@ -284,13 +284,13 @@ public class FlowServiceImpl implements FlowService {
 
 
 
-    private Map<Long, List<SensorType>> getSensorTypesByFlowId(List<Flow> templateFlows){
+    private Map<Long, List<MeasurementType>> getSensorTypesByFlowId(List<Flow> templateFlows){
         List<FlowTemplateSensorType> allFlowTemplateSensorTypes = flowTemplateSensorTypeRespository.findAllByFlowIn(templateFlows);
-        Map<Long, List<SensorType>> sensorTypesByFlowId = allFlowTemplateSensorTypes.stream()
+        Map<Long, List<MeasurementType>> sensorTypesByFlowId = allFlowTemplateSensorTypes.stream()
                 .collect(Collectors.groupingBy(
                         fts -> fts.getFlow().getId(),
                         Collectors.mapping(
-                                FlowTemplateSensorType::getSensorType,
+                                FlowTemplateSensorType::getMeasurementType,
                                 Collectors.toList()
                         )
                 ));

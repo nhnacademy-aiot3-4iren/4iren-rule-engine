@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.dto.flow;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.SensorType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import lombok.Builder;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public record TemplateListResponse(
 ) {
     public static TemplateListResponse from(
             List<Flow> templateFlow,
-            Map<Long, List<SensorType>> sensorTypes
+            Map<Long, List<MeasurementType>> sensorTypes
     ){
         List<TemplateResponse> templateResponses =  TemplateResponse.fromList(templateFlow, sensorTypes);
         return new TemplateListResponse(templateResponses);

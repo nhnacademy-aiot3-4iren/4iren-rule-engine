@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
-// SensorType.java
-public enum SensorType {
+// MeasurementType.java
+public enum MeasurementType {
     CO2("이산화탄소"),
     HUMIDITY("상대습도"),
     ILLUMINATION("주변 조도"),
@@ -13,7 +13,7 @@ public enum SensorType {
 
     private String sensorDesc;
 
-    SensorType(String sensorDesc){
+    MeasurementType(String sensorDesc){
         this.sensorDesc = sensorDesc;
     }
 }
