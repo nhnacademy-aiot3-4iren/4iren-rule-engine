@@ -4,13 +4,13 @@ import java.util.List;
 
 public record NodeConfigValidationResponse(
         boolean valid,
-        List<ValidationErrorResponse> errors
+        List<String> errors
 ) {
     public static NodeConfigValidationResponse success() {
         return new NodeConfigValidationResponse(true, List.of());
     }
 
-    public static NodeConfigValidationResponse fail(List<ValidationErrorResponse> errors) {
+    public static NodeConfigValidationResponse failure(List<String> errors) {
         return new NodeConfigValidationResponse(false, errors);
     }
 }

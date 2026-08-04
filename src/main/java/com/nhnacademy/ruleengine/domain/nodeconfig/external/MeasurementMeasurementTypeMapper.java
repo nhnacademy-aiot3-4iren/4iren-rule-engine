@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class MeasurementSensorTypeMapper {
+public class MeasurementMeasurementTypeMapper {
     private final Map<String, MeasurementType> sensorTypeMap = Map.of(
             "co2", MeasurementType.CO2,
             "temperature", MeasurementType.TEMPERATURE,
@@ -18,7 +18,7 @@ public class MeasurementSensorTypeMapper {
             "infrared", MeasurementType.INFRARED
     );
 
-    public Optional<MeasurementType> toSensorType(String measurementKey){
+    public Optional<MeasurementType> toMeasurementType(String measurementKey){
         if(measurementKey == null || measurementKey.isBlank()){
             return Optional.empty();
         }
