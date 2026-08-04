@@ -1,19 +1,18 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.validator;
+package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ValidationErrorResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
-import jakarta.validation.constraints.NotNull;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ThresholdNodeConfigValidator implements NodeConfigValidator{
+public class ThresholdNodeConfigValidator implements NodeConfigValidator {
     @Override
     public NodeType supportsNodeType() {
         return NodeType.THRESHOLD;

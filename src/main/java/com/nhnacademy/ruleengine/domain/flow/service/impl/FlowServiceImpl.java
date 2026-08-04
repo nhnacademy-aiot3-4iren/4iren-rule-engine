@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
-import com.nhnacademy.ruleengine.common.redis.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.flow.dto.connection.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
 import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeInfo;

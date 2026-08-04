@@ -7,7 +7,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
-import com.nhnacademy.ruleengine.common.redis.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.service.cache;
+package com.nhnacademy.ruleengine.common.redis.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

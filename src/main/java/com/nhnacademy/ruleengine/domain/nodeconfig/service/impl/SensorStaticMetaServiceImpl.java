@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.common.redis.impl;
+package com.nhnacademy.ruleengine.domain.nodeconfig.service.impl;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.MeasurementTypeNotFoundException;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
@@ -6,8 +6,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.external.MeasurementMeasurementTypeMapper;
-import com.nhnacademy.ruleengine.common.redis.SensorStaticMetaService;
-import com.nhnacademy.ruleengine.domain.nodeconfig.service.cache.RoomDeviceCacheService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.common.redis.cache.RoomDeviceCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

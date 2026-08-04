@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.common.redis;
+package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
