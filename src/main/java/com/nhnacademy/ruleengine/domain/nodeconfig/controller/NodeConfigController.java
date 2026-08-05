@@ -6,6 +6,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationRespo
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,19 +18,21 @@ public class NodeConfigController {
 
 
     @GetMapping("/node-config/{node-id}")
-    public NodeConfigResponse getNodeConfigNMeta(
+    public ResponseEntity<NodeConfigResponse> getNodeConfigNMeta(
             @PathVariable("room-id") Long roomId,
             @PathVariable("node-id") Long nodeId,
             @RequestParam NodeType nodeType
     ) {
-        return nodeConfigService.getNodeConfigNMeta(roomId, nodeId, nodeType);
+        NodeConfigResponse response = nodeConfigService.getNodeConfigNMeta(roomId, nodeId, nodeType);
+        return ResponseEntity.ok(response);
     }
 
-//    @PostMapping("/validate-config")
-//    public NodeConfigValidationResponse validateNodeConfig(
-//            @PathVariable("room-id") Long roomId,
-//            @RequestBody NodeConfigValidateRequest request
-//    ) {
-//        return nodeConfigService.validate(roomId,request);
-//    }
+    @PostMapping("/validate-config")
+    public ResponseEntity<NodeConfigValidationResponse> validateNodeConfig(
+            @PathVariable("room-id") Long roomId,
+            @RequestBody NodeConfigValidateRequest request
+    ) {
+        NodeConfigValidationResponse response = nodeConfigService.validate(roomId,request);
+        return ResponseEntity.ok(response);
+    }
 }
