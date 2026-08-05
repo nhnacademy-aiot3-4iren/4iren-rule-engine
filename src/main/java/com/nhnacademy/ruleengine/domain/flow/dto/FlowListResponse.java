@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto.flow;
+package com.nhnacademy.ruleengine.domain.flow.dto;
 
 import java.util.List;
 

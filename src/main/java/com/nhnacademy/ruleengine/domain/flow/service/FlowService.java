@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.RoomTemplateDetailResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.*;
 
 public interface FlowService {
     //플로우 생성

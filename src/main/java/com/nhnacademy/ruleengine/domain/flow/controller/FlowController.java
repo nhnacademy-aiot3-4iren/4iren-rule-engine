@@ -1,8 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.controller;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.RoomTemplateDetailResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
