@@ -60,7 +60,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 2. 스프링 부트 종합 테스트 스타터인 spring-boot-starter-test 로 교정 (보통 단 하나만 씁니다) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -85,6 +84,8 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.5</version>
         </dependency>
+
+        <!--spring cloud 관련 설정들-->
         <!--Feign Client 의존성-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

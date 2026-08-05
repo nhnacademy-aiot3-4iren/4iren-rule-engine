@@ -9,7 +9,7 @@ import lombok.Builder;
 
 import java.util.List;
 @Builder
-public record TemplateDetailResponse (
+public record RoomTemplateDetailResponse(
         Long templateId,
 
         String templateName,
@@ -20,12 +20,12 @@ public record TemplateDetailResponse (
 
         List<ConnectionResponse> connections
 ){
-    public static TemplateDetailResponse from(
+    public static RoomTemplateDetailResponse from(
             Flow flowTempalte,
             List<Node> nodes,
             List<Connection> connections
     ) {
-        return TemplateDetailResponse.builder()
+        return RoomTemplateDetailResponse.builder()
                 .templateId(flowTempalte.getId())
                 .templateName(flowTempalte.getFlowName())
                 .description(flowTempalte.getDescription())

@@ -12,8 +12,8 @@ import com.nhnacademy.ruleengine.domain.flow.entity.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
-import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.RoomTemplateDetailResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -96,33 +96,33 @@ public class FlowServiceImpl implements FlowService {
     public FlowDetailResponse getFlowDetail(Long roomId, Long flowId) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()-> new FlowNotFoundException());
 
-        List<FlowSchedule> flowSchedules = flowScheduleRepository.findAllByFlowId(flowId);
+//        List<FlowSchedule> flowSchedules = flowScheduleRepository.findAllByFlowId(flowId);
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
 
-        return FlowDetailResponse.from(flow,!flowSchedules.isEmpty(),flowSchedules, nodes,connections);
+        return FlowDetailResponse.from(flow,nodes,connections);
     }
 
     @Override
-    public TemplateListResponse getFlowTemplateList(Long roomId) {
+    public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
         List<Flow> templateFlow = flowRepository.findAllByIsTemplate(true);
 
         Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getSensorTypesByTemokateId(templateFlow);
         List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
         //TODO
 
-        return TemplateListResponse.from(templateFlow, measurementTypesByTemplateId);
+        return RoomTemplateListResponse.from(templateFlow, measurementTypesByTemplateId);
     }
 
     @Override
-    public TemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
+    public RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
         Flow tempalteFlow = flowRepository.findById(templateFlowId)
                 .orElseThrow(() -> new FlowNotFoundException());
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
 
-        return TemplateDetailResponse.from(tempalteFlow, nodes, connections);
+        return RoomTemplateDetailResponse.from(tempalteFlow, nodes, connections);
     }
 
     @Transactional

@@ -25,23 +25,17 @@ public record FlowDetailResponse (
 
         boolean isActive,
 
-        boolean hasSchedule,
-
         List<NodeResponse> nodes,
-
-        List<FlowScheduleResponse> schedules,
 
         List<ConnectionResponse> connections,
 
         LocalDateTime createdAt,
-        @NotNull
+
         LocalDateTime updatedAt
 ){
 
     public static FlowDetailResponse from(
             Flow flow,
-            boolean hasSchedule,
-            List<FlowSchedule> schedules,
             List<Node> nodes,
             List<Connection> connections
     ){
@@ -51,8 +45,6 @@ public record FlowDetailResponse (
                 .flowName(flow.getFlowName())
                 .description(flow.getDescription())
                 .isActive(flow.getIsActive())
-                .hasSchedule(hasSchedule)
-                .schedules(FlowScheduleResponse.fromList(schedules))
                 .nodes(NodeResponse.fromList(nodes))
                 .connections(ConnectionResponse.fromList(connections))
                 .createdAt(flow.getCreatedAt())

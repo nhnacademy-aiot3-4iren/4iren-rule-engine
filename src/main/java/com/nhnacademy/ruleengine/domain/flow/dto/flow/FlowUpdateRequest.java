@@ -28,9 +28,6 @@ public record FlowUpdateRequest(
 
         @NotNull
         List<ConnectionInfo> connections
-
-//        @NotNull
-//        List<FlowScheduleInfo> schedules
 ) {
 
 }

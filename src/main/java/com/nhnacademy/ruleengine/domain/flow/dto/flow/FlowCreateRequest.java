@@ -17,14 +17,10 @@ public record FlowCreateRequest(
         @Length(max = 255)
         String description,
 
-//        @NotNull
-//        List<FlowScheduleRequest> schedules,
-
         @NotEmpty
         List<NodeInfo> nodes,
 
         @NotNull
         List<ConnectionInfo> connections
 ) {
-
 }

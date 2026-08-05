@@ -8,15 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record TemplateListResponse(
-        List<TemplateResponse> templateResponseList
+public record RoomTemplateListResponse(
+        List<RoomTemplateResponse> roomTemplateResponseList
 ) {
-    public static TemplateListResponse from(
+    public static RoomTemplateListResponse from(
             List<Flow> templateFlow,
             Map<Long, List<MeasurementType>> sensorTypes
     ){
-        List<TemplateResponse> templateResponses =  TemplateResponse.fromList(templateFlow, sensorTypes);
-        return new TemplateListResponse(templateResponses);
+        List<RoomTemplateResponse> roomTemplateRespons =  RoomTemplateResponse.fromList(templateFlow, sensorTypes);
+        return new RoomTemplateListResponse(roomTemplateRespons);
     }
-
 }

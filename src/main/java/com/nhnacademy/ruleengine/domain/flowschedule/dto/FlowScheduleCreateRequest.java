@@ -9,9 +9,11 @@ import java.time.LocalTime;
 public record FlowScheduleCreateRequest(
         @NotNull
         DayOfWeek dayOfWeek,
+
         @NotNull
         @JsonFormat(pattern = "HH:mm:ss")
         LocalTime startTime,
+
         @NotNull
         @JsonFormat(pattern = "HH:mm:ss")
         LocalTime endTime

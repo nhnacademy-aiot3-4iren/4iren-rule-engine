@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record TemplateResponse(
+public record RoomTemplateResponse(
         Long templateId,
 
         String templateName,
@@ -17,24 +17,24 @@ public record TemplateResponse(
 
         List<MeasurementType> measurementTypes
 ) {
-    public static TemplateResponse from(
+    public static RoomTemplateResponse from(
             Flow flowTemplate,   List<MeasurementType> measurementType
     ){
-        return TemplateResponse.builder()
+        return RoomTemplateResponse.builder()
                 .templateId(flowTemplate.getId())
                 .templateName(flowTemplate.getFlowName())
                 .description(flowTemplate.getDescription())
                 .measurementTypes(measurementType).build();
     }
 
-    public static List<TemplateResponse> fromList(
+    public static List<RoomTemplateResponse> fromList(
         List<Flow> flowTemplates, Map<Long, List<MeasurementType>> sensorTypesByFlowId
     ){
         return flowTemplates.stream()
                 .map(f ->{
                     List<MeasurementType> measurementTypeList = sensorTypesByFlowId.get(f.getId());
 
-                    return TemplateResponse.builder()
+                    return RoomTemplateResponse.builder()
                             .templateId(f.getId())
                             .templateName(f.getFlowName())
                             .description(f.getDescription())

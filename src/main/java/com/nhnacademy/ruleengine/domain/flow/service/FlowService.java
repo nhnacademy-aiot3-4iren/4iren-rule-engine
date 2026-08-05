@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.flow.*;
+import com.nhnacademy.ruleengine.domain.flow.dto.flow.RoomTemplateDetailResponse;
 
 public interface FlowService {
     //플로우 생성
@@ -16,10 +17,10 @@ public interface FlowService {
     FlowDetailResponse getFlowDetail(Long roomId, Long flowId);
 
     //강의실별 템플릿 플로우 제안 목록
-    TemplateListResponse getFlowTemplateList(Long roomId);
+    RoomTemplateListResponse getFlowTemplateList(Long roomId);
 
     //템플릿 기반 플로우 생성 폼 = 템플릿 플로우 상세
-    TemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId);
+    RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId);
 
     //플로우 수정
     void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request);
