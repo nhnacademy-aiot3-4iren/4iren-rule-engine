@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +23,10 @@ public record AlertNodeConfig(
     AlertChannel channel,
 
     @NotBlank
-    String messageTemplate,//
+    String alertTitle,
+
+    @NotNull
+    AlertType alertType,
 
     @Positive
     Integer dedupWindowSec

@@ -34,6 +34,7 @@ public record GradiantNodeConfig(
         @Positive
         Integer windowSec
 
+//        gradiant 의 음수 양수 여부로 알 수 있으므로 필드 포함하지 않기로 함
 //        @NotNull
 //        GradiantDirection direction
 
