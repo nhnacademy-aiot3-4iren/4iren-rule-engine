@@ -104,7 +104,7 @@ public class FlowServiceImpl implements FlowService {
     public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
         List<Flow> templateFlow = flowRepository.findAllByIsTemplate(true);
 
-        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getSensorTypesByTemokateId(templateFlow);
+        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getSensorTypesByTemolateId(templateFlow);
         List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
         //TODO
 
@@ -275,7 +275,7 @@ public class FlowServiceImpl implements FlowService {
 
 
 
-    private Map<Long, List<MeasurementType>> getSensorTypesByTemokateId(List<Flow> templateFlows){
+    private Map<Long, List<MeasurementType>> getSensorTypesByTemolateId(List<Flow> templateFlows){
         List<FlowTemplateSensorType> allFlowTemplateSensorTypes = flowTemplateSensorTypeRespository.findAllByFlowIn(templateFlows);
         Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateSensorTypes.stream()
                 .collect(Collectors.groupingBy(
@@ -290,7 +290,6 @@ public class FlowServiceImpl implements FlowService {
     }
 
     //플로우 무결성 검사를 위한 메서드들
-
     public void validate(@NotEmpty List<NodeInfo> nodes, @NotNull List<ConnectionInfo> connections){
         List<String> errors =  new ArrayList<>();
 
