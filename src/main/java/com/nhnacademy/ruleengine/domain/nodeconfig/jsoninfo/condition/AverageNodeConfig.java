@@ -35,4 +35,9 @@ public record AverageNodeConfig(
 
 
 ) implements NodeConfig {
+
+        @Override
+        public MeasurementType measurementType(){
+                return measurementType;
+        }
 }

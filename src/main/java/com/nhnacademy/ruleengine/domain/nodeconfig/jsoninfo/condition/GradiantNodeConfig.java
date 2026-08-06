@@ -39,4 +39,8 @@ public record GradiantNodeConfig(
 //        GradiantDirection direction
 
 )implements NodeConfig {
+        @Override
+        public MeasurementType measurementType(){
+                return measurementType;
+        }
 }

@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
@@ -30,4 +31,8 @@ public interface NodeConfig {
     NodeType nodeType();
     Integer x();
     Integer y();
+
+    default MeasurementType measurementType(){
+        return null;
+    }
 }

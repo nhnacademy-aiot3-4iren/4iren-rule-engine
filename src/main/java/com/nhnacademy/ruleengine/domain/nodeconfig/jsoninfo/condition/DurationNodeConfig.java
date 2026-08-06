@@ -33,4 +33,8 @@ public record DurationNodeConfig(
 
 
 ) implements NodeConfig {
+        @Override
+        public MeasurementType measurementType(){
+                return measurementType;
+        }
 }

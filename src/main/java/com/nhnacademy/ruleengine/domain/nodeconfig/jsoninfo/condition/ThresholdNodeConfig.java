@@ -31,5 +31,8 @@ public record ThresholdNodeConfig (
         double threshold
 
 )implements NodeConfig {
-
+        @Override
+        public MeasurementType measurementType(){
+                return measurementType;
+        }
 }
