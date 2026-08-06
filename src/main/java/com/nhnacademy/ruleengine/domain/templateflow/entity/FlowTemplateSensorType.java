@@ -1,6 +1,7 @@
-package com.nhnacademy.ruleengine.domain.flow.entity;
+package com.nhnacademy.ruleengine.domain.templateflow.entity;
 
 
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,7 +1,7 @@
-package com.nhnacademy.ruleengine.domain.flow.repository;
+package com.nhnacademy.ruleengine.domain.templateflow.repository;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.flow.entity.FlowTemplateSensorType;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateSensorType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
