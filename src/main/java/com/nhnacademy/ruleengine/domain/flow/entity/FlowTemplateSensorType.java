@@ -5,7 +5,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "flow_template_sensor_types")
@@ -27,6 +26,7 @@ public class FlowTemplateSensorType {
     private MeasurementType measurementType;
 
 
+    @Builder
     public FlowTemplateSensorType(Flow flow, MeasurementType measurementType) {
         this.flow = flow;
         this.measurementType = measurementType;

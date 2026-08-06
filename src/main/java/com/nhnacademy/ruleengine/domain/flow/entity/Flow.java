@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "flows")
@@ -45,20 +44,51 @@ public class Flow {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Node> nodes = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Connection> connections = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FlowSchedule> schedules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<FlowTemplateSensorType> flowTemplateSensorTypes = new ArrayList<>();
 
+
+    //일반 플로우 생성용
+    @Builder(builderMethodName = "regularBuilder")
+    public Flow(Long roomId, String flowName, String description){
+        this.id = null;
+        this.createdAt = null;
+        this.updatedAt = null;
+
+        this.roomId =roomId;
+        this.isActive = true;
+
+        this.flowName = flowName;
+        this.description = description;
+
+        this.isTemplate = false;
+    }
+
+    //템플릿 플로우 생성용
     //템플릿일경우  room_id, is_active null
+    @Builder(builderMethodName = "templateBuilder")
+    public Flow( String flowName, String description){
+        this.id = null;
+        this.createdAt = null;
+        this.updatedAt = null;
+
+        this.roomId = null;
+        this.isActive = null;
+
+        this.flowName = flowName;
+        this.description = description;
+
+        this.isTemplate = true;
+    }
 
     public void update(String flowName, String description, Boolean isActive) {
         if (flowName != null) this.flowName = flowName;

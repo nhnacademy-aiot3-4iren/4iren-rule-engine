@@ -4,13 +4,13 @@ import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
+import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "nodes")
@@ -48,6 +48,7 @@ public class Node {
     @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Connection> incomingConnections = new ArrayList<>();
 
+    @Builder
     public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
         this.flow = flow;
         this.nodeName = nodeName;
@@ -63,8 +64,22 @@ public class Node {
                 .cooldownSec(nodeInfo.cooldownSec())
                 .build();
     }
+    public static Node create(Flow flow, TemplateNodeInfo nodeInfo){
+        return Node.builder().flow(flow)
+                .nodeName(nodeInfo.nodeName())
+                .nodeType(nodeInfo.nodeType())
+                .nodeConfig(nodeInfo.nodeConfig())
+                .cooldownSec(nodeInfo.cooldownSec())
+                .build();
+    }
 
     public void update(NodeInfo nodeInfo) {
+        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
+        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
+        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
+        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
+    }
+    public void update(TemplateNodeInfo nodeInfo) {
         if (nodeName != null) this.nodeName = nodeInfo.nodeName();
         if (nodeType != null) this.nodeType = nodeInfo.nodeType();
         if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();

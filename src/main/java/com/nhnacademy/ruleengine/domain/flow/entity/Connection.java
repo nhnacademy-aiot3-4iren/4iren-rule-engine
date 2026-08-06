@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Builder
 @Getter
 @Entity
 @Table(
@@ -42,7 +41,7 @@ public class Connection {
     @Column(name = "conditions_result", nullable = false, length = 10)
     private ConditionResult conditionResult;
 
-
+    @Builder
     public Connection(Flow flow, Node sourceNode, Node targetNode, ConditionResult conditionResult) {
         this.flow = flow;
         this.sourceNode = sourceNode;

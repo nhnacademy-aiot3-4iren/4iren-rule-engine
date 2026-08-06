@@ -9,7 +9,6 @@ import lombok.*;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "flow_schedules")
@@ -35,6 +34,7 @@ public class FlowSchedule {
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
+    @Builder
     public FlowSchedule(Flow flow, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
         this.flow = flow;
         this.dayOfWeek = dayOfWeek;
