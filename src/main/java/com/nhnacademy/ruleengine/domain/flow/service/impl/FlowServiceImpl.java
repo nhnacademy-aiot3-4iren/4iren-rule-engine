@@ -95,7 +95,7 @@ public class FlowServiceImpl implements FlowService {
     public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
         List<Flow> templateFlow = flowRepository.findAllByIsTemplate(true);
 
-        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getSensorTypesByTemolateId(templateFlow);
+        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(templateFlow);
         List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
         //TODO
 
@@ -118,7 +118,7 @@ public class FlowServiceImpl implements FlowService {
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
         Flow flow = flowRepository.findById(flowId).orElseThrow( () -> new FlowNotFoundException());
 
-        flow.update(request.flowName(),request.description(), request.isActive());
+        flow.updateReguler(request.flowName(),request.description(), request.isActive());
 
         //update
         updateNodes(flow, request.nodes());
@@ -168,7 +168,7 @@ public class FlowServiceImpl implements FlowService {
         saveConnections(savedFlow, connections);
     }
 
-    private Map<Long, List<MeasurementType>> getSensorTypesByTemolateId(List<Flow> templateFlows){
+    private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
         List<FlowTemplateSensorType> allFlowTemplateSensorTypes = flowTemplateSensorTypeRespository.findAllByFlowIn(templateFlows);
         Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateSensorTypes.stream()
                 .collect(Collectors.groupingBy(

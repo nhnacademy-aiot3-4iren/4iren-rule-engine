@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.templateflow.service.impl;
 
 
+import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateSensorType;
@@ -57,29 +58,41 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
         List<Flow> templateList = flowRepository.findAllByIsTemplate(true);
 
         if(templateList.isEmpty()){
-            return TemplateListResponse.of(List.of(), List.of());
+            return new TemplateListResponse(List.of());
         }
-
-//        return TemplateListResponse.of(templateList, );
-        return null;
+        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(templateList);
+        return TemplateListResponse.of(templateList, measurementTypesByTemplateId);
     }
 
     @Override
     public TemplateDetailResponse getTemplateDetail(Long templateId) {
+        Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
 
-        return null;
+        List<Node> nodes = nodeRepository.findAllByFlowId(templateId);
+        List<Connection> connections = connectionRepository.findAllByFlowId(templateId);
+
+        return TemplateDetailResponse.from(templateFlow, nodes, connections);
     }
 
     @Transactional
     @Override
     public void updateTemplate(Long templateId, TemplateFlowUpdateRequest request) {
+        Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
 
+        templateFlow.updateTemplate(request.flowName(), request.description());
+
+        updateNodes(templateFlow, request.nodes());
+        updateConnections(templateFlow, request.connections());
+        validate(request.nodes(), request.connections());
     }
 
     @Transactional
     @Override
     public void deleteTemplate(Long templateId) {
-
+        if(!flowRepository.existsById(templateId)){
+            throw new FlowNotFoundException();
+        }
+        flowRepository.deleteById(templateId);
     }
 
     private void saveNodes(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes) {
@@ -125,7 +138,18 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
         flowTemplateSensorTypeRespository.saveAll(flowTemplateSensorTypeList);
     }
 
-
+    private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
+        List<FlowTemplateSensorType> allFlowTemplateSensorTypes = flowTemplateSensorTypeRespository.findAllByFlowIn(templateFlows);
+        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateSensorTypes.stream()
+                .collect(Collectors.groupingBy(
+                        fts -> fts.getFlow().getId(),
+                        Collectors.mapping(
+                                FlowTemplateSensorType::getMeasurementType,
+                                Collectors.toList()
+                        )
+                ));
+        return measurementTypesByTemplateId;
+    }
 
     //플로우 무결성 검사를 위한 메서드들    //TODO validator 패키지 만들어서 분리하기
     public void validate(@NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections){
