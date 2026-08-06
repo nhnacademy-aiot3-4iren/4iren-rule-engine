@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.templateflow.dto;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record RoomTemplateResponse(
+public record TemplateResponse(
         Long templateId,
 
         String templateName,
@@ -17,24 +17,22 @@ public record RoomTemplateResponse(
 
         List<MeasurementType> measurementTypes
 ) {
-    public static RoomTemplateResponse from(
-            Flow flowTemplate,   List<MeasurementType> measurementType
-    ){
-        return RoomTemplateResponse.builder()
-                .templateId(flowTemplate.getId())
-                .templateName(flowTemplate.getFlowName())
-                .description(flowTemplate.getDescription())
-                .measurementTypes(measurementType).build();
+    public static TemplateResponse of(Flow flow, List<MeasurementType> measurementTypes){
+        return TemplateResponse.builder()
+                .templateId(flow.getId())
+                .templateName(flow.getFlowName())
+                .description(flow.getDescription())
+                .measurementTypes(measurementTypes).build();
     }
 
-    public static List<RoomTemplateResponse> fromList(
-        List<Flow> flowTemplates, Map<Long, List<MeasurementType>> measurementTypesByFlowId
+    public static List<TemplateResponse> fromList(
+            List<Flow> flowTemplates, Map<Long, List<MeasurementType>> measurementTypesByFlowId
     ){
         return flowTemplates.stream()
                 .map(f ->{
                     List<MeasurementType> measurementTypeList = measurementTypesByFlowId.get(f.getId());
 
-                    return RoomTemplateResponse.builder()
+                    return TemplateResponse.builder()
                             .templateId(f.getId())
                             .templateName(f.getFlowName())
                             .description(f.getDescription())
@@ -42,4 +40,5 @@ public record RoomTemplateResponse(
                             .build();
                 }).toList();
     }
+
 }

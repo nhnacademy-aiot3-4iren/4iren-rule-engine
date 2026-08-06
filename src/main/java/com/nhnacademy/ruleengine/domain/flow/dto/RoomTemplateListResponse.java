@@ -15,7 +15,7 @@ public record RoomTemplateListResponse(
             List<Flow> templateFlow,
             Map<Long, List<MeasurementType>> sensorTypes
     ){
-        List<RoomTemplateResponse> roomTemplateRespons =  RoomTemplateResponse.fromList(templateFlow, sensorTypes);
-        return new RoomTemplateListResponse(roomTemplateRespons);
+        List<RoomTemplateResponse> roomTemplateResponses =  RoomTemplateResponse.fromList(templateFlow, sensorTypes);
+        return new RoomTemplateListResponse(roomTemplateResponses);
     }
 }

@@ -1,24 +1,25 @@
-package com.nhnacademy.ruleengine.domain.flow.dto;
+package com.nhnacademy.ruleengine.domain.templateflow.dto;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
-import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record ConnectionResponse (
-
-        Long sourceNodeId,
+record TemplateConnectionResponse(
+          Long sourceNodeId,
 
         Long targetNodeId
+
 ){
-    public static List<ConnectionResponse> fromList(List<Connection> connections) {
+
+    public static List<TemplateConnectionResponse> fromList(List<Connection> connections) {
         return connections.stream()
-                .map(c -> ConnectionResponse.builder()
+                .map(c -> TemplateConnectionResponse.builder()
                         .sourceNodeId(c.getSourceNode().getId())
                         .targetNodeId(c.getTargetNode().getId())
                         .build()
                 ).toList();
     }
+
 }
