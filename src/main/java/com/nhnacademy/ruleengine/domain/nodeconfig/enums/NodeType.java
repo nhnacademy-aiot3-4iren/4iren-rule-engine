@@ -3,10 +3,10 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 public enum NodeType {
     //condition
-    THRESHOLD("임계치"),
-    GRADIANT("기울기"),
-    AVERAGE("평균값"),
-    DURATION("지속시간"),
+    THRESHOLD("임계치 판단"),
+    GRADIANT("기울기 판단"),
+    AVERAGE("평균값 판단"),
+    DURATION("지속시간 핀딘"),
 
     //action
     ALERT("알람(텔레그램)")
@@ -21,7 +21,7 @@ public enum NodeType {
         return description;
     }
 
-    public boolean isSensorDecisionNode() {
+    public boolean isConditionNode() {
         return this == THRESHOLD
                 || this == AVERAGE
                 || this == DURATION
