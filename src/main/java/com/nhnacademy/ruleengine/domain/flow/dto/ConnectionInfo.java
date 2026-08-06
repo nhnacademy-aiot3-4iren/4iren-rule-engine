@@ -9,8 +9,6 @@ public record ConnectionInfo(
         Long sourceNodeId,
 
         @NotNull
-        Long targetNodeId,
-
-        ConditionResult conditionResult
+        Long targetNodeId
 ) {
 }

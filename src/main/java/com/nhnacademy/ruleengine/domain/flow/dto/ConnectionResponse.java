@@ -14,9 +14,7 @@ public record ConnectionResponse (
 
         Long sourceNodeId,
 
-        Long targetNodeId,
-
-        ConditionResult conditionResult
+        Long targetNodeId
 ){
     public static List<ConnectionResponse> fromList(List<Connection> connections) {
         return connections.stream()
@@ -25,7 +23,7 @@ public record ConnectionResponse (
                         .flowId(c.getFlow().getId())
                         .sourceNodeId(c.getSourceNode().getId())
                         .targetNodeId(c.getTargetNode().getId())
-                        .conditionResult(c.getConditionResult()).build()
+                        .build()
                 ).toList();
     }
 }

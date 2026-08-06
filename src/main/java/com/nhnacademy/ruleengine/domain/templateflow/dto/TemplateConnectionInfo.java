@@ -8,7 +8,5 @@ public 	record TemplateConnectionInfo(
         Long sourceNodeId,
 
         @NotNull
-        Long targetNodeId,
-
-        ConditionResult conditionResult
+        Long targetNodeId
 ) {}

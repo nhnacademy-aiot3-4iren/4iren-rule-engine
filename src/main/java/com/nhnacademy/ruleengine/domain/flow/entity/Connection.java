@@ -1,9 +1,12 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Entity
@@ -37,20 +40,16 @@ public class Connection {
     @JoinColumn(name = "target_node_id", nullable = false)
     private Node targetNode;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "conditions_result", nullable = false, length = 10)
-    private ConditionResult conditionResult;
 
     @Builder
     public Connection(Flow flow, Node sourceNode, Node targetNode, ConditionResult conditionResult) {
         this.flow = flow;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
-        this.conditionResult =conditionResult;
     }
 
-    public static Connection create(Flow flow, Node sourceNode, Node targetNode, ConditionResult conditionResult){
+    public static Connection create(Flow flow, Node sourceNode, Node targetNode){
         return Connection.builder()
-                .flow(flow).sourceNode(sourceNode).targetNode(targetNode).conditionResult(conditionResult).build();
+                .flow(flow).sourceNode(sourceNode).targetNode(targetNode).build();
     }
 }
