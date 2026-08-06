@@ -1,8 +1,11 @@
 package com.nhnacademy.ruleengine.domain.templateflow.controller;
 
+import com.nhnacademy.ruleengine.domain.templateflow.dto.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -10,5 +13,44 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplateFlowController {
 
 
+    // [템플릿 플로우 생성]
+    @PostMapping
+    public ResponseEntity<TemplateCreateResponse> createTemplateFlow(
+            @Valid @RequestBody TemplateFlowCreateRequest request) {
 
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // [템플릿 플로우 목록 조회] GET /api/templates/
+    @GetMapping
+    public ResponseEntity<TemplateListResponse> getTemplateFlowList() {
+
+        return ResponseEntity.ok().build();
+    }
+
+    // [템플릿 플로우 상세 조회 및 템플릿 플로우 수정 폼 화면] GET /api/templates/{template_id}
+    @GetMapping("/{template_id}")
+    public ResponseEntity<TemplateDetailResponse> getTemplateFlowDetail(
+            @PathVariable("template_id") Long templateId) {
+
+        return ResponseEntity.ok().build();
+    }
+
+    // [템플릿 플로우 수정] POST /api/templates/{template_id}
+    @PostMapping("/{template_id}")
+    public ResponseEntity<Void> updateTemplateFlow(
+            @PathVariable("template_id") Long templateId,
+            @Valid @RequestBody TemplateFlowUpdateRequest request) {
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // [템플릿 플로우 삭제] DELETE /api/templates/{template-id}
+    @DeleteMapping("/{template-id}")
+    public ResponseEntity<Void> deleteTemplateFlow(
+            @PathVariable("template-id") Long templateId) {
+
+        return ResponseEntity.noContent().build();
+    }
 }
+
