@@ -38,39 +38,37 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
-        Flow flow = Flow.builder()
-                .roomId(roomId)
-                .flowName(request.flowName())
-                .description(request.description())
-                .isActive(true)
-                .isTemplate(false).build();
+        Flow flow = Flow.regularBuilder()
+                .roomId(roomId).flowName(request.flowName()).description(request.description()).build();
+
 
         Flow savedFlow = flowRepository.save(flow);
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
         validate(request.nodes(), request.connections());
+
         return FlowCreateResponse.of(savedFlow.getId());
     }
 
-    @Transactional
-    @Override
-    public FlowCreateResponse createFlowFromTemplate(Long roomId, Long templateId, FlowCreateRequest request) {
-        Flow flow = Flow.builder()
-                .roomId(roomId)
-                .flowName(request.flowName())
-                .description(request.description())
-                .isActive(true)
-                .isTemplate(false).build();
-
-        Flow savedFlow = flowRepository.save(flow);
-
-        Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes());
-        saveConnections(savedFlow, request.connections(), tempIdMap);
-        validate(request.nodes(), request.connections());
-        //TODO isTemplate 검증 필요
-        return FlowCreateResponse.of(savedFlow.getId());
-    }
+//    @Transactional
+//    @Override
+//    public FlowCreateResponse createFlowFromTemplate(Long roomId, Long templateId, FlowCreateRequest request) {
+//        Flow flow = Flow.builder()
+//                .roomId(roomId)
+//                .flowName(request.flowName())
+//                .description(request.description())
+//                .isActive(true)
+//                .isTemplate(false).build();
+//
+//        Flow savedFlow = flowRepository.save(flow);
+//
+//        Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes());
+//        saveConnections(savedFlow, request.connections(), tempIdMap);
+//        validate(request.nodes(), request.connections());
+//
+//        return FlowCreateResponse.of(savedFlow.getId());
+//    }
 
     @Override
     public FlowListResponse getFlowList(Long roomId) {
@@ -80,12 +78,7 @@ public class FlowServiceImpl implements FlowService {
             return FlowListResponse.of(List.of());
         }
 
-        List<FlowResponse> response = flowList.stream()
-                .map(f -> FlowResponse.from(
-                        f, flowScheduleRepository.existsById(f.getId()))
-                )
-                .toList();
-
+        List<FlowResponse> response = FlowResponse.fromList(flowList);
         return FlowListResponse.of(response);
     }
 

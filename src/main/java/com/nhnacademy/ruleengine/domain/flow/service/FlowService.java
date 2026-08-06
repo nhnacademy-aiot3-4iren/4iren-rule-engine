@@ -7,7 +7,7 @@ public interface FlowService {
     FlowCreateResponse createFlow(Long roomeId, FlowCreateRequest request);
 
     //템플릿 기반 플로우 생성
-    FlowCreateResponse createFlowFromTemplate(Long roomId, Long templateId, FlowCreateRequest request);
+//    FlowCreateResponse createFlowFromTemplate(Long roomId, Long templateId, FlowCreateRequest request);
 
     //플로우 목록 조회
     FlowListResponse getFlowList(Long roomId);

@@ -4,6 +4,9 @@ import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Builder
 public record FlowResponse(
@@ -13,8 +16,6 @@ public record FlowResponse(
 
         String description,
 
-        boolean hasSchedule,
-
         boolean isActive,
 
         LocalDateTime createdAt,
@@ -22,16 +23,26 @@ public record FlowResponse(
         LocalDateTime updatedAt
 ) {
 
-    static public FlowResponse from(Flow flow, boolean hasSchedule){
+    public static  FlowResponse from(Flow flow){
         return FlowResponse.builder()
                 .flowId(flow.getId())
                 .flowName(flow.getFlowName())
                 .description(flow.getDescription())
-                .hasSchedule(hasSchedule)
                 .isActive(flow.getIsActive())
                 .createdAt(flow.getCreatedAt())
                 .updatedAt(flow.getUpdatedAt()).build();
 
+    }
+    public static List<FlowResponse> fromList(List<Flow> flowList){
+         return flowList.stream()
+                .map(flow -> FlowResponse.builder()
+                        .flowId(flow.getId())
+                        .flowName(flow.getFlowName())
+                        .description(flow.getDescription())
+                        .isActive(flow.getIsActive())
+                        .createdAt(flow.getCreatedAt())
+                        .updatedAt(flow.getUpdatedAt()).build()
+                ).toList();
     }
 
 }
