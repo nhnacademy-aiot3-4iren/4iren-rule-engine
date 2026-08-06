@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateSensorType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
