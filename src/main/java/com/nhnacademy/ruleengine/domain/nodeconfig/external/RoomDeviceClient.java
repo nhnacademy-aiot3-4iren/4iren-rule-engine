@@ -10,6 +10,6 @@ import java.util.List;
 @FeignClient(name = "4iren-processing")
 public interface RoomDeviceClient {
 
-    @GetMapping("/api/sensors")
-    List<ExternalRoomDeviceInfo> getRoomDevices(@RequestParam("roomId") Long roomId);
+    @GetMapping("/api/processing/sensors")
+    List<ExternalRoomDeviceInfo> getRoomDevices(@RequestParam("room-id") Long roomId);
 }
