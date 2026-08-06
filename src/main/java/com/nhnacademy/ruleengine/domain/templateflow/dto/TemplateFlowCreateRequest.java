@@ -24,4 +24,5 @@ public record TemplateFlowCreateRequest(
         @NotNull
         List<TemplateConnectionInfo> connections
 ) {
+
 }

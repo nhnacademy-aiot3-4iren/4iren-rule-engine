@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.templateflow.dto;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.ConnectionResponse;
-import com.nhnacademy.ruleengine.domain.flow.dto.flow.NodeResponse;
+
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;

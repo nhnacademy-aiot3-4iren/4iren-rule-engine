@@ -23,4 +23,9 @@ public record TemplateNodeInfo(
 
         Integer cooldownSec
 
-) {}
+) {
+
+    public boolean isNew(){
+        return this.nodeId < 0;
+    }
+}
