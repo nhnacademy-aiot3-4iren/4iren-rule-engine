@@ -8,8 +8,6 @@ import org.hibernate.validator.constraints.Length;
 import java.util.List;
 
 public record FlowUpdateRequest(
-        @NotNull
-        Long flowId,
 
         @Length(max = 50)
         @NotBlank
