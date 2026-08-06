@@ -29,17 +29,17 @@ public class TemplateFlowController {
     }
 
     // [템플릿 플로우 상세 조회 및 템플릿 플로우 수정 폼 화면] GET /api/templates/{template_id}
-    @GetMapping("/{template_id}")
+    @GetMapping("/{template-id}")
     public ResponseEntity<TemplateDetailResponse> getTemplateFlowDetail(
-            @PathVariable("template_id") Long templateId) {
+            @PathVariable("template-id") Long templateId) {
 
         return ResponseEntity.ok().build();
     }
 
     // [템플릿 플로우 수정] POST /api/templates/{template_id}
-    @PostMapping("/{template_id}")
+    @PostMapping("/{template-id}")
     public ResponseEntity<Void> updateTemplateFlow(
-            @PathVariable("template_id") Long templateId,
+            @PathVariable("template-id") Long templateId,
             @Valid @RequestBody TemplateFlowUpdateRequest request) {
 
         return ResponseEntity.noContent().build();
