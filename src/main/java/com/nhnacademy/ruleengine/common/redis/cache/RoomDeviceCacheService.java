@@ -29,19 +29,19 @@ public class RoomDeviceCacheService {
         String key = buildKey(roomId);
 
         Object cached = redisTemplate.opsForValue().get(key);
-        if (cached != null) {
-            return objectMapper.convertValue(
-                    cached,
-                    new TypeReference<List<ExternalRoomDeviceInfo>>() {}
-            );
-        }
-
-//        if (cached instanceof List<?> cachedList) {
-//            @SuppressWarnings("unchecked")
-//            List<ExternalRoomDeviceInfo> devices = (List<ExternalRoomDeviceInfo>) cachedList;
-//            log.debug("Redis cache hit. roomId={}, key={}", roomId, key);
-//            return devices;
+//        if (cached != null) {
+//            return objectMapper.convertValue(
+//                    cached,
+//                    new TypeReference<List<ExternalRoomDeviceInfo>>() {}
+//            );
 //        }
+
+        if (cached instanceof List<?> cachedList) {
+            @SuppressWarnings("unchecked")
+            List<ExternalRoomDeviceInfo> devices = (List<ExternalRoomDeviceInfo>) cachedList;
+            log.debug("Redis cache hit. roomId={}, key={}", roomId, key);
+            return devices;
+        }
 
         List<ExternalRoomDeviceInfo> devices;
 
