@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_FLOW_SCHEDULE(HttpStatus.BAD_REQUEST, "INVALID_FLOW_SCHEDULE", "유효하지 않은 Flow Schedule입니다."),
     INVALID_NODE(HttpStatus.BAD_REQUEST, "INVALID_NODE", "유효하지 않은 Node입니다."),
 
+    FLOW_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FLOW_VALIDATION_FAILED","플로우 무결성 검증에 실패했습니다."),
 
     //401 unauthorized
     UNAUTHORIZED_FLOW_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_FLOW_ACCESS", "해당 Flow에 접근 권한이 없습니다."),
