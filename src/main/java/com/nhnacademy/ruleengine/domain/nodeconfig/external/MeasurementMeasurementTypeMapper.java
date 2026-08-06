@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Component
 public class MeasurementMeasurementTypeMapper {
+    //TODO MeasurementType, 단위 processing에게 의존하도록? 혹은 매핑 방식을 동적으로? 암튼 하드코딩 안됨
     private final Map<String, MeasurementType> sensorTypeMap = Map.of(
             "co2", MeasurementType.CO2,
             "temperature", MeasurementType.TEMPERATURE,

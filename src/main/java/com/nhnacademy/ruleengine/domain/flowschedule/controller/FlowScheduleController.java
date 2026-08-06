@@ -12,10 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/rooms/{room-id}/flow/{flow-id}/schedules")
+@RequestMapping("/api/rooms/{room-id}/flows/{flow-id}/schedules")
 @RequiredArgsConstructor
 public class FlowScheduleController {
     private final FlowScheduleService flowScheduleService;
+    //TODO 안쓰는 파라미터 매개변수 삭제
 
     //플로우 스케줄 생성
     @PostMapping

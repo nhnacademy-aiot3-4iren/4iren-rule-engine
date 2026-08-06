@@ -84,7 +84,7 @@ public class NodeConfigServiceImpl implements NodeConfigService {
             default -> errors.add("알 수 없는 노드 타입");
         }
     }
-
+//TODO 검증 코드 클래스별로 분리 -> 확장성
     private void validateValueRange(MeasurementType type, double value, List<String> errors) {
         switch (type) {
             case TEMPERATURE -> {
@@ -99,7 +99,7 @@ public class NodeConfigServiceImpl implements NodeConfigService {
                 if (value < 0 || value > 10000)
                     errors.add("CO2 값 범위 초과 (0 ~ 10000): " + value);
             }
-            // 추가 measurementType 여기에
+            // TODO 추가 measurementType 여기에
         }
     }
 

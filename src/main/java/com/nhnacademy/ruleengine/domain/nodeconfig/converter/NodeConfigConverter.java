@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeConfigConverter implements AttributeConverter<NodeConfig, String> {
 
+    //TODO static 빼야함. npe 발생 가능
     private static ObjectMapper objectMapper;
     public NodeConfigConverter(ObjectMapper objectMapper){
         NodeConfigConverter.objectMapper = objectMapper;

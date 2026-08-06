@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+//TODO /api/rule 붙이기
 @RestController
 @RequestMapping("/api/rooms/{room-id}/flows")
 @RequiredArgsConstructor

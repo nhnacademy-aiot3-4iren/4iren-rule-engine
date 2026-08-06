@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+//TODO 레디스 종류 string 레디스 ...etc @cacheable / string cache
 
 @Slf4j
 @Service
@@ -21,7 +22,7 @@ public class RoomDeviceCacheService {
     private static final Duration TTL = Duration.ofMinutes(10);
 
     @Qualifier("externalRoomDeviceRedisTemplate")
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;//TODO 생성자 주입하기
     private final RoomDeviceClient roomDeviceClient;
     private final ObjectMapper objectMapper;
 
@@ -29,21 +30,24 @@ public class RoomDeviceCacheService {
         String key = buildKey(roomId);
 
         Object cached = redisTemplate.opsForValue().get(key);
-//        if (cached != null) {
-//            return objectMapper.convertValue(
-//                    cached,
-//                    new TypeReference<List<ExternalRoomDeviceInfo>>() {}
-//            );
-//        }
+        if (cached != null) {
+            log.info("redis cache");
+            return objectMapper.convertValue(
+                    cached,
+                    new TypeReference<List<ExternalRoomDeviceInfo>>() {}
+            );
 
-        if (cached instanceof List<?> cachedList) {
-            @SuppressWarnings("unchecked")
-            List<ExternalRoomDeviceInfo> devices = (List<ExternalRoomDeviceInfo>) cachedList;
-            log.debug("Redis cache hit. roomId={}, key={}", roomId, key);
-            return devices;
         }
 
+//        if (cached instanceof List<?> cachedList) {
+//            @SuppressWarnings("unchecked")
+//            List<ExternalRoomDeviceInfo> devices = (List<ExternalRoomDeviceInfo>) cachedList;
+//            log.debug("Redis cache hit. roomId={}, key={}", roomId, key);
+//            return devices;
+//        }//TODO
+
         List<ExternalRoomDeviceInfo> devices;
+
 
 
         try {
@@ -60,8 +64,10 @@ public class RoomDeviceCacheService {
         return "room:%d:devices".formatted(roomId);
     }
 
+    //TODO 테스트용
     private List<ExternalRoomDeviceInfo> getDummyDevices() {
         try {
+            log.info("getDummyDevices");
             return objectMapper.readValue("""
                         [
                           {

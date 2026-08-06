@@ -22,10 +22,9 @@ import java.util.List;
 public class FlowScheduleServiceImpl implements FlowScheduleService {
     private final FlowRepository flowRepository;
     private final FlowScheduleRepository flowScheduleRepository;
-
     @Override
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
-        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()->new FlowNotFoundException());
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()->new FlowNotFoundException());//TODO 람다 말고 ::방식
 
         FlowSchedule flowSchedule = FlowSchedule.create(flow, request);
         FlowSchedule savedFlowSchedule = flowScheduleRepository.save(flowSchedule);
@@ -55,6 +54,7 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
         flowScheduleRepository.deleteById(scheduleId);
     }
 
+    //tODO 삭제
     private void saveSchedules(Flow savedFlow, @NotNull List<FlowScheduleCreateRequest> schedules) {
         if(schedules.isEmpty()){
             return;
