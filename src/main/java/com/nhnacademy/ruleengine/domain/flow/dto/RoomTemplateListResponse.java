@@ -12,10 +12,10 @@ public record RoomTemplateListResponse(
         List<RoomTemplateResponse> roomTemplateResponseList
 ) {
     public static RoomTemplateListResponse from(
-            List<Flow> templateFlow,
+            List<Flow> templateFlowList,
             Map<Long, List<MeasurementType>> sensorTypes
     ){
-        List<RoomTemplateResponse> roomTemplateResponses =  RoomTemplateResponse.fromList(templateFlow, sensorTypes);
+        List<RoomTemplateResponse> roomTemplateResponses =  RoomTemplateResponse.fromList(templateFlowList, sensorTypes);
         return new RoomTemplateListResponse(roomTemplateResponses);
     }
 }

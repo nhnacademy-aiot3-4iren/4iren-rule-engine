@@ -93,13 +93,23 @@ public class FlowServiceImpl implements FlowService {
 
     @Override
     public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
-        List<Flow> templateFlow = flowRepository.findAllByIsTemplate(true);
+        List<Flow> allTemplateFlowList = flowRepository.findAllByIsTemplate(true);
 
-        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(templateFlow);
+        //템플릿 플로우 id별 필요한 MeasurementType List
+        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(allTemplateFlowList);
+
+        //강의실에서 측정가능한 MeasurementType List
         List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
-        //TODO
 
-        return RoomTemplateListResponse.from(templateFlow, measurementTypesByTemplateId);
+        //강의실 MeasurementType List 기반 사용가능한 템플릿 플로우 리스트 필터링
+        List<Long> availableTemplateIds = measurementTypesByTemplateId.entrySet().stream()
+                .filter(entry -> measurementTypesInRoom.containsAll(entry.getValue()))
+                .map(Map.Entry::getKey).toList();
+        List<Flow> templateFlowList = flowRepository.findAllById(availableTemplateIds);
+
+        RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
+
+        return RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
     }
 
     @Override

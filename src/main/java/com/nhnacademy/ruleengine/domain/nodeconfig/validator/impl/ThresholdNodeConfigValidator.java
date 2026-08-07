@@ -47,7 +47,7 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
         return errors;
     }
 
-    //TODO utill클래스로 뺴기
+    //TODO util클래스로 빼기
     private List<String>  validateThresholdRange(MeasurementType measurementType, double threshold, List<String> errors) {
         switch (measurementType) {
             case TEMPERATURE -> {

@@ -10,6 +10,9 @@ public record SensorStaticMeta(
         MeasurementType measurementType,
         String unit,
         List<DeviceInfo> deviceOptions
+        /*
+        MeasurementType measurementTypeDesc
+         */
 ) {
     public static  SensorStaticMeta of(MeasurementType measurementType, String unit, List<DeviceInfo> deviceOptions){
         return SensorStaticMeta.builder().measurementType(measurementType).unit(unit).deviceOptions(deviceOptions).build();
