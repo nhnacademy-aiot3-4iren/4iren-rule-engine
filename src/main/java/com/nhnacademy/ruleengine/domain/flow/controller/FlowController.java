@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//TODO /api/rule 붙이기
+
 @RestController
-@RequestMapping("/api/rooms/{room-id}/flows")
+@RequestMapping("/api/rule/rooms/{room-id}/flows")
 @RequiredArgsConstructor
 public class FlowController {
 
@@ -23,16 +23,6 @@ public class FlowController {
         FlowCreateResponse response = flowService.createFlow(roomId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-//    //템플릿으로 플로우 생성 -> 일반적인 플로우 생성으로 api 통일
-//    @PostMapping("/templates/{template-id}")
-//    public ResponseEntity<FlowCreateResponse> createFlowFromTemplate(
-//            @PathVariable("room-id") Long roomId,
-//            @PathVariable("template-id") Long templateId,
-//            @Valid @RequestBody FlowCreateRequest request) {
-//        FlowCreateResponse response = flowService.createFlowFromTemplate(roomId, templateId, request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//    }
 
     //플로우 목록 조회
     @GetMapping

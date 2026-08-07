@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/rooms/{room-id}")
+@RequestMapping("api/rule/rooms/{room-id}")
 @RequiredArgsConstructor
 public class NodeConfigController {
 

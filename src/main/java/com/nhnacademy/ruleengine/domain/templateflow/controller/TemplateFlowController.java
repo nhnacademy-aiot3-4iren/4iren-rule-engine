@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(" /api/templates/")
+@RequestMapping("/api/rule/templates/")
 public class TemplateFlowController {
 
     TemplateFlowService templateFlowService;

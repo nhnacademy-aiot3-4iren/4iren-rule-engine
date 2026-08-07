@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/rooms/{room-id}/flows/{flow-id}/schedules")
+@RequestMapping("/api/rule/rooms/{room-id}/flows/{flow-id}/schedules")
 @RequiredArgsConstructor
 public class FlowScheduleController {
     private final FlowScheduleService flowScheduleService;
