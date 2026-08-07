@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisCacheConfig {
 
     //
-    @Bean(name = "externalRoomDeviceRedisTemplate")
+    @Bean()
     public RedisTemplate<String, Object> externalRoomDeviceRedisTemplate(
             RedisConnectionFactory redisConnectionFactory,
             ObjectMapper objectMapper

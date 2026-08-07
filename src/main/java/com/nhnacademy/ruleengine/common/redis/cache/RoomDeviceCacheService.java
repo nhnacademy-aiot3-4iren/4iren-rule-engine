@@ -13,18 +13,25 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
-//TODO 레디스 종류 string 레디스 ...etc @cacheable / string cache
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RoomDeviceCacheService {
     private static final Duration TTL = Duration.ofMinutes(10);
 
-    @Qualifier("externalRoomDeviceRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;//TODO 생성자 주입하기
     private final RoomDeviceClient roomDeviceClient;
     private final ObjectMapper objectMapper;
+
+    public RoomDeviceCacheService(
+            @Qualifier("externalRoomDeviceRedisTemplate")RedisTemplate<String, Object> redisTemplate,
+            RoomDeviceClient roomDeviceClient,
+            ObjectMapper objectMapper
+            ){
+        this.redisTemplate = redisTemplate;
+        this.roomDeviceClient = roomDeviceClient;
+        this.objectMapper = objectMapper;
+    }
 
     public List<ExternalRoomDeviceInfo> getRoomDevices(Long roomId){
         String key = buildKey(roomId);
@@ -39,16 +46,7 @@ public class RoomDeviceCacheService {
 
         }
 
-//        if (cached instanceof List<?> cachedList) {
-//            @SuppressWarnings("unchecked")
-//            List<ExternalRoomDeviceInfo> devices = (List<ExternalRoomDeviceInfo>) cachedList;
-//            log.debug("Redis cache hit. roomId={}, key={}", roomId, key);
-//            return devices;
-//        }//TODO
-
         List<ExternalRoomDeviceInfo> devices;
-
-
 
         try {
             devices = roomDeviceClient.getRoomDevices(roomId);
@@ -64,7 +62,7 @@ public class RoomDeviceCacheService {
         return "room:%d:devices".formatted(roomId);
     }
 
-    //TODO 테스트용
+    //TODO 테스트용 추후 삭제
     private List<ExternalRoomDeviceInfo> getDummyDevices() {
         try {
             log.info("getDummyDevices");
