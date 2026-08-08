@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//TODO 바뀐 플로우 빌드 방식에 따라 수정해야함
 @Service
 @RequiredArgsConstructor
 public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {

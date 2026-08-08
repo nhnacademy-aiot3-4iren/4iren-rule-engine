@@ -54,21 +54,5 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
         flowScheduleRepository.deleteById(scheduleId);
     }
 
-    //tODO 삭제
-    private void saveSchedules(Flow savedFlow, @NotNull List<FlowScheduleCreateRequest> schedules) {
-        if(schedules.isEmpty()){
-            return;
-        }
-
-        List<FlowSchedule> scheduleList = schedules.stream()
-                .map(s-> FlowSchedule.builder()
-                        .flow(savedFlow)
-                        .dayOfWeek(s.dayOfWeek())
-                        .startTime(s.startTime())
-                        .endTime(s.endTime()).build())
-                .toList();
-
-        List<FlowSchedule> savedScheduleList = flowScheduleRepository.saveAll(scheduleList);
-    }
 
 }

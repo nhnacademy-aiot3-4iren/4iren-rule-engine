@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FlowScheduleController {
     private final FlowScheduleService flowScheduleService;
-    //TODO 안쓰는 파라미터 매개변수 삭제
 
     //플로우 스케줄 생성
     @PostMapping
@@ -25,15 +24,12 @@ public class FlowScheduleController {
             @PathVariable("flow-id") Long flowId,
             @RequestBody @Valid FlowScheduleCreateRequest request
             ){
-
         return ResponseEntity.status(HttpStatus.CREATED).body(flowScheduleService.createFlowSchedule(roomId,flowId, request));
     }
-
 
     //특정 플로우의 스케줄 목록 조회
     @GetMapping
     public ResponseEntity<FlowScheduleListResponse> getList(
-            @PathVariable("room-id") Long roomId,
             @PathVariable("flow-id") Long flowId
     ){
         return ResponseEntity.ok(flowScheduleService.getFlowScheduleList( flowId));
@@ -42,8 +38,6 @@ public class FlowScheduleController {
     //특정 플로우 스케줄 상세 조회
     @GetMapping("/{schedule-id}")
     public ResponseEntity<FlowScheduleResponse> getDetail(
-            @PathVariable("room-id") Long roomId,
-            @PathVariable("flow-id") Long flowId,
             @PathVariable("schedule-id") Long scheduleId
     ){
         return ResponseEntity.ok(flowScheduleService.getFlowScheduleDetail(scheduleId));
@@ -51,8 +45,6 @@ public class FlowScheduleController {
 
     @DeleteMapping("/{schedule-id}")
     public ResponseEntity<Void> delete(
-            @PathVariable("room-id") Long roomId,
-            @PathVariable("flow-id") Long flowId,
             @PathVariable("schedule-id") Long scheduleId
     ){
         flowScheduleService.deleteFlowSchedule( scheduleId);

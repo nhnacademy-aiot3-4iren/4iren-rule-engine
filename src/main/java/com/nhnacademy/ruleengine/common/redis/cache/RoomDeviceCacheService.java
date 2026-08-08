@@ -19,7 +19,7 @@ import java.util.List;
 public class RoomDeviceCacheService {
     private static final Duration TTL = Duration.ofMinutes(10);
 
-    private final RedisTemplate<String, Object> redisTemplate;//TODO 생성자 주입하기
+    private final RedisTemplate<String, Object> redisTemplate;
     private final RoomDeviceClient roomDeviceClient;
     private final ObjectMapper objectMapper;
 
