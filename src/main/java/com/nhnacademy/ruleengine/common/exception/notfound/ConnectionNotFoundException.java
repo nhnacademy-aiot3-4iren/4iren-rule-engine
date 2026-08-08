@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.BusinessException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 
 public class ConnectionNotFoundException extends BusinessException {
-    public ConnectionNotFoundException(Long connId) {
+    public ConnectionNotFoundException() {
         super(ErrorCode.CONNECTION_NOT_FOUND);
     }
 }

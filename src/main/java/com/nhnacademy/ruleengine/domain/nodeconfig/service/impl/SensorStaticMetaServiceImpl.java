@@ -63,7 +63,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream())
-                .map(measurement -> measurementmeasurementTypeMapper.toMeasurementType(measurement).orElseThrow(()-> new MeasurementTypeNotFoundException()))
+                .map(measurement -> measurementmeasurementTypeMapper.toMeasurementType(measurement).orElseThrow(MeasurementTypeNotFoundException::new))
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -72,7 +72,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().entrySet().stream())
                 .collect(Collectors.toMap(
-                        entry -> measurementmeasurementTypeMapper.toMeasurementType(entry.getKey()).orElseThrow(()->new MeasurementTypeNotFoundException()),
+                        entry -> measurementmeasurementTypeMapper.toMeasurementType(entry.getKey()).orElseThrow(MeasurementTypeNotFoundException::new),
                         Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue,
                         () -> new EnumMap<>(MeasurementType.class)
@@ -83,7 +83,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementType>
                         .map(measurementType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>
-                                measurementmeasurementTypeMapper.toMeasurementType(measurementType).orElseThrow(()->new MeasurementTypeNotFoundException()),
+                                measurementmeasurementTypeMapper.toMeasurementType(measurementType).orElseThrow(MeasurementTypeNotFoundException::new),
                                 DeviceInfo.of(room.devEui(), room.deviceName())
                         ))
                 ).collect(Collectors.groupingBy(//Map<MeasurementType, List<DeviceInfo>>

@@ -36,7 +36,7 @@ public class NodeConfigServiceImpl implements NodeConfigService {
         NodeConfig nodeConfig = null;
 
         if(nodeId > 0) {
-            Node node = nodeRepository.findById(nodeId).orElseThrow(() -> new NodeNotFoundException());
+            Node node = nodeRepository.findById(nodeId).orElseThrow(NodeNotFoundException::new);
             nodeConfig = node.getNodeConfig();
         }
 

@@ -24,7 +24,7 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
     private final FlowScheduleRepository flowScheduleRepository;
     @Override
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
-        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()->new FlowNotFoundException());//TODO 람다 말고 ::방식
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
         FlowSchedule flowSchedule = FlowSchedule.create(flow, request);
         FlowSchedule savedFlowSchedule = flowScheduleRepository.save(flowSchedule);
@@ -44,7 +44,7 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
     @Override
     public FlowScheduleResponse getFlowScheduleDetail(Long scheduleId) {
         FlowSchedule flowSchedule = flowScheduleRepository.findById(scheduleId)
-                .orElseThrow(()-> new FlowScheduleNotFoundException(scheduleId));
+                .orElseThrow(FlowScheduleNotFoundException::new);
 
         return FlowScheduleResponse.from(flowSchedule);
     }

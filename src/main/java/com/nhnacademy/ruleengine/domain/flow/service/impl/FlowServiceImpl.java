@@ -66,7 +66,7 @@ public class FlowServiceImpl implements FlowService {
 
     @Override
     public FlowDetailResponse getFlowDetail(Long roomId, Long flowId) {
-        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(()-> new FlowNotFoundException());
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
@@ -98,7 +98,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
         Flow tempalteFlow = flowRepository.findById(templateFlowId)
-                .orElseThrow(() -> new FlowNotFoundException());
+                .orElseThrow(FlowNotFoundException::new);
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
@@ -109,7 +109,7 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
-        Flow flow = flowRepository.findById(flowId).orElseThrow( () -> new FlowNotFoundException());
+        Flow flow = flowRepository.findById(flowId).orElseThrow(FlowNotFoundException::new);
 
         flow.updateReguler(request.flowName(),request.description(), request.isActive());
 
@@ -123,7 +123,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public void deleteFlow(Long roomId, Long flowId) {
         if(!flowRepository.existsByIdAndRoomId(flowId, roomId)){
-            throw new UnauthorizedFlowAccessException(flowId, roomId);
+            throw new UnauthorizedFlowAccessException();
         }
         flowRepository.deleteById(flowId);
     }
