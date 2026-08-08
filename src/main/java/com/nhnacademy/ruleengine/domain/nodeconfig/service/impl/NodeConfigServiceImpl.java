@@ -99,7 +99,6 @@ public class NodeConfigServiceImpl implements NodeConfigService {
                 if (value < 0 || value > 10000)
                     errors.add("CO2 값 범위 초과 (0 ~ 10000): " + value);
             }
-            // TODO 추가 measurementType 여기에
         }
     }
 
