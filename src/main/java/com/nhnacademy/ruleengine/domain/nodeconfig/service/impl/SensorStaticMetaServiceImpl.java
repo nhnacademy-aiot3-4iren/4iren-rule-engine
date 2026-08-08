@@ -30,11 +30,11 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 
         List<SensorStaticMeta> sensorStaticMetaList = new ArrayList<>();
 
-        Map<MeasurementType, List<DeviceInfo>> deviceInfoBySensorType = getDeviceInfoByMeasurementType(roomDeviceInfoList);
-        Map<MeasurementType, String> unitBySensorType = getUnitByMeasuremrntType(roomDeviceInfoList);
+        Map<MeasurementType, List<DeviceInfo>> deviceInfoByMeasurementType = getDeviceInfoByMeasurementType(roomDeviceInfoList);
+        Map<MeasurementType, String> unitByMeasurementType = getUnitByMeasuremrntType(roomDeviceInfoList);
 
-        for(MeasurementType measurementType : deviceInfoBySensorType.keySet()){
-            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitBySensorType.get(measurementType), deviceInfoBySensorType.get(measurementType)));
+        for(MeasurementType measurementType : deviceInfoByMeasurementType.keySet()){
+            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitByMeasurementType.get(measurementType), deviceInfoByMeasurementType.get(measurementType)));
         }
 
         return sensorStaticMetaList;
@@ -81,9 +81,9 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 
     private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoByMeasurementType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
-                .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementSensorType>
-                        .map(sensorType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>
-                                measurementmeasurementTypeMapper.toMeasurementType(sensorType).orElseThrow(()->new MeasurementTypeNotFoundException()),
+                .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementType>
+                        .map(measurementType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>
+                                measurementmeasurementTypeMapper.toMeasurementType(measurementType).orElseThrow(()->new MeasurementTypeNotFoundException()),
                                 DeviceInfo.of(room.devEui(), room.deviceName())
                         ))
                 ).collect(Collectors.groupingBy(//Map<MeasurementType, List<DeviceInfo>>

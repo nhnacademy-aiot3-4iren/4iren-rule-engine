@@ -1,116 +1,44 @@
-### 글로벌 변수 설정 (필요시 파일 상단에 정의하거나 IntelliJ 환경 파일로 관리)
-@host = http://localhost:8080
-@roomId = 101
-@nodeId = 2
+### 변수 설정
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}/api/rule
+@roomId = 1
+@nodeId = 3
 @tempNodeId = -1
 
-
-### 1. 저장된 노드의 설정 및 메타 정보 조회 (판단 노드)
-# 양수 nodeId인 경우 nodeConfig가 포함되고, 판단 노드(NodeType=CONDITION)이므로 sensorStaticMetaList가 반환됩니다.
-GET {{host}}/api/rooms/{{roomId}}/node-config/1?nodeType=THRESHOLD
+### [노드 설정 조회 및 메타 정보] 특정 노드의 설정 양식 및 장비 옵션 추출
+GET {{baseUrl}}/rooms/{{roomId}}/node-config/{{nodeId}}?nodeType=DURATION
 Accept: application/json
 
-> {%
-    client.test("Request executed successfully", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.nodeId > 0, "nodeId should be positive");
-        client.assert(response.body.nodeConfig !== null, "nodeConfig should not be null for existing nodes");
-        client.assert(response.body.sensorStaticMetaList !== null, "sensorStaticMetaList should not be null for condition nodes");
-    });
-%}
-
-
-### 2. 미저장(임시 ID) 노드의 설정 및 메타 정보 조회 (판단 노드)
-# 음수 nodeId인 경우 nodeConfig는 null로 반환됩니다.
-GET {{host}}/api/rooms/{{roomId}}/node-config/{{tempNodeId}}?nodeType=THRESHOLD
-Accept: application/json
-
-> {%
-    client.test("Request executed successfully", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.nodeId < 0, "nodeId should be negative");
-        client.assert(response.body.nodeConfig === null, "nodeConfig should be null for temporary nodes");
-    });
-%}
-
-
-### 3. 행동 노드의 설정 및 메타 정보 조회
-# NodeType이 ACTION(행동노드)이므로 sensorStaticMetaList는 null로 반환됩니다.
-GET {{host}}/api/rooms/{{roomId}}/node-config/{{nodeId}}?nodeType=ALERT
-Accept: application/json
-
-> {%
-    client.test("Request executed successfully", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.sensorStaticMetaList === null, "sensorStaticMetaList should be null for action nodes");
-    });
-%}
-
-
-### 4. 노드 설정 유효성 검증 - 성공 케이스 (Threshold 노드 예시)
-# 정상적인 범위의 값을 전송하여 valid가 true로 오는지 확인합니다.
-POST {{host}}/api/rooms/{{roomId}}/validate-config
+### [노드 설정 유효성 검증] 정상 케이스 테스트
+POST {{baseUrl}}/rooms/{{roomId}}/validate-config
 Content-Type: application/json
 
 {
   "nodeConfig": {
     "nodeType": "THRESHOLD",
+    "x": 200,
+    "y": 200,
+    "measurementType": "CO2",
+    "unit": "ppm",
+    "operator": "GTE",
+    "threshold": 1200.0
+  }
+}
+
+### [노드 설정 유효성 검증] 실패 케이스 테스트 (잘못된 필드 누락 등)
+POST {{baseUrl}}/rooms/{{roomId}}/validate-config
+Content-Type: application/json
+
+{
+  "nodeConfig": {
+    "nodeType": "AVERAGE",
+    "x": 200,
+    "y": 200,
     "measurementType": "TEMPERATURE",
-    "threshold": 25.5
+    "unit": "°C",
+    "operator": "LT",
+    "average": 22.0,
+    "windowSec": -60
   }
 }
-
-> {%
-    client.test("Validation Success", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.valid === true, "Validation should be successful");
-        client.assert(response.body.errors.length === 0, "Errors list should be empty");
-    });
-%}
-
-
-### 5. 노드 설정 유효성 검증 - 실패 케이스 (Gradient 노드 범위 초과 및 0 입력)
-# 잘못된 범위의 값과 gradient 값에 0을 입력하여 에러 메시지가 정상적으로 반환되는지 확인합니다.
-POST {{host}}/api/rooms/{{roomId}}/validate-config
-Content-Type: application/json
-
-{
-  "nodeConfig": {
-    "nodeType": "GRADIENT",
-    "measurementType": "HUMIDITY",
-    "gradiant": 0,
-    "windowSec": 5
-  }
-}
-
-> {%
-    client.test("Validation Failure", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.valid === false, "Validation should fail");
-        client.assert(response.body.errors.length > 0, "Errors list should not be empty");
-    });
-%}
-
-
-### 6. 노드 설정 유효성 검증 - 행동 노드 케이스 (Alert 노드 제목 누락)
-# 알림 제목(alertTitle)을 누락하거나 빈 값으로 보냈을 때 에러가 나는지 확인합니다.
-POST {{host}}/api/rooms/{{roomId}}/validate-config
-Content-Type: application/json
-
-{
-  "nodeConfig": {
-    "nodeType": "ALERT",
-    "alertTitle": "",
-    "dedupWindowSec": -5
-  }
-}
-
-> {%
-    client.test("Alert Validation Failure", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.valid === false, "Validation should fail");
-        // 에러 목록에 제목 누락과 시간 범위 초과 메시지가 포함되었는지 검증
-        client.assert(response.body.errors.includes("알림 제목을 입력해주세요"), "Should contain title error");
-        client.assert(response.body.errors.includes("dedupWindowSec은 0 이상이어야 합니다"), "Should contain windowSec error");
-    });
-%}

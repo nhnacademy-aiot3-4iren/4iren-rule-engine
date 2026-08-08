@@ -22,7 +22,7 @@ public record ThresholdNodeConfig (
         MeasurementType measurementType,
 
         @NotNull
-        String targetDeviceEui,
+        String unit,
 
         @NotNull
         Operator operator,

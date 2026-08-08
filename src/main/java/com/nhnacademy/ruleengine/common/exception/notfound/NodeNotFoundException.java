@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.BusinessException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 
 public class NodeNotFoundException extends BusinessException {
-    public NodeNotFoundException(Long nodeId) {
+    public NodeNotFoundException() {
         super(ErrorCode.NODE_NOT_FOUND);
     }
 }

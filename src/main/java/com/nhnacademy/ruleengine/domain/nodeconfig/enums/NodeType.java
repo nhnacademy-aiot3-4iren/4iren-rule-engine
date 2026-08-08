@@ -4,7 +4,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 public enum NodeType {
     //condition
     THRESHOLD("임계치 판단"),
-    GRADIANT("기울기 판단"),
+    GRADIENT("기울기 판단"),
     AVERAGE("평균값 판단"),
     DURATION("지속시간 핀딘"),
 
@@ -25,7 +25,7 @@ public enum NodeType {
         return this == THRESHOLD
                 || this == AVERAGE
                 || this == DURATION
-                || this == GRADIANT;
+                || this == GRADIENT;
     }
 
     public boolean isActionNode() {

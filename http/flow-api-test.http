@@ -1,233 +1,127 @@
-### 0. 글로벌 환경 및 헤더 변수 설정
-@baseUrl = http://localhost:8080
-@roomId = 101
-@flowId = 1
-@templateId = 1
-@contentType = application/json
+### 변수 설정
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}/api/rule
+@roomId = 1
+@flowId = 2
 
-
-### 1. 플로우 목록 조회
-GET {{baseUrl}}/api/rooms/{{roomId}}/flows
-Accept: {{contentType}}
-
-
-
-
-### 2. 강의실 별 템플릿 플로우 제안 목록 조회
-# <템플릿으로 플로우 생성> 버튼 클릭 시 호출
-GET {{baseUrl}}/api/rooms/{{roomId}}/flows/templates
-Accept: {{contentType}}
-
-
-
-### 3. 추천 템플릿 플로우 상세 조회
-# 템플릿 기반 생성 폼 화면을 그리기 위해 호출
-GET {{baseUrl}}/api/rooms/{{roomId}}/flows/{{templateId}}
-Accept: {{contentType}}
-
-
-
-### 4. 플로우 생성 (THRESHOLD + ALERT 예시)
-# 신규 생성 시 새로 추가된 노드는 음수 아이디(-1, -2)를 부여합니다.
-POST {{baseUrl}}/api/rooms/{{roomId}}/flows
-Content-Type: {{contentType}}
-Accept: {{contentType}}
+### [플로우 생성] 새로운 플로우 등록 (음수 임시 ID 포함)
+POST {{baseUrl}}/rooms/{{roomId}}/flows
+Content-Type: application/json
 
 {
-  "flowName": "CO2 임계치 알림 플로우",
-  "description": "CO2가 기준치 이상이면 텔레그램 알림 전송",
+  "flowName": "강의실 101호 쾌적도 제어 플로우",
+  "description": "CO2 농도가 높을 때 텔레그램으로 환기 알림을 보내는 플로우",
   "nodes": [
     {
       "nodeId": -1,
-      "nodeName": "CO2 임계치 조건",
+      "nodeName": "이산화탄소 임계치 판단 노드",
       "nodeType": "THRESHOLD",
       "cooldownSec": 60,
       "nodeConfig": {
         "nodeType": "THRESHOLD",
-        "x": 120,
-        "y": 180,
+        "x": 100,
+        "y": 150,
         "measurementType": "CO2",
-        "targetDeviceEui" : "24e124126d152862",
-        "operator": "GTE",
+        "unit": "ppm",
+        "operator": "GT",
         "threshold": 1000.0
       }
     },
     {
       "nodeId": -2,
-      "nodeName": "텔레그램 알림",
+      "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
       "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 420,
-        "y": 180,
+        "x": 300,
+        "y": 150,
         "channel": "TELEGRAM",
-        "alertTitle": "[경고] 실내 CO2 위험 수치 도달",
+        "alertTitle": "실내 이산화탄소 수치 초과!",
         "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 300
+        "dedupWindowSec": 600
       }
     }
   ],
   "connections": [
     {
       "sourceNodeId": -1,
-      "targetNodeId": -2,
-      "conditionResult": "TRUE"
+      "targetNodeId": -2
     }
   ]
 }
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
 
+### [플로우 목록 조회] 해당 룸의 전체 플로우 조회
+GET {{baseUrl}}/rooms/{{roomId}}/flows
+Accept: application/json
 
-### 5. 생성된 플로우 단건(상세) 조회 및 수정 폼
-# 4번에서 생성되어 동적으로 저장된 {{generatedFlowId}}를 추적하여 조회합니다.
-GET {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
-Accept: {{contentType}}
+### [강의실별 템플릿 플로우 제안 목록 조회]
+GET {{baseUrl}}/rooms/{{roomId}}/flows/templates
+Accept: application/json
 
+### [플로우 단건 상세 조회 및 수정 폼]
+GET {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+Accept: application/json
 
+### [추천 템플릿 플로우 상세 조회] (충돌 방지 경로 적용)
+GET {{baseUrl}}/rooms/{{roomId}}/flows/templates/1
+Accept: application/json
 
-### 6. 템플릿으로 플로우 생성
-POST {{baseUrl}}/api/rooms/{{roomId}}/flows/{{templateId}}
-Content-Type: {{contentType}}
-Accept: {{contentType}}
+### [플로우 수정] 기존 플로우 정보 및 노드 구조 대치
+PUT {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+Content-Type: application/json
 
 {
-  "flowName": "템플릿 기반 환기 플로우",
-  "description": "템플릿을 기반으로 생성한 플로우",
+  "flowName": "강의실 101호 쾌적도 제어 플로우 (수정)",
+  "description": "평균 온도 감지 기능이 추가된 플로우",
+  "isActive": true,
   "nodes": [
     {
-      "nodeId" : -1,
-      "nodeName": "CO2 평균값 조건",
+      "nodeId": 1,
+      "nodeName": "온도 평균값 판단 노드",
       "nodeType": "AVERAGE",
       "cooldownSec": 120,
       "nodeConfig": {
         "nodeType": "AVERAGE",
-        "x": 100,
-        "y": 150,
-        "measurementType": "CO2",
-        "targetDeviceEui": "24e124126d152862",
+        "x": 120,
+        "y": 200,
+        "measurementType": "TEMPERATURE",
+        "unit": "°C",
         "operator": "GTE",
-        "average": 1200.0,
+        "average": 28.5,
         "windowSec": 600
       }
     },
     {
       "nodeId": -2,
-      "nodeName": "텔레그램 알림",
+      "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
       "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 421,
-        "y": 180,
+        "x": 300,
+        "y": 150,
         "channel": "TELEGRAM",
-        "alertTitle": "[경고] CO2 평균 농도 초과",
+        "alertTitle": "실내 이산화탄소 수치 초과!",
         "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 300
+        "dedupWindowSec": 600
       }
     }
   ],
   "connections": [
-    {
-      "sourceNodeId": -1,
-      "targetNodeId": -2,
-      "conditionResult": "TRUE"
-    }
+      {
+      "sourceNodeId": 1,
+      "targetNodeId": -2
+      }
   ]
 }
 
-> {%
-    client.test("6. 템플릿 기반 플로우 생성 성공", function() {
-        client.assert(response.status === 201, "상태 코드가 201이 아닙니다.");
-    });
-%}
-
-
-### 7. 플로우 수정 (기존 노드 유지 및 신규 노드 추가 믹스)
-# 명세의 FlowUpdateRequest에 맞게 isActive 필드를 포함하고, 새 노드(-1)를 연결 구조에 엮어 수정합니다.
-PUT {{baseUrl}}/api/rooms/{{roomId}}/flows/{{flowId}}
-Content-Type: {{contentType}}
-Accept: {{contentType}}
-
-{
-  "flowName": "수정된 CO2 알림 플로우",
-  "description": "CO2 임계치 초과 시 알림 + 로그 저장",
-  "isActive": true,
-  "nodes": [
-    {
-      "nodeId": 1,
-      "nodeName": "CO2 임계치 조건",
-      "nodeType": "THRESHOLD",
-      "cooldownSec": 60,
-      "nodeConfig": {
-        "nodeType": "THRESHOLD",
-        "x": 120,
-        "y": 180,
-        "measurementType": "CO2",
-        "targetDeviceEui" : "24e124126d152862",
-        "operator": "GTE",
-        "threshold": 1000.0
-      }
-    },
-    {
-      "nodeId": 2,
-      "nodeName": "텔레그램 알림",
-      "nodeType": "ALERT",
-      "cooldownSec": 300,
-      "nodeConfig": {
-        "nodeType": "ALERT",
-        "x": 421,
-        "y": 180,
-        "channel": "TELEGRAM",
-        "alertTitle": "[경고] 실내 CO2 수치 위험",
-        "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 300
-      }
-    },
-    {
-      "nodeId": -1,
-      "nodeName": "추가된 서브 텔레그램 알림",
-      "nodeType": "ALERT",
-      "cooldownSec": 300,
-      "nodeConfig": {
-        "nodeType": "ALERT",
-        "x": 421,
-        "y": 300,
-        "channel": "TELEGRAM",
-        "alertTitle": "[추가 서브 알림] CO2 전파",
-        "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 300
-      }
-    }
-  ],
-  "connections": [
-    {
-      "sourceNodeId": 1,
-      "targetNodeId": 2,
-      "conditionResult": "TRUE"
-    },
-    {
-      "sourceNodeId": 1,
-      "targetNodeId": -1,
-      "conditionResult": "TRUE"
-    }
-  ]
-}
-
-> {%
-    client.test("7. 플로우 수정 성공", function() {
-        client.assert(response.status === 204, "상태 코드가 204가 아닙니다.");
-    });
-%}
-
-
-### 8. 플로우 삭제
-# 동적으로 생성 및 수정 테스트가 끝난 임시 플로우를 청소합니다.
-DELETE {{baseUrl}}/api/rooms/{{roomId}}/flows/{{generatedFlowId}}
-Accept: {{contentType}}
-
-> {%
-    client.test("8. 플로우 삭제 성공", function() {
-        client.assert(response.status === 204, "상태 코드가 204가 아닙니다.");
-    });
-%}
+### [플로우 삭제]
+DELETE {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}

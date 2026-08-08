@@ -10,7 +10,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradiantNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
@@ -36,7 +36,7 @@ public class NodeConfigServiceImpl implements NodeConfigService {
         NodeConfig nodeConfig = null;
 
         if(nodeId > 0) {
-            Node node = nodeRepository.findById(nodeId).orElseThrow(() -> new NodeNotFoundException(nodeId));
+            Node node = nodeRepository.findById(nodeId).orElseThrow(() -> new NodeNotFoundException());
             nodeConfig = node.getNodeConfig();
         }
 
@@ -71,10 +71,10 @@ public class NodeConfigServiceImpl implements NodeConfigService {
                 validateValueRange(c.measurementType(), c.average(), errors);
                 validateWindowSec(c.windowSec(), errors);
             }
-            case GradiantNodeConfig c -> {
-                validateValueRange(c.measurementType(), c.gradiant(), errors);
+            case GradientNodeConfig c -> {
+                validateValueRange(c.measurementType(), c.gradient(), errors);
                 validateWindowSec(c.windowSec(), errors);
-                if (c.gradiant() == 0) errors.add("gradient 값은 0이 될 수 없습니다");
+                if (c.gradient() == 0) errors.add("gradient 값은 0이 될 수 없습니다");
             }
             case DurationNodeConfig c -> {
                 validateValueRange(c.measurementType(), c.threshold(), errors);

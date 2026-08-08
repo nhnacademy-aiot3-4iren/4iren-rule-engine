@@ -6,10 +6,10 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradiantNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 
-import java.time.Duration;
 
 
 @JsonTypeInfo(
@@ -20,9 +20,9 @@ import java.time.Duration;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ThresholdNodeConfig.class, name = "THRESHOLD"),
-        @JsonSubTypes.Type(value = GradiantNodeConfig.class, name = "GRADIENT"),
+        @JsonSubTypes.Type(value = GradientNodeConfig.class, name = "GRADIENT"),
         @JsonSubTypes.Type(value = AverageNodeConfig.class, name = "AVERAGE"),
-        @JsonSubTypes.Type(value = Duration.class, name = "DURATION"),
+        @JsonSubTypes.Type(value = DurationNodeConfig.class, name = "DURATION"),
 
         @JsonSubTypes.Type(value = AlertNodeConfig.class, name = "ALERT")
 })

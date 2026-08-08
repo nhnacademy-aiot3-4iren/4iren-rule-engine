@@ -20,7 +20,7 @@ public record DurationNodeConfig(
         MeasurementType measurementType,
 
         @NotNull
-        String targetDeviceEui,
+        String unit,
 
         @NotNull
         Operator operator,

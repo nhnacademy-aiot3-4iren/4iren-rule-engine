@@ -8,14 +8,14 @@ import lombok.*;
 
 @Getter
 @Entity
-@Table(name = "flow_template_sensor_types")
+@Table(name = "flow_template_measurement_types")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class FlowTemplateSensorType {
+public class FlowTemplateMeasurementType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "required_sensor_id")
+    @Column(name = "required_type_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -23,12 +23,12 @@ public class FlowTemplateSensorType {
     private Flow flow;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sensor_type", nullable = false, length = 20)
+    @Column(name = "measurement_type", nullable = false, length = 20)
     private MeasurementType measurementType;
 
 
     @Builder
-    public FlowTemplateSensorType(Flow flow, MeasurementType measurementType) {
+    public FlowTemplateMeasurementType(Flow flow, MeasurementType measurementType) {
         this.flow = flow;
         this.measurementType = measurementType;
     }

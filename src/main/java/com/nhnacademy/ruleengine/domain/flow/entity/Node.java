@@ -42,11 +42,10 @@ public class Node {
     @Column(name = "cooldown_sec")
     private Integer cooldownSec;
 
-    //TODO cascade 검토하기
-    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sourceNode")
     private List<Connection> outgoingConnections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "targetNode")
     private List<Connection> incomingConnections = new ArrayList<>();
 
     @Builder

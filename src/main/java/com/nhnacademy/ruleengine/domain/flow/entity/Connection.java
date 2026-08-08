@@ -42,7 +42,7 @@ public class Connection {
 
 
     @Builder
-    public Connection(Flow flow, Node sourceNode, Node targetNode, ConditionResult conditionResult) {
+    public Connection(Flow flow, Node sourceNode, Node targetNode) {
         this.flow = flow;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;

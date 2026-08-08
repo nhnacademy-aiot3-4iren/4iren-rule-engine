@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/rule/templates/")
+@RequestMapping("/api/rule/templates")
 public class TemplateFlowController {
 
-    TemplateFlowService templateFlowService;
+    private final TemplateFlowService templateFlowService;
 
 
     // [템플릿 플로우 생성]
     @PostMapping
-    public ResponseEntity<TemplateCreateResponse> createTemplateFlow(
+    public ResponseEntity<TemplateFlowCreateResponse> createTemplateFlow(
             @Valid @RequestBody TemplateFlowCreateRequest request) {
 
-        TemplateCreateResponse response = templateFlowService.createTemplatFlow(request);
+        TemplateFlowCreateResponse response = templateFlowService.createTemplatFlow(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,8 +45,8 @@ public class TemplateFlowController {
         return ResponseEntity.ok().body(response);
     }
 
-    // [템플릿 플로우 수정] POST /api/templates/{template_id}
-    @PostMapping("/{template-id}")
+    // [템플릿 플로우 수정] Put /api/templates/{template_id}
+    @PutMapping("/{template-id}")
     public ResponseEntity<Void> updateTemplateFlow(
             @PathVariable("template-id") Long templateId,
             @Valid @RequestBody TemplateFlowUpdateRequest request) {

@@ -23,24 +23,19 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
         ThresholdNodeConfig thresholdNodeConfig = (ThresholdNodeConfig) nodeConfig;
         List<String > errors = new ArrayList<>();
 
-        boolean validSensorType = sensorStaticMetaList.stream()
+        boolean validMeasurementType = sensorStaticMetaList.stream()
                 .anyMatch(meta -> meta.measurementType() == thresholdNodeConfig.measurementType());
-        if (!validSensorType) {
-            errors.add("해당 강의실에서 지원하지 않는 sensorType: " + thresholdNodeConfig.measurementType());
+        if (!validMeasurementType) {
+            errors.add("해당 강의실에서 지원하지 않는 measurementType: " + thresholdNodeConfig.measurementType());
             return errors; // 이후 검증 의미 없음
         }
 
-        // 2. targetDeviceEui가 해당 sensorType의 deviceOptions에 존재하는지
+        // 2. targetDeviceEui가 해당 measurementType의 deviceOptions에 존재하는지
         SensorStaticMeta targetMeta = sensorStaticMetaList.stream()
                 .filter(meta -> meta.measurementType() == thresholdNodeConfig.measurementType())
                 .findFirst().get();
 
-        boolean validDevice = targetMeta.deviceOptions().stream()
-                .anyMatch(device -> device.devEui().equals(thresholdNodeConfig.targetDeviceEui()));
-        if (!validDevice) {
-            errors.add("해당 강의실에 존재하지 않는 deviceEui: " + thresholdNodeConfig.targetDeviceEui());
 
-        }
 
         validateThresholdRange(thresholdNodeConfig.measurementType(), thresholdNodeConfig.threshold(), errors);
 
@@ -62,7 +57,7 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
                 if (threshold < 0 || threshold > 10000)
                     errors.add("CO2 임계값 범위 초과 (0 ~ 10000): " + threshold);
             }
-            // 필요한 sensorType 추가
+            // 필요한 measurementType 추가
         }
         return errors;
     }

@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
-import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateSensorType;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -55,11 +55,11 @@ public class Flow {
     private List<FlowSchedule> schedules = new ArrayList<>();
 
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<FlowTemplateSensorType> flowTemplateSensorTypes = new ArrayList<>();
+    private List<FlowTemplateMeasurementType> flowTemplateMeasurementTypes = new ArrayList<>();
 
 
     //일반 플로우 생성용
-    @Builder(builderMethodName = "regularBuilder")
+    @Builder(builderMethodName = "regularBuilder",  builderClassName = "RegularBuilder")
     public Flow(Long roomId, String flowName, String description){
         this.id = null;
         this.createdAt = null;
@@ -76,7 +76,7 @@ public class Flow {
 
     //템플릿 플로우 생성용
     //템플릿일경우  room_id, is_active null
-    @Builder(builderMethodName = "templateBuilder")
+    @Builder(builderMethodName = "templateBuilder",  builderClassName = "TemplateBuilder")
     public Flow( String flowName, String description){
         this.id = null;
         this.createdAt = null;

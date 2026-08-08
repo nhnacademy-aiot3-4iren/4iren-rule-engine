@@ -21,7 +21,7 @@ public record AverageNodeConfig(
         MeasurementType measurementType,
 
         @NotNull
-        String targetDeviceEui,
+        String unit,
 
         @NotNull
         Operator operator,
