@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.external;
+package com.nhnacademy.ruleengine.domain.nodeconfig.feignclient;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import org.springframework.stereotype.Component;

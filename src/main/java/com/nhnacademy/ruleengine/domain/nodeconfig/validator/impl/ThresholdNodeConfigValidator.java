@@ -30,37 +30,7 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
             return errors; // 이후 검증 의미 없음
         }
 
-        // 2. targetDeviceEui가 해당 measurementType의 deviceOptions에 존재하는지
-        SensorStaticMeta targetMeta = sensorStaticMetaList.stream()
-                .filter(meta -> meta.measurementType() == thresholdNodeConfig.measurementType())
-                .findFirst().get();
-
-
-
-        validateThresholdRange(thresholdNodeConfig.measurementType(), thresholdNodeConfig.threshold(), errors);
-
         return errors;
     }
-
-    //TODO util클래스로 빼기
-    private List<String>  validateThresholdRange(MeasurementType measurementType, double threshold, List<String> errors) {
-        switch (measurementType) {
-            case TEMPERATURE -> {
-                if (threshold < -50 || threshold > 100)
-                    errors.add("온도 임계값 범위 초과 (-50 ~ 100): " + threshold);
-            }
-            case HUMIDITY -> {
-                if (threshold < 0 || threshold > 100)
-                    errors.add("습도 임계값 범위 초과 (0 ~ 100): " + threshold);
-            }
-            case CO2 -> {
-                if (threshold < 0 || threshold > 10000)
-                    errors.add("CO2 임계값 범위 초과 (0 ~ 10000): " + threshold);
-            }
-            // 필요한 measurementType 추가
-        }
-        return errors;
-    }
-
     
 }

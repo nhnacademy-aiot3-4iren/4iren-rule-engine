@@ -5,7 +5,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.external.MeasurementMeasurementTypeMapper;
+import com.nhnacademy.ruleengine.domain.nodeconfig.feignclient.MeasurementMeasurementTypeMapper;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.common.redis.cache.RoomDeviceCacheService;
 import lombok.RequiredArgsConstructor;

@@ -49,71 +49,20 @@ public class NodeConfigServiceImpl implements NodeConfigService {
 
     @Override
     public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
-        List<String> errors = new ArrayList<>();
+        // 액션 노드는 sensorMeta 조회 불필요
+        List<SensorStaticMeta> sensorMetas = request.nodeConfig().nodeType().isActionNode()
+                ? List.of()
+                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
 
-        if (request.nodeConfig().nodeType().isActionNode()) {
-            validateAlertConfig((AlertNodeConfig) request.nodeConfig(), errors);
-        } else {
-            validateConditionConfig(request.nodeConfig(), errors);
-        }
+        List<String> errors = validatorRegistry.validate(
+                request.nodeConfig().nodeType(),
+                request.nodeConfig(),
+                sensorMetas
+        );
 
         return errors.isEmpty()
                 ? NodeConfigValidationResponse.success()
                 : NodeConfigValidationResponse.failure(errors);
-    }
-    private void validateConditionConfig(NodeConfig config, List<String> errors) {
-        // 판단 노드 공통: measurementType별 값 범위
-        switch (config) {
-            case ThresholdNodeConfig c -> {
-                validateValueRange(c.measurementType(), c.threshold(), errors);
-            }
-            case AverageNodeConfig c -> {
-                validateValueRange(c.measurementType(), c.average(), errors);
-                validateWindowSec(c.windowSec(), errors);
-            }
-            case GradientNodeConfig c -> {
-                validateValueRange(c.measurementType(), c.gradient(), errors);
-                validateWindowSec(c.windowSec(), errors);
-                if (c.gradient() == 0) errors.add("gradient 값은 0이 될 수 없습니다");
-            }
-            case DurationNodeConfig c -> {
-                validateValueRange(c.measurementType(), c.threshold(), errors);
-                if (c.durationSec() < 10 || c.durationSec() > 86400)
-                    errors.add("durationSec 범위 초과 (10 ~ 86400): " + c.durationSec());
-            }
-            default -> errors.add("알 수 없는 노드 타입");
-        }
-    }
-//TODO 검증 코드 클래스별로 분리 -> 확장성
-    private void validateValueRange(MeasurementType type, double value, List<String> errors) {
-        switch (type) {
-            case TEMPERATURE -> {
-                if (value < -50 || value > 100)
-                    errors.add("온도 값 범위 초과 (-50 ~ 100): " + value);
-            }
-            case HUMIDITY -> {
-                if (value < 0 || value > 100)
-                    errors.add("습도 값 범위 초과 (0 ~ 100): " + value);
-            }
-            case CO2 -> {
-                if (value < 0 || value > 10000)
-                    errors.add("CO2 값 범위 초과 (0 ~ 10000): " + value);
-            }
-        }
-    }
 
-    private void validateWindowSec(Integer windowSec, List<String> errors) {
-        if (windowSec < 10 || windowSec > 3600)
-            errors.add("windowSec 범위 초과 (10 ~ 3600): " + windowSec);
     }
-
-    private void validateAlertConfig(AlertNodeConfig config, List<String> errors) {
-        if (config.alertTitle() == null || config.alertTitle().isBlank())
-            errors.add("알림 제목을 입력해주세요");
-        if (config.dedupWindowSec() != null && config.dedupWindowSec() < 0)
-            errors.add("dedupWindowSec은 0 이상이어야 합니다");
-    }
-
-
-
 }
