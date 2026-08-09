@@ -31,11 +31,11 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
 
         List<SensorStaticMeta> sensorStaticMetaList = new ArrayList<>();
 
-        Map<MeasurementType, List<DeviceInfo>> deviceInfoByMeasurementType = getDeviceInfoByMeasurementType(roomDeviceInfoList);
+        List<MeasurementType> measurementTypeOptionsInRoom = getMeasurementTypeOptionsInRoom(roomId);
         Map<MeasurementType, String> unitByMeasurementType = getUnitByMeasuremrntType(roomDeviceInfoList);
 
-        for(MeasurementType measurementType : deviceInfoByMeasurementType.keySet()){
-            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitByMeasurementType.get(measurementType), deviceInfoByMeasurementType.get(measurementType)));
+        for(MeasurementType measurementType : measurementTypeOptionsInRoom){
+            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitByMeasurementType.get(measurementType)));
         }
 
         return sensorStaticMetaList;
