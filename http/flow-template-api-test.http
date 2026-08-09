@@ -1,0 +1,112 @@
+### 변수 설정
+@hostname = localhost
+@port = 8080
+@baseUrl = http://{{hostname}}:{{port}}/api/rule/templates
+@templateId = 1
+
+### [템플릿 플로우 생성] 사이트 관리자의 마스터 템플릿 등록
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "flowName": "표준 환기 권장 템플릿",
+  "description": "모든 강의실에 범용적으로 적용 가능한 기본 대기질 판단 스펙",
+  "nodes": [
+    {
+      "nodeId": -1,
+      "nodeName": "기울기 판단 노드",
+      "nodeType": "GRADIENT",
+      "cooldownSec": 30,
+      "nodeConfig": {
+        "nodeType": "GRADIENT",
+        "x": 50,
+        "y": 50,
+        "measurementType": "TVOC",
+        "unit": "ppb",
+        "operator": "GT",
+        "gradient": 5.0,
+        "windowSec": 300
+      }
+    },
+    {
+      "nodeId": -2,
+      "nodeName": "텔레그램 경고 알림 노드",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
+      "nodeConfig": {
+        "nodeType": "ALERT",
+        "x": 300,
+        "y": 150,
+        "channel": "TELEGRAM",
+        "alertTitle": "실내 이산화탄소 수치 초과!",
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec": 600
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNodeId": -1,
+      "targetNodeId": -2
+    }
+  ]
+}
+
+### [템플릿 플로우 목록 조회]
+GET {{baseUrl}}
+Accept: application/json
+
+### [템플릿 플로우 상세 조회]
+GET {{baseUrl}}/{{templateId}}
+Accept: application/json
+
+### [템플릿 플로우 수정]
+PUT {{baseUrl}}/{{templateId}}
+Content-Type: application/json
+
+{
+  "flowName": "표준 환기 권장 템플릿 (업데이트)",
+  "description": "지속시간 판단 조건으로 교체된 템플릿",
+  "nodes": [
+    {
+      "nodeId": -3,
+      "nodeName": "지속시간 판단 노드",
+      "nodeType": "DURATION",
+      "cooldownSec": 0,
+      "nodeConfig": {
+        "nodeType": "DURATION",
+        "x": 150,
+        "y": 150,
+        "measurementType": "HUMIDITY",
+        "unit": "%",
+        "operator": "LTE",
+        "threshold": 30.0,
+        "durationSec": 1800
+      }
+    },
+    {
+      "nodeId": 2,
+      "nodeName": "텔레그램 경고 알림 노드",
+      "nodeType": "ALERT",
+      "cooldownSec": 300,
+      "nodeConfig": {
+        "nodeType": "ALERT",
+        "x": 300,
+        "y": 150,
+        "channel": "TELEGRAM",
+        "alertTitle": "실내 이산화탄소 수치 초과!",
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec": 600
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNodeId": -3,
+      "targetNodeId": 2
+    }
+  ]
+}
+
+### [템플릿 플로우 삭제]
+DELETE {{baseUrl}}/{{templateId}}
