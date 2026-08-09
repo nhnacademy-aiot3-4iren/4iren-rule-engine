@@ -35,6 +35,9 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
     @Transactional(readOnly = true)
     @Override
     public FlowScheduleListResponse getFlowScheduleList(Long flowId) {
+        if (!flowRepository.existsById(flowId)) {
+            throw new FlowNotFoundException();
+        }
         List<FlowSchedule> flowScheduleList = flowScheduleRepository.findAllByFlowId(flowId);
 
         return FlowScheduleListResponse.from(flowId, flowScheduleList);
@@ -51,6 +54,9 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
 
     @Override
     public void deleteFlowSchedule( Long scheduleId) {
+        if (!flowScheduleRepository.existsById(scheduleId)) {
+            throw new FlowScheduleNotFoundException();
+        }
         flowScheduleRepository.deleteById(scheduleId);
     }
 

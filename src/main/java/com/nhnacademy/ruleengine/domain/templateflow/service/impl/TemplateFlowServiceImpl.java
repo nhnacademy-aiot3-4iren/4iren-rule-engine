@@ -3,6 +3,7 @@ package com.nhnacademy.ruleengine.domain.templateflow.service.impl;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
@@ -44,13 +45,13 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
         Flow flow = Flow.templateBuilder()
                 .flowName(request.flowName()).description(request.description()).build();
 
+        validate(request.nodes(), request.connections());
         Flow savedFlow = flowRepository.save(flow);
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
         savedFlowTemplatemeasurementType(savedFlow, request.nodes());
 
-        validate(request.nodes(), request.connections());
 
         return TemplateFlowCreateResponse.of(savedFlow.getId());
     }
@@ -70,7 +71,9 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     public TemplateDetailResponse getTemplateDetail(Long templateId) {
         Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
 
-
+        if (!templateFlow.getIsTemplate()) {
+            throw new InvalidFlowException();
+        }
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateId);
@@ -84,6 +87,10 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     @Override
     public void updateTemplate(Long templateId, TemplateFlowUpdateRequest request) {
         Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
+
+        if (!templateFlow.getIsTemplate()) {
+            throw new InvalidFlowException();
+        }
 
         templateFlow.updateTemplate(request.flowName(), request.description());
         updateNodesNConnections(templateFlow, request.nodes(), request.connections());

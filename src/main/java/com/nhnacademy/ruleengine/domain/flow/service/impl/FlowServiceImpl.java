@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.flow.service.impl;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
@@ -41,12 +42,12 @@ public class FlowServiceImpl implements FlowService {
         Flow flow = Flow.regularBuilder()
                 .roomId(roomId).flowName(request.flowName()).description(request.description()).build();
 
+        validate(request.nodes(), request.connections());
         Flow savedFlow = flowRepository.save(flow);
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
 
-        validate(request.nodes(), request.connections());
 
         return FlowCreateResponse.of(savedFlow.getId());
     }
@@ -68,6 +69,9 @@ public class FlowServiceImpl implements FlowService {
     public FlowDetailResponse getFlowDetail(Long roomId, Long flowId) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
+        if(flow.getIsTemplate()){
+            throw new InvalidFlowException();
+        }
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
 
@@ -90,8 +94,6 @@ public class FlowServiceImpl implements FlowService {
                 .map(Map.Entry::getKey).toList();
         List<Flow> templateFlowList = flowRepository.findAllById(availableTemplateIds);
 
-        RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
-
         return RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
     }
 
@@ -109,7 +111,7 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
-        Flow flow = flowRepository.findById(flowId).orElseThrow(FlowNotFoundException::new);
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
         flow.updateReguler(request.flowName(),request.description(), request.isActive());
 
@@ -124,6 +126,11 @@ public class FlowServiceImpl implements FlowService {
     public void deleteFlow(Long roomId, Long flowId) {
         if(!flowRepository.existsByIdAndRoomId(flowId, roomId)){
             throw new UnauthorizedFlowAccessException();
+        }
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
+                .orElseThrow(UnauthorizedFlowAccessException::new);
+        if (flow.getIsTemplate()) {
+            throw new InvalidFlowException();
         }
         flowRepository.deleteById(flowId);
     }

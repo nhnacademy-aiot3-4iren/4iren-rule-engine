@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.BusinessException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 
 public class InvalidNodeException extends BusinessException {
-    public InvalidNodeException(Long nodeId) {
+    public InvalidNodeException() {
         super(ErrorCode.INVALID_NODE);
     }
 }
