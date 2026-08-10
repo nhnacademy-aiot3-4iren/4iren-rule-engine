@@ -12,7 +12,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
-import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRespository;
+import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class FlowServiceImpl implements FlowService {
     private final FlowRepository flowRepository;
     private final NodeRepository nodeRepository;
     private final ConnectionRepository connectionRepository;
-    private final FlowTemplateMeasurementTypeRespository flowTemplateMeasurementTypeRespository;
+    private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
     private final SensorStaticMetaService metaService;
 
@@ -113,7 +113,7 @@ public class FlowServiceImpl implements FlowService {
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
-        flow.updateReguler(request.flowName(),request.description(), request.isActive());
+        flow.updateRegular(request.flowName(),request.description(), request.isActive());
 
         //update
         updateNodesNConnections(flow, request.nodes(), request.connections());
@@ -193,7 +193,7 @@ public class FlowServiceImpl implements FlowService {
     }
 
     private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
-        List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRespository.findAllByFlowIn(templateFlows);
+        List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
         Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateMeasurementTypes.stream()
                 .collect(Collectors.groupingBy(
                         fts -> fts.getFlow().getId(),

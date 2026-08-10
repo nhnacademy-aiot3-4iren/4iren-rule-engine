@@ -21,7 +21,7 @@ public class TemplateFlowController {
     public ResponseEntity<TemplateFlowCreateResponse> createTemplateFlow(
             @Valid @RequestBody TemplateFlowCreateRequest request) {
 
-        TemplateFlowCreateResponse response = templateFlowService.createTemplatFlow(request);
+        TemplateFlowCreateResponse response = templateFlowService.createTemplateFlow(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

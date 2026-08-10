@@ -11,7 +11,7 @@ import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurem
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.repository.ConnectionRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
-import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRespository;
+import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
@@ -37,11 +37,11 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     private final NodeRepository nodeRepository;
     private final ConnectionRepository connectionRepository;
     private final FlowScheduleRepository flowScheduleRepository;
-    private final FlowTemplateMeasurementTypeRespository flowTemplateMeasurementTypeRespository;
+    private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
     @Transactional
     @Override
-    public TemplateFlowCreateResponse createTemplatFlow(TemplateFlowCreateRequest request) {
+    public TemplateFlowCreateResponse createTemplateFlow(TemplateFlowCreateRequest request) {
         Flow flow = Flow.templateBuilder()
                 .flowName(request.flowName()).description(request.description()).build();
 
@@ -50,7 +50,7 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
-        savedFlowTemplatemeasurementType(savedFlow, request.nodes());
+        savedFlowTemplateMeasurementType(savedFlow, request.nodes());
 
 
         return TemplateFlowCreateResponse.of(savedFlow.getId());
@@ -63,7 +63,7 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
         if(templateList.isEmpty()){
             return new TemplateListResponse(List.of());
         }
-        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(templateList);
+        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTypesByTemplateIds(templateList);
         return TemplateListResponse.of(templateList, measurementTypesByTemplateId);
     }
 
@@ -156,16 +156,16 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections ) {
         connectionRepository.deleteAllByFlowId(savedFlow.getId());
         nodeRepository.deleteAllByFlowId(savedFlow.getId());
-        flowTemplateMeasurementTypeRespository.deleteAllByFlow(savedFlow);
+        flowTemplateMeasurementTypeRepository.deleteAllByFlow(savedFlow);
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow,nodes);
         saveConnections(savedFlow, connections,tempIdMap);
-        savedFlowTemplatemeasurementType(savedFlow, nodes);
+        savedFlowTemplateMeasurementType(savedFlow, nodes);
     }
 
 
     //템플릿 플로우의 구성 센서들을 저장하는 메서드
-    private void savedFlowTemplatemeasurementType(Flow savedTemplateFlow, List<TemplateNodeInfo> nodeInfoList){
+    private void savedFlowTemplateMeasurementType(Flow savedTemplateFlow, List<TemplateNodeInfo> nodeInfoList){
         List<MeasurementType> measurementTypes = nodeInfoList.stream()
                 .filter(nodeInfo -> nodeInfo.nodeConfig().nodeType().isConditionNode())
                 .map(nodeInfo->nodeInfo.nodeConfig().measurementType()).toList();
@@ -174,11 +174,11 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
                 .map(m -> FlowTemplateMeasurementType.builder().flow(savedTemplateFlow).measurementType(m).build())
                 .toList();
 
-        flowTemplateMeasurementTypeRespository.saveAll(flowTemplateMeasurementTypeList);
+        flowTemplateMeasurementTypeRepository.saveAll(flowTemplateMeasurementTypeList);
     }
 
-    private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
-        List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRespository.findAllByFlowIn(templateFlows);
+    private Map<Long, List<MeasurementType>> getMeasurementTypesByTemplateIds(List<Flow> templateFlows){
+        List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
         Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateMeasurementTypes.stream()
                 .collect(Collectors.groupingBy(
                         fts -> fts.getFlow().getId(),

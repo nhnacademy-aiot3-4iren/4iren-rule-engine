@@ -91,7 +91,7 @@ public class Flow {
         this.isTemplate = true;
     }
 
-    public void updateReguler(String flowName, String description, Boolean isActive) {
+    public void updateRegular(String flowName, String description, Boolean isActive) {
         if (flowName != null) this.flowName = flowName;
         if (description != null) this.description = description;
         if (isActive != null) this.isActive = isActive;

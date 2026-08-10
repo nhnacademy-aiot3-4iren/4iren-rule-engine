@@ -32,7 +32,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
         List<SensorStaticMeta> sensorStaticMetaList = new ArrayList<>();
 
         List<MeasurementType> measurementTypeOptionsInRoom = getMeasurementTypeOptionsInRoom(roomId);
-        Map<MeasurementType, String> unitByMeasurementType = getUnitByMeasuremrntType(roomDeviceInfoList);
+        Map<MeasurementType, String> unitByMeasurementType = getUnitByMeasurementType(roomDeviceInfoList);
 
         for(MeasurementType measurementType : measurementTypeOptionsInRoom){
             sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitByMeasurementType.get(measurementType)));
@@ -69,7 +69,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
                 .collect(Collectors.toList());
     }
 
-    private Map<MeasurementType, String> getUnitByMeasuremrntType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
+    private Map<MeasurementType, String> getUnitByMeasurementType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().entrySet().stream())
                 .collect(Collectors.toMap(
