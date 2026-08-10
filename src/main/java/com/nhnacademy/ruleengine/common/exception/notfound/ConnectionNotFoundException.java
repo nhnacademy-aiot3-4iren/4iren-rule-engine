@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.notfound;
 
-public class ConnectionNotFoundException extends RuntimeException {
-    public ConnectionNotFoundException(Long connId) {
-        super("Connection NotFound: " + connId);
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class ConnectionNotFoundException extends BusinessException {
+    public ConnectionNotFoundException() {
+        super(ErrorCode.CONNECTION_NOT_FOUND);
     }
 }

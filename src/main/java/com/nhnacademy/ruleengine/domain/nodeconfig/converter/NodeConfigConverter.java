@@ -1,18 +1,18 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.converter;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 @Converter
 @Component
 public class NodeConfigConverter implements AttributeConverter<NodeConfig, String> {
 
-    private static ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     public NodeConfigConverter(ObjectMapper objectMapper){
-        NodeConfigConverter.objectMapper = objectMapper;
+       this.objectMapper = objectMapper;
     }
 
     @Override

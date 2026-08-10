@@ -1,17 +1,22 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigUpdateRequest;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public interface NodeConfigService {
 
-    //노드 설정 조회
-    NodeResponse nodeConfigDetail(Long roomId, Long flowId, Long tempNodeId, NodeConfigRequest request);
+    //nodeId 있을때 nodeConfig 조회
+    //nodeId 없을 때 nodeConfig 조회
+    //그냥 위의 두 api 합치는 걸로? -> id 음수/양수로 판단
+    NodeConfigResponse getNodeConfigNMeta(Long roomId, Long nodeId, NodeType nodeType);
 
-    //노드 설정 수정 및 저장
-    void updateNodeConfig(Long roomId, Long flowId, Long tempNodeId, NodeConfigUpdateRequest request);
+//
+//    //nodeConfig검증 api
+    NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request);
+
+
 }

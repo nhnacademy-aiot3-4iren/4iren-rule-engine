@@ -1,11 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.notfound;
 
-public class FlowNotFoundException extends RuntimeException {
-    public FlowNotFoundException(Long flowId) {
-        super("Flow NotFound: "+ flowId);
-    }
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 
-    public FlowNotFoundException(Long flowId, boolean isTemplate) {
-        super("Flow NotFound: "+ flowId);
+public class FlowNotFoundException extends BusinessException {
+    public FlowNotFoundException() {
+        super(ErrorCode.FLOW_NOT_FOUND);
     }
 }

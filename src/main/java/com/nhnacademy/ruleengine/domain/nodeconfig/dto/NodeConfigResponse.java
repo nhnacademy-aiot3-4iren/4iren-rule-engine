@@ -1,22 +1,17 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.dto;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.Node;
-import com.nhnacademy.ruleengine.domain.flow.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.NodeConfig;
-import jakarta.validation.constraints.NotNull;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
+import lombok.Builder;
 
+import java.util.List;
+@Builder
 public record NodeConfigResponse(
-        Long tempNodeId,
-        NodeType nodeType,
-        NodeConfig nodeConfig
-
+        Long nodeId,
+        NodeConfig nodeConfig,
+        List<SensorStaticMeta> sensorStaticMetaList
 ) {
-    public static NodeConfigResponse from(Node node) {
-        return new NodeConfigResponse(
-                node.getId(),
-                node.getNodeType(),
-                node.getNodeConfig()
-        );
+    public static NodeConfigResponse of(Long nodeId, NodeConfig nodeConfig, List<SensorStaticMeta> sensorStaticMetaList) {
+        return NodeConfigResponse.builder().nodeId(nodeId).nodeConfig(nodeConfig).sensorStaticMetaList(sensorStaticMetaList).build();
     }
-}
 
+}

@@ -1,26 +1,73 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service.impl;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.node.NodeResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigRequest;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigUpdateRequest;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.common.exception.notfound.NodeNotFoundException;
+import com.nhnacademy.ruleengine.domain.flow.entity.Node;
+import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
+@Transactional(readOnly = true)
 @Service
+@RequiredArgsConstructor
 public class NodeConfigServiceImpl implements NodeConfigService {
-    //노드 상세 조회 및 설정(node_config)
-    //+ 센서 타입별 기본설정 제공 및 노드 저장시 검증
-    //
-    @Transactional(readOnly = true)
+    private final NodeRepository nodeRepository;
+    private final SensorStaticMetaService sensorStaticMetaService;
+    private final NodeConfigValidatorRegistry validatorRegistry;
+    //노드 상세 조회(node_config)
+    //nodeId가 음수면 nodeConfig null, nodeType이 행동노드면 sensorStaticMetaList null
+
     @Override
-    public NodeResponse nodeConfigDetail(Long roomId, Long flowId, Long tempNodeId, NodeConfigRequest request) {
-        return null;
+    public NodeConfigResponse getNodeConfigNMeta(Long roomId, Long nodeId, NodeType nodeType) {
+        NodeConfig nodeConfig = null;
+
+        if(nodeId != null && nodeId > 0) {
+            Node node = nodeRepository.findById(nodeId).orElseThrow(NodeNotFoundException::new);
+            nodeConfig = node.getNodeConfig();
+        }
+
+        List<SensorStaticMeta> sensorStaticMetaList = nodeType.isActionNode()
+                ? null
+                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
+
+        return NodeConfigResponse.of(nodeId,nodeConfig, sensorStaticMetaList);
     }
 
-    @Transactional
     @Override
-    public void updateNodeConfig(Long roomId, Long flowId, Long tempNodeId, NodeConfigUpdateRequest request) {
+    public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
+        if (request.nodeConfig() == null) {
+            throw new InvalidNodeException();
+        }
+
+        // 액션 노드는 sensorMeta 조회 불필요
+        List<SensorStaticMeta> sensorMetas = request.nodeConfig().nodeType().isActionNode()
+                ? List.of()
+                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
+
+        List<String> errors = validatorRegistry.validate(
+                request.nodeConfig().nodeType(),
+                request.nodeConfig(),
+                sensorMetas
+        );
+
+        return errors.isEmpty()
+                ? NodeConfigValidationResponse.success()
+                : NodeConfigValidationResponse.failure(errors);
 
     }
 }

@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.invalid;
 
-public class InvalidNodeException extends RuntimeException {
-    public InvalidNodeException(Long nodeId) {
-        super("Invalid Node: " + nodeId);
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class InvalidNodeException extends BusinessException {
+    public InvalidNodeException() {
+        super(ErrorCode.INVALID_NODE);
     }
 }

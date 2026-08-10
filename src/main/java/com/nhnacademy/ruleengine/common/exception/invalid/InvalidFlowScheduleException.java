@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.invalid;
 
-public class InvalidFlowScheduleException extends RuntimeException {
+import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+
+public class InvalidFlowScheduleException extends BusinessException {
     public InvalidFlowScheduleException(Long scheduleId) {
-        super( " "+scheduleId);
+        super( ErrorCode.INVALID_FLOW_SCHEDULE);
     }
 }

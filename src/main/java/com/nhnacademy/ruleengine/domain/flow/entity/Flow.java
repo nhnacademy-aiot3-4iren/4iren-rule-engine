@@ -1,18 +1,16 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "flows")
@@ -47,22 +45,59 @@ public class Flow {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Node> nodes = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Connection> connections = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FlowSchedule> schedules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<FlowTemplateMeasurementType> flowTemplateMeasurementTypes = new ArrayList<>();
 
+
+    //일반 플로우 생성용
+    @Builder(builderMethodName = "regularBuilder",  builderClassName = "RegularBuilder")
+    public Flow(Long roomId, String flowName, String description){
+        this.id = null;
+        this.createdAt = null;
+        this.updatedAt = null;
+
+        this.roomId =roomId;
+        this.isActive = true;
+
+        this.flowName = flowName;
+        this.description = description;
+
+        this.isTemplate = false;
+    }
+
+    //템플릿 플로우 생성용
     //템플릿일경우  room_id, is_active null
+    @Builder(builderMethodName = "templateBuilder",  builderClassName = "TemplateBuilder")
+    public Flow( String flowName, String description){
+        this.id = null;
+        this.createdAt = null;
+        this.updatedAt = null;
 
-    public void update(String flowName, String description, Boolean isActive) {
+        this.roomId = null;
+        this.isActive = null;
+
+        this.flowName = flowName;
+        this.description = description;
+
+        this.isTemplate = true;
+    }
+
+    public void updateRegular(String flowName, String description, Boolean isActive) {
+        if (flowName != null) this.flowName = flowName;
+        if (description != null) this.description = description;
+        if (isActive != null) this.isActive = isActive;
+    }
+
+    public void updateTemplate(String flowName, String description) {
         if (flowName != null) this.flowName = flowName;
         if (description != null) this.description = description;
         if (isActive != null) this.isActive = isActive;

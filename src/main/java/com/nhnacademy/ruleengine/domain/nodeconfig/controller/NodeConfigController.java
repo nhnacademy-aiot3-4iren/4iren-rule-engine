@@ -1,18 +1,38 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/")
+@RequestMapping("api/rule/rooms/{room-id}")
+@RequiredArgsConstructor
 public class NodeConfigController {
 
-   /*
-    플로우 구성 화면 내에서 (저장이든 편집이든) 노드의 상세설정을 누르면 NodeType에 맞는 nodeConfig설정 화면이 나올것
-    1. 판단 노드인 경우
-    sensorType를 반드시 포함하고 있으며. 강의실 내에 측정가능한 sensorType를 조회하는 api 필요함
+    private final NodeConfigService nodeConfigService;
 
-    2. 행동 노드인 경우
 
-    */
+    @GetMapping("/node-config/{node-id}")
+    public ResponseEntity<NodeConfigResponse> getNodeConfigNMeta(
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("node-id") Long nodeId,
+            @RequestParam NodeType nodeType
+    ) {
+        NodeConfigResponse response = nodeConfigService.getNodeConfigNMeta(roomId, nodeId, nodeType);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/validate-config")
+    public ResponseEntity<NodeConfigValidationResponse> validateNodeConfig(
+            @PathVariable("room-id") Long roomId,
+            @RequestBody NodeConfigValidateRequest request
+    ) {
+        NodeConfigValidationResponse response = nodeConfigService.validate(roomId,request);
+        return ResponseEntity.ok(response);
+    }
 }
