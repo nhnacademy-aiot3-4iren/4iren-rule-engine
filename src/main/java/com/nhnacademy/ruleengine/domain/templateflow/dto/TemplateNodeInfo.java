@@ -15,7 +15,6 @@ public record TemplateNodeInfo(
         String nodeName,
 
         @NotNull
-        @Length(max = 20)
         NodeType nodeType,
 
         @NotNull

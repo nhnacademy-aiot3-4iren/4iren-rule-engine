@@ -3,6 +3,7 @@ package com.nhnacademy.ruleengine.domain.templateflow.dto;
 import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,10 +20,10 @@ public record TemplateFlowCreateRequest(
         String description,
 
         @NotEmpty
-        List<TemplateNodeInfo> nodes,
+        List<@Valid TemplateNodeInfo> nodes,
 
         @NotNull
-        List<TemplateConnectionInfo> connections
+        List<@Valid TemplateConnectionInfo> connections
 ) {
 
 }

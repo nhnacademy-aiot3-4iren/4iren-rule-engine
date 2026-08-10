@@ -49,11 +49,11 @@ public class RoomDeviceCacheService {
 
         try {
             devices = roomDeviceClient.getRoomDevices(roomId);
+            redisTemplate.opsForValue().set(key, devices, TTL);
         } catch (Exception e) {
             log.warn("External API unavailable. Using dummy payload.", e);
             devices = getDummyDevices();
         }
-        redisTemplate.opsForValue().set(key, devices, TTL);
         return devices;
     }
 

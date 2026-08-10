@@ -48,7 +48,6 @@ public class FlowServiceImpl implements FlowService {
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
 
-
         return FlowCreateResponse.of(savedFlow.getId());
     }
 
@@ -98,9 +97,13 @@ public class FlowServiceImpl implements FlowService {
     }
 
     @Override
-    public RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
+    public RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId) {
         Flow tempalteFlow = flowRepository.findById(templateFlowId)
                 .orElseThrow(FlowNotFoundException::new);
+
+        if(!tempalteFlow.getIsTemplate()){
+            throw new InvalidFlowException();
+        }
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);

@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -20,10 +21,10 @@ public record FlowUpdateRequest(
         Boolean isActive,
 
         @NotEmpty
-        List<NodeInfo> nodes,
+        List<@Valid NodeInfo> nodes,
 
         @NotNull
-        List<ConnectionInfo> connections
+        List<@Valid ConnectionInfo> connections
 ) {
 
 }

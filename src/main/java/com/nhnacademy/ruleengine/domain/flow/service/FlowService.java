@@ -19,7 +19,7 @@ public interface FlowService {
     RoomTemplateListResponse getFlowTemplateList(Long roomId);
 
     //템플릿 기반 플로우 생성 폼 = 템플릿 플로우 상세
-    RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId);
+    RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId);
 
     //플로우 수정
     void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request);

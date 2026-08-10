@@ -15,7 +15,6 @@ public record NodeInfo(
         String nodeName,
 
         @NotNull
-        @Length(max = 20)
         NodeType nodeType,
 
         @NotNull

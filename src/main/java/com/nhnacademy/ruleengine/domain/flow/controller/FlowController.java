@@ -51,9 +51,8 @@ public class FlowController {
     //추천 템플릿 플로우 상세 조회 및 플로우 생성 폼 화면(강의실별 플로우 관리자 전용)
     @GetMapping("/templates/{template-id}")
     public ResponseEntity<RoomTemplateDetailResponse> getTemplateFlowDetail(
-            @PathVariable("room-id") Long roomId,
             @PathVariable("template-id") Long templateId) {
-        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(roomId, templateId);
+        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(templateId);
         return ResponseEntity.ok(response);
     }
 

@@ -34,8 +34,8 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
 
     @Transactional(readOnly = true)
     @Override
-    public FlowScheduleListResponse getFlowScheduleList(Long flowId) {
-        if (!flowRepository.existsById(flowId)) {
+    public FlowScheduleListResponse getFlowScheduleList(Long flowId, Long roomId) {
+        if (!flowRepository.existsByIdAndRoomId(flowId, roomId)) {
             throw new FlowNotFoundException();
         }
         List<FlowSchedule> flowScheduleList = flowScheduleRepository.findAllByFlowId(flowId);
@@ -45,16 +45,17 @@ public class FlowScheduleServiceImpl implements FlowScheduleService {
 
     @Transactional(readOnly = true)
     @Override
-    public FlowScheduleResponse getFlowScheduleDetail(Long scheduleId) {
-        FlowSchedule flowSchedule = flowScheduleRepository.findById(scheduleId)
+    public FlowScheduleResponse getFlowScheduleDetail(Long roomId, Long flowId, Long scheduleId) {
+
+        FlowSchedule flowSchedule = flowScheduleRepository.findSchedule(scheduleId, flowId, roomId)
                 .orElseThrow(FlowScheduleNotFoundException::new);
 
         return FlowScheduleResponse.from(flowSchedule);
     }
 
     @Override
-    public void deleteFlowSchedule( Long scheduleId) {
-        if (!flowScheduleRepository.existsById(scheduleId)) {
+    public void deleteFlowSchedule( Long roomId, Long flowId, Long scheduleId) {
+        if (!flowScheduleRepository.existsFlowSchedule(scheduleId, flowId, roomId)) {
             throw new FlowScheduleNotFoundException();
         }
         flowScheduleRepository.deleteById(scheduleId);

@@ -100,8 +100,10 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     @Transactional
     @Override
     public void deleteTemplate(Long templateId) {
-        if(!flowRepository.existsById(templateId)){
-            throw new FlowNotFoundException();
+        Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
+
+        if(!templateFlow.getIsTemplate()){
+            throw new InvalidFlowException();
         }
         flowRepository.deleteById(templateId);
     }
