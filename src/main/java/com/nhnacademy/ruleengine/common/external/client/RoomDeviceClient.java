@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.feignclient;
+package com.nhnacademy.ruleengine.common.external.client;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import org.springframework.cloud.openfeign.FeignClient;

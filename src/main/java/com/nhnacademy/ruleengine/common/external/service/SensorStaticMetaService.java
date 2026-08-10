@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.service;
+package com.nhnacademy.ruleengine.common.external.service;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
