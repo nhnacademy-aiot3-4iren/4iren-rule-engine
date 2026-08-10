@@ -35,6 +35,11 @@ public class SensorPayloadConverter {
         if (payload.sensorDataList() == null || payload.sensorDataList().isEmpty()) {
             throw new IllegalArgumentException("측정 데이터(sensorDataList)가 비어 있습니다.");
         }
+        for (SensorPayload.SensorData data : payload.sensorDataList()) {
+            if (data == null || data.measurement() == null || data.value() == null) {
+                throw new IllegalArgumentException("유효하지 않은 센서 데이터 항목이 포함되어 있습니다.");
+            }
+        }
         if (payload.measuredAt() == null) {
             throw new IllegalArgumentException("측정 시각(measuredAt) 정보가 누락되었습니다.");
         }
