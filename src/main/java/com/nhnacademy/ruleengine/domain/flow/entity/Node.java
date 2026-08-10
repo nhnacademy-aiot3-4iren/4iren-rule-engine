@@ -40,7 +40,7 @@ public class Node {
     private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")
-    private Integer cooldownSec;
+    private Integer cooldownSec;//알람 노드의 경우 null
 
     @OneToMany(mappedBy = "sourceNode")
     private List<Connection> outgoingConnections = new ArrayList<>();
