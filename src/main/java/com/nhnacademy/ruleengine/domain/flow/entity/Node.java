@@ -1,8 +1,10 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
+import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,6 +54,23 @@ public class Node {
         this.nodeType = nodeType;
         this.nodeConfig = nodeConfig;
         this.cooldownSec = cooldownSec;
+    }
+
+    public static Node create(Flow flow, NodeInfo nodeInfo){
+        return Node.builder().flow(flow)
+                .nodeName(nodeInfo.nodeName())
+                .nodeType(nodeInfo.nodeType())
+                .nodeConfig(nodeInfo.nodeConfig())
+                .cooldownSec(nodeInfo.cooldownSec())
+                .build();
+    }
+    public static Node create(Flow flow, TemplateNodeInfo nodeInfo){
+        return Node.builder().flow(flow)
+                .nodeName(nodeInfo.nodeName())
+                .nodeType(nodeInfo.nodeType())
+                .nodeConfig(nodeInfo.nodeConfig())
+                .cooldownSec(nodeInfo.cooldownSec())
+                .build();
     }
 
     @Transient
