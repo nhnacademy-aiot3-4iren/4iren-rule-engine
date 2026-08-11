@@ -1,9 +1,9 @@
 package com.nhnacademy.ruleengine.engine.facade;
 
 import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
-import com.nhnacademy.ruleengine.engine.dto.SensorPayload;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
+import com.nhnacademy.ruleengine.engine.model.SensorPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,6 @@ public class RuleEngineOrchestrator {
         //1. 플로우 로드
         List<ExecutableFlow> flows = flowLoader.load(roomId);
         if(flows.isEmpty()){
-            return;
         }
 
 

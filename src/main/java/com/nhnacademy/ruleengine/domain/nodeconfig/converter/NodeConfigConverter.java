@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeConfigConverter implements AttributeConverter<NodeConfig, String> {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     public NodeConfigConverter(ObjectMapper objectMapper){
        this.objectMapper = objectMapper;
     }

@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.templateflow.service.impl;
 
-
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
@@ -111,15 +110,14 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     private Map<Long, Long> saveNodes(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes) {
         Map<Long, Long> tempIdMap = new HashMap<>();
 
-        nodes.stream()
-                .forEach(n -> {
-                    Node savedNode = nodeRepository.save(
-                            Node.builder()
-                                    .flow(savedFlow)
-                                    .nodeName(n.nodeName())
-                                    .nodeType(n.nodeType())
-                                    .nodeConfig(n.nodeConfig())
-                                    .cooldownSec(n.cooldownSec()).build()
+        nodes.forEach(n -> {
+            Node savedNode = nodeRepository.save(
+                    Node.builder()
+                            .flow(savedFlow)
+                            .nodeName(n.nodeName())
+                            .nodeType(n.nodeType())
+                            .nodeConfig(n.nodeConfig())
+                            .cooldownSec(n.cooldownSec()).build()
                     );
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });
@@ -128,31 +126,29 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
     }
 
     private void saveConnections(Flow savedFlow, @NotNull List<TemplateConnectionInfo> connections, Map<Long, Long> tempIdMap) {
-        if(connections.isEmpty()){
+        if (connections.isEmpty()) {
             return;
         }
-        Set<Long> savedNodeIds = tempIdMap.values().stream().collect(Collectors.toSet());
 
-
+        Set<Long> savedNodeIds = new HashSet<>(tempIdMap.values());
         List<Connection> connectionList = connections.stream()
                 .map(c -> {
                     Long sourceId = tempIdMap.get(c.sourceNodeId());
                     Long targetId = tempIdMap.get(c.targetNodeId());
-
                     if (sourceId == null || targetId == null ||
                             !savedNodeIds.contains(sourceId) || !savedNodeIds.contains(targetId)) {
                         throw new InvalidConnectionException(sourceId, targetId);
                     }
-
                     return Connection.builder()
                             .flow(savedFlow)
                             .sourceNode(nodeRepository.getReferenceById(sourceId))
-                            .targetNode(nodeRepository.getReferenceById(targetId)).build();
+                            .targetNode(nodeRepository.getReferenceById(targetId))
+                            .branchType(String.valueOf(c.branchType()))
+                            .build();
                 })
                 .toList();
 
-        List<Connection> savedConnectionList = connectionRepository.saveAll(connectionList);
-
+        connectionRepository.saveAll(connectionList);
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections ) {
@@ -181,7 +177,7 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
 
     private Map<Long, List<MeasurementType>> getMeasurementTypesByTemplateIds(List<Flow> templateFlows){
         List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
-        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateMeasurementTypes.stream()
+        return allFlowTemplateMeasurementTypes.stream()
                 .collect(Collectors.groupingBy(
                         fts -> fts.getFlow().getId(),
                         Collectors.mapping(
@@ -189,7 +185,6 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
                                 Collectors.toList()
                         )
                 ));
-        return measurementTypesByTemplateId;
     }
 
     //플로우 무결성 검사를 위한 메서드들    //TODO validator 패키지 만들어서 분리하기

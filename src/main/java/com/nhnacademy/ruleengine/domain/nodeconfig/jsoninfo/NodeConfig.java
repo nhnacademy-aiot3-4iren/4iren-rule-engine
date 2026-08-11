@@ -9,7 +9,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNod
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
-
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig;
 
 
 @JsonTypeInfo(
@@ -23,6 +23,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdN
         @JsonSubTypes.Type(value = GradientNodeConfig.class, name = "GRADIENT"),
         @JsonSubTypes.Type(value = AverageNodeConfig.class, name = "AVERAGE"),
         @JsonSubTypes.Type(value = DurationNodeConfig.class, name = "DURATION"),
+
+        @JsonSubTypes.Type(value = OrNodeConfig.class, name = "OR"),
 
         @JsonSubTypes.Type(value = AlertNodeConfig.class, name = "ALERT")
 })

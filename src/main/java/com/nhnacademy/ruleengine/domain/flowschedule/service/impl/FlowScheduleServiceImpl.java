@@ -9,7 +9,6 @@ import com.nhnacademy.ruleengine.domain.flowschedule.dto.*;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import com.nhnacademy.ruleengine.domain.flowschedule.service.FlowScheduleService;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

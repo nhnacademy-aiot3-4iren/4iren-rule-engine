@@ -34,19 +34,18 @@ public class Node {
     @Column(name = "node_type", nullable = false, length = 20)
     private NodeType nodeType;
 
-//    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "node_config", nullable = false)
     @Convert(converter = NodeConfigConverter.class)
     private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")
-    private Integer cooldownSec;//알람 노드의 경우 null
+    private Integer cooldownSec;
 
-    @OneToMany(mappedBy = "sourceNode")
-    private List<Connection> outgoingConnections = new ArrayList<>();
-
-    @OneToMany(mappedBy = "targetNode")
+    @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Connection> incomingConnections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> outgoingConnections = new ArrayList<>();
 
     @Builder
     public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
@@ -56,6 +55,7 @@ public class Node {
         this.nodeConfig = nodeConfig;
         this.cooldownSec = cooldownSec;
     }
+
     public static Node create(Flow flow, NodeInfo nodeInfo){
         return Node.builder().flow(flow)
                 .nodeName(nodeInfo.nodeName())
@@ -73,16 +73,17 @@ public class Node {
                 .build();
     }
 
-    public void update(NodeInfo nodeInfo) {
-        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
-        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
-        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
-        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
+    @Transient
+    public List<Connection> getTrueOutgoingConnections() {
+        return outgoingConnections.stream()
+                .filter(c -> "TRUE".equalsIgnoreCase(c.getBranchType()))
+                .toList();
     }
-    public void update(TemplateNodeInfo nodeInfo) {
-        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
-        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
-        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
-        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
+
+    @Transient
+    public List<Connection> getFalseOutgoingConnections() {
+        return outgoingConnections.stream()
+                .filter(c -> "FALSE".equalsIgnoreCase(c.getBranchType()))
+                .toList();
     }
 }

@@ -100,6 +100,5 @@ public class Flow {
     public void updateTemplate(String flowName, String description) {
         if (flowName != null) this.flowName = flowName;
         if (description != null) this.description = description;
-        if (isActive != null) this.isActive = isActive;
     }
 }

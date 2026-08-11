@@ -1,10 +1,10 @@
 package com.nhnacademy.ruleengine.common.exception.invalid;
 
-import com.nhnacademy.ruleengine.common.advice.ValidationError;
-import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class FlowValidationFailed extends RuntimeException {
     private final List<String> errors;
 
@@ -14,7 +14,4 @@ public class FlowValidationFailed extends RuntimeException {
         this.errors = errors;
     }
 
-    public List<String> getErrors() {
-        return errors;
-    }
 }

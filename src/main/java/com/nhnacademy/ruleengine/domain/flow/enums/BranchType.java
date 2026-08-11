@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.enums;
 
-public enum ConditionResult {
-    TRUE,FALSE
+public enum BranchType {
+    TRUE,
+    FALSE,
 }

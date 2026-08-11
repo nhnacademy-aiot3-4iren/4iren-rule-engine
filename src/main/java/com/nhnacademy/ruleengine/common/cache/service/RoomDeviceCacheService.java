@@ -8,11 +8,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.common.external.client.RoomDeviceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +19,7 @@ public class RoomDeviceCacheService {
     private final RoomDeviceCacheRepository cacheRepository; // 리포지토리 주입
     private final RoomDeviceClient roomDeviceClient;
     private final ObjectMapper objectMapper;//추후 더미데이터와 함께 삭제
+
     public List<ExternalRoomDeviceInfo> getRoomDevices(Long roomId) {
         List<ExternalRoomDeviceInfo> cached = cacheRepository.get(roomId);
         if (cached != null) {

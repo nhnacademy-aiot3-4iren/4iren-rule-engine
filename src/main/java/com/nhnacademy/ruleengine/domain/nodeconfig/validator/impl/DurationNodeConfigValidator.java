@@ -3,7 +3,6 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidator;
 import org.springframework.stereotype.Component;
