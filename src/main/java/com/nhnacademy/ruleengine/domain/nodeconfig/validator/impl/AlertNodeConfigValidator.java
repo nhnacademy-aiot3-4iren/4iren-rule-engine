@@ -29,9 +29,6 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         if (c.alertTitle() == null || c.alertTitle().isBlank()) {
             errors.add("알림 제목을 입력해주세요");
         }
-        if (c.dedupWindowSec() != null && c.dedupWindowSec() < 0) {
-            errors.add("dedupWindowSec은 0 이상이어야 합니다");
-        }
 
         return errors;
     }
