@@ -1,11 +1,11 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
+import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +44,7 @@ public class Node {
     private List<Connection> incomingConnections = new ArrayList<>();
 
     @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
-    @SQLRestriction("branch_type = 'TRUE'")
-    private List<Connection> trueOutgoingConnections = new ArrayList<>();
-
-    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
-    @SQLRestriction("branch_type = 'FALSE'")
-    private List<Connection> falseOutgoingConnections = new ArrayList<>();
+    private List<Connection> outgoingConnections = new ArrayList<>();
 
     @Builder
     public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
@@ -58,5 +53,19 @@ public class Node {
         this.nodeType = nodeType;
         this.nodeConfig = nodeConfig;
         this.cooldownSec = cooldownSec;
+    }
+
+    @Transient
+    public List<Connection> getTrueOutgoingConnections() {
+        return outgoingConnections.stream()
+                .filter(c -> "TRUE".equalsIgnoreCase(c.getBranchType()))
+                .toList();
+    }
+
+    @Transient
+    public List<Connection> getFalseOutgoingConnections() {
+        return outgoingConnections.stream()
+                .filter(c -> "FALSE".equalsIgnoreCase(c.getBranchType()))
+                .toList();
     }
 }

@@ -1,8 +1,10 @@
 package com.nhnacademy.ruleengine.engine.flow;
 
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
+import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import org.springframework.stereotype.Component;
 
@@ -31,12 +33,11 @@ public class FlowGraphBuilder {
         for (Connection conn : connections) {
             Long srcId = conn.getSourceNode().getId();
             Long tgtId = conn.getTargetNode().getId();
-            String branchString = conn.getBranchType();
+            BranchType branchType = parseBranchType(conn.getBranchType());
 
-            if ("FALSE".equalsIgnoreCase(branchString)) {
-                falseAdjacencyMap.get(srcId).add(tgtId);
-            } else {
-                trueAdjacencyMap.get(srcId).add(tgtId);
+            switch (branchType) {
+                case TRUE -> trueAdjacencyMap.get(srcId).add(tgtId);
+                case FALSE -> falseAdjacencyMap.get(srcId).add(tgtId);
             }
         }
 
@@ -53,6 +54,14 @@ public class FlowGraphBuilder {
                 trueAdjacencyMap,
                 falseAdjacencyMap
         );
+    }
+
+    private BranchType parseBranchType(String branchType) {
+        try {
+            return BranchType.valueOf(branchType.toUpperCase(Locale.ROOT));
+        } catch (Exception e) {
+            throw new InvalidFlowException();
+        }
     }
 
     private Map<Long, ExecutableFlow.ExecutableNode> buildNodeMap(List<Node> nodes) {
