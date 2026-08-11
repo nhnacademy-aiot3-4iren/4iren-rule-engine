@@ -14,13 +14,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisCacheConfig {
 
     //
-    @Bean()
-    public RedisTemplate<String, Object> externalRoomDeviceRedisTemplate(
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(
             RedisConnectionFactory redisConnectionFactory,
             ObjectMapper objectMapper
     ){
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         RedisSerializer<String> keySerializer = new StringRedisSerializer();
@@ -36,4 +35,6 @@ public class RedisCacheConfig {
 
         return redisTemplate;
     }
+
+
 }

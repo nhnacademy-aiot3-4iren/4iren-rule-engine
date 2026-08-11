@@ -9,4 +9,5 @@ public interface NodeRepository extends JpaRepository<Node, Long> {
 
     List<Node> findAllByFlowId(Long flowId);
     void deleteAllByFlowId(Long flowId);
+    List<Node> findAllByFlowIdIn(List<Long> flowIds);
 }

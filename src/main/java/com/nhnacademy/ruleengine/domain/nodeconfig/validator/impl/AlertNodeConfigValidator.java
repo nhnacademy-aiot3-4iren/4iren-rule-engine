@@ -30,6 +30,7 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
             errors.add("알림 제목을 입력해주세요");
         }
 
+
         return errors;
     }
 }

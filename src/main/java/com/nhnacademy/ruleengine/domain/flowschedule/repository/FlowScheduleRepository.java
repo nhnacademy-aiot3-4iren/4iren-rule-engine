@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.repository;
 
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +32,6 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
     Optional<FlowSchedule> findSchedule(@Param("id") Long id,
                                         @Param("flowId") Long flowId,
                                         @Param("roomId") Long roomId);
+
+    List<FlowSchedule> findAllByFlowIdIn(List<Long> flowIds);
 }
