@@ -39,8 +39,7 @@ Content-Type: application/json
         "y": 150,
         "channel": "TELEGRAM",
         "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 600
+        "alertType": "COMFORT_LIMIT_EXCEEDED"
       }
     }
   ],
@@ -110,8 +109,7 @@ Content-Type: application/json
         "y": 150,
         "channel": "TELEGRAM",
         "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED",
-        "dedupWindowSec": 600
+        "alertType": "COMFORT_LIMIT_EXCEEDED"
       }
     }
   ],

@@ -7,7 +7,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.common.external.MeasurementMeasurementTypeMapper;
 import com.nhnacademy.ruleengine.common.external.service.SensorStaticMetaService;
-import com.nhnacademy.ruleengine.common.redis.cache.RoomDeviceCacheService;
+import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
