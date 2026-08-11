@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.service.impl;
 
+import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
@@ -36,8 +37,7 @@ public class FlowServiceImpl implements FlowService {
     private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
     private final SensorStaticMetaService metaService;
-    private final FlowLoader flowLoader;
-
+    private final FlowCacheRepository flowCacheRepository;
     @Transactional
     @Override
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
@@ -126,7 +126,7 @@ public class FlowServiceImpl implements FlowService {
         validate(request.nodes(), request.connections());
 
         //캐시 무효화
-        flowLoader.evictCache(roomId);
+        flowCacheRepository.evict(roomId);
     }
 
     @Transactional
@@ -143,7 +143,7 @@ public class FlowServiceImpl implements FlowService {
         flowRepository.deleteById(flowId);
 
         //캐시 무효화
-        flowLoader.evictCache(roomId);
+        flowCacheRepository.evict(roomId);
     }
 
 

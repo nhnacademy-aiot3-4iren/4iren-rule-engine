@@ -58,8 +58,6 @@ public class FlowGraphBuilder {
         Map<Long, List<Long>> adjacencyMap = new HashMap<>();
         nodeMap.keySet().forEach(id -> adjacencyMap.put(id, new ArrayList<>()));
 
-
-
         for (Connection connection : connections) {
             adjacencyMap
                     .get(connection.getSourceNode().getId())
@@ -79,6 +77,10 @@ public class FlowGraphBuilder {
         List<Long> startNodes = nodeMap.keySet().stream()
                 .filter(id -> !hasIncomingEdge.contains(id))
                 .toList();
+
+        if(startNodes.size() > 1){
+            //TODO 예외처리
+        }
 
         return startNodes.get(0);
     }

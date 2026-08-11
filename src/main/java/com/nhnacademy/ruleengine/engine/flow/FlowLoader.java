@@ -36,16 +36,16 @@ public class FlowLoader {
         //캐시 확인
         List<ExecutableFlow> cached = flowCacheRepository.get(roomId);
         if(cached != null){
-            log.debug("cache hit roomId = {}", roomId);
+            log.info("cache hit roomId = {}", roomId);
             return cached;
         }
 
-        log.debug("cache miss roomId = {}, DB 조회", roomId);
+        log.info("cache miss roomId = {}, DB 조회", roomId);
         List<ExecutableFlow> executableFlows  =  loadFromDatabase(roomId);
 
         //활성 플로우 없으면 바로 반환(캐시저장 x)
         if(executableFlows.isEmpty()){
-            log.debug("활성 플로우 없음 roomId={}", roomId);
+            log.info("활성 플로우 없음 roomId={}", roomId);
             return executableFlows;
         }
 
@@ -107,9 +107,5 @@ public class FlowLoader {
     private <T> Map<Long, List<T>> groupByFlowId(List<T> list, Function<T, Long> flowIdExtractor) {
         return list.stream()
                 .collect(Collectors.groupingBy(flowIdExtractor));
-    }
-
-    public void evictCache(Long roomId){
-        flowCacheRepository.evict(roomId);
     }
 }
