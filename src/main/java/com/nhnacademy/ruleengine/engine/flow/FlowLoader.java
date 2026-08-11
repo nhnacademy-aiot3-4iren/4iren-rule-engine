@@ -58,7 +58,7 @@ public class FlowLoader {
         return executableFlows;
     }
     private List<ExecutableFlow> loadFromDatabase(Long roomId){
-        List<Flow> flows = flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateTrue(roomId);
+        List<Flow> flows = flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(roomId);
         if (flows.isEmpty()) {
             return Collections.emptyList();
         }
@@ -74,9 +74,9 @@ public class FlowLoader {
         List<FlowSchedule> allSchedules = flowScheduleRepository.findAllByFlowIdIn(flowIds);
 
         //플로우 그루핑
-        Map<Long, List<Node>> nodesByFlowId = groupByFlowId(allNodes, Node::getId);
-        Map<Long, List<Connection>> connectionsByFlowId = groupByFlowId(allConnections,Connection::getId);
-        Map<Long, List<FlowSchedule>> schedulesByFlowId = groupByFlowId(allSchedules, FlowSchedule::getId);
+        Map<Long, List<Node>> nodesByFlowId = groupByFlowId(allNodes, node -> node.getFlow().getId());
+        Map<Long, List<Connection>> connectionsByFlowId = groupByFlowId(allConnections, conn -> conn.getFlow().getId());
+        Map<Long, List<FlowSchedule>> schedulesByFlowId = groupByFlowId(allSchedules, fs-> fs.getFlow().getId());
 
         //플로우별 ExecutableFlow 조립
         return flows.stream()
@@ -87,7 +87,7 @@ public class FlowLoader {
                             connectionsByFlowId.getOrDefault(flow.getId(), Collections.emptyList()),
                             schedulesByFlowId.getOrDefault(flow.getId(), Collections.emptyList())
                     )
-                ).filter(Objects::isNull)
+                ).filter(Objects::nonNull)
                 .toList();
     }
     private ExecutableFlow buildSafely(

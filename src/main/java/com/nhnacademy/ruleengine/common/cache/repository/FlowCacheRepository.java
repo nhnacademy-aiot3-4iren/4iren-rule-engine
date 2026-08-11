@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FlowCacheRepository {
-    private static final String KEY_PREFIX = "flow:room:";
+    private static final String KEY_PREFIX = "flow:room:%d";
     private static final Duration TTL = Duration.ofHours(1);
 
     private final RedisTemplate<String, Object> redisTemplate;
