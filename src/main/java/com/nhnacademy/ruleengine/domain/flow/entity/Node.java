@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
-import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
