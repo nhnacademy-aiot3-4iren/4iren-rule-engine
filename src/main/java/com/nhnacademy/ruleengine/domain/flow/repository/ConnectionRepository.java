@@ -1,0 +1,13 @@
+package com.nhnacademy.ruleengine.domain.flow.repository;
+
+import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
+import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ConnectionRepository extends JpaRepository<Connection, Long> {
+    List<Connection> findAllByFlowId(Long flowId);
+    void deleteAllByFlowId(Long flowId);
+    List<Connection> findAllByFlowIdIn(List<Long> flowIds);
+}
