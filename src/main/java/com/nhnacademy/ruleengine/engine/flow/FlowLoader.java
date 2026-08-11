@@ -87,7 +87,7 @@ public class FlowLoader {
                             connectionsByFlowId.getOrDefault(flow.getId(), Collections.emptyList()),
                             schedulesByFlowId.getOrDefault(flow.getId(), Collections.emptyList())
                     )
-                ).filter(Objects::isNull)
+                ).filter(Objects::nonNull)
                 .toList();
     }
     private ExecutableFlow buildSafely(
