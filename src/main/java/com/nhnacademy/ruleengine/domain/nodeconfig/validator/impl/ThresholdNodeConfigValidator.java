@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;

@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto;
 
-import com.nhnacademy.ruleengine.domain.flow.enums.ConditionResult;
+import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import jakarta.validation.constraints.NotNull;
 
 
@@ -9,6 +9,13 @@ public record ConnectionInfo(
         Long sourceNodeId,
 
         @NotNull
-        Long targetNodeId
+        Long targetNodeId,
+
+        BranchType branchType
 ) {
+        public ConnectionInfo {
+                if (branchType == null) {
+                        branchType = BranchType.TRUE;
+                }
+        }
 }

@@ -13,7 +13,7 @@ public enum Operator {
     NEQ("!=")  // Not Equal
     ;
 
-    private String symbol;
+    private final String symbol;
 
     Operator(String symbol){
         this.symbol = symbol;

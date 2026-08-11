@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.repository;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +14,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
 
     @Query("""
          SELECT COUNT(fs) > 0 FROM FlowSchedule fs
-         WHERE fs.id = :id 
+         WHERE fs.id = :id
          AND fs.flow.id = :flowId
          AND fs.flow.roomId = :roomId
     """)
@@ -25,7 +24,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
 
     @Query("""
          SELECT fs FROM FlowSchedule fs
-         WHERE fs.id = :id 
+         WHERE fs.id = :id
          AND fs.flow.id = :flowId
          AND fs.flow.roomId = :roomId
     """)

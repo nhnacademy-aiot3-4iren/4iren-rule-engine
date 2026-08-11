@@ -6,7 +6,7 @@ public enum GradientDirection {
     ABS("절대 변화량 검증")//방향 상관없이 변화의 크기만 봄
     ;
 
-    private String directionStr;
+    private final String directionStr;
     GradientDirection(String directionStr){
         this.directionStr = directionStr;
     }

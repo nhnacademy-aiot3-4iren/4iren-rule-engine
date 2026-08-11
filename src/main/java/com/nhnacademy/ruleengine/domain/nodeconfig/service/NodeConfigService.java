@@ -4,8 +4,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
-import org.springframework.stereotype.Service;
-
 
 public interface NodeConfigService {
 

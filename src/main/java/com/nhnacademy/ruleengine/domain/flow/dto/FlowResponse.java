@@ -6,8 +6,6 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Builder
 public record FlowResponse(
         Long flowId,

@@ -14,7 +14,6 @@ import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
-import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +37,7 @@ public class FlowServiceImpl implements FlowService {
 
     private final SensorStaticMetaService metaService;
     private final FlowCacheRepository flowCacheRepository;
+
     @Transactional
     @Override
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
@@ -91,7 +91,7 @@ public class FlowServiceImpl implements FlowService {
 
         //강의실 MeasurementType List 기반 사용가능한 템플릿 플로우 리스트 필터링
         List<Long> availableTemplateIds = measurementTypesByTemplateId.entrySet().stream()
-                .filter(entry -> measurementTypesInRoom.containsAll(entry.getValue()))
+                .filter(entry -> new HashSet<>(measurementTypesInRoom).containsAll(entry.getValue()))
                 .map(Map.Entry::getKey).toList();
         List<Flow> templateFlowList = flowRepository.findAllById(availableTemplateIds);
 
@@ -151,8 +151,7 @@ public class FlowServiceImpl implements FlowService {
     private Map<Long, Long> saveNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
         Map<Long, Long> tempIdMap = new HashMap<>();
 
-        nodes.stream()
-                .forEach(n -> {
+        nodes.forEach(n -> {
                     Node savedNode = nodeRepository.save(
                             Node.builder()
                                     .flow(savedFlow)
@@ -167,32 +166,30 @@ public class FlowServiceImpl implements FlowService {
         return tempIdMap;
     }
 
+    // FlowServiceImpl.java 내 saveConnections 수정
     private void saveConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections, Map<Long, Long> tempIdMap) {
-        if(connections.isEmpty()){
+        if (connections.isEmpty()) {
             return;
         }
-        Set<Long> savedNodeIds = tempIdMap.values().stream().collect(Collectors.toSet());
 
-
+        Set<Long> savedNodeIds = new HashSet<>(tempIdMap.values());
         List<Connection> connectionList = connections.stream()
                 .map(c -> {
                     Long sourceId = tempIdMap.get(c.sourceNodeId());
                     Long targetId = tempIdMap.get(c.targetNodeId());
-
                     if (sourceId == null || targetId == null ||
                             !savedNodeIds.contains(sourceId) || !savedNodeIds.contains(targetId)) {
                         throw new InvalidConnectionException(sourceId, targetId);
                     }
-
                     return Connection.builder()
                             .flow(savedFlow)
                             .sourceNode(nodeRepository.getReferenceById(sourceId))
-                            .targetNode(nodeRepository.getReferenceById(targetId)).build();
+                            .targetNode(nodeRepository.getReferenceById(targetId))
+                            .branchType(String.valueOf(c.branchType()))
+                            .build();
                 })
                 .toList();
-
-        List<Connection> savedConnectionList = connectionRepository.saveAll(connectionList);
-
+        connectionRepository.saveAll(connectionList);
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<NodeInfo> nodes, @NotNull List<ConnectionInfo> connections ) {
@@ -205,7 +202,7 @@ public class FlowServiceImpl implements FlowService {
 
     private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
         List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
-        Map<Long, List<MeasurementType>> measurementTypesByTemplateId = allFlowTemplateMeasurementTypes.stream()
+        return allFlowTemplateMeasurementTypes.stream()
                 .collect(Collectors.groupingBy(
                         fts -> fts.getFlow().getId(),
                         Collectors.mapping(
@@ -213,7 +210,6 @@ public class FlowServiceImpl implements FlowService {
                                 Collectors.toList()
                         )
                 ));
-        return measurementTypesByTemplateId;
     }
 
     //TODO validator 패키지 만들어서 분리하기

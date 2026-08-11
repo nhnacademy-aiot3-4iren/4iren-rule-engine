@@ -1,12 +1,11 @@
 package com.nhnacademy.ruleengine.domain.flow.entity;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,19 +33,23 @@ public class Node {
     @Column(name = "node_type", nullable = false, length = 20)
     private NodeType nodeType;
 
-//    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "node_config", nullable = false)
     @Convert(converter = NodeConfigConverter.class)
     private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")
-    private Integer cooldownSec;//알람 노드의 경우 null
+    private Integer cooldownSec;
 
-    @OneToMany(mappedBy = "sourceNode")
-    private List<Connection> outgoingConnections = new ArrayList<>();
-
-    @OneToMany(mappedBy = "targetNode")
+    @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Connection> incomingConnections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @SQLRestriction("branch_type = 'TRUE'")
+    private List<Connection> trueOutgoingConnections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sourceNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @SQLRestriction("branch_type = 'FALSE'")
+    private List<Connection> falseOutgoingConnections = new ArrayList<>();
 
     @Builder
     public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
@@ -55,34 +58,5 @@ public class Node {
         this.nodeType = nodeType;
         this.nodeConfig = nodeConfig;
         this.cooldownSec = cooldownSec;
-    }
-    public static Node create(Flow flow, NodeInfo nodeInfo){
-        return Node.builder().flow(flow)
-                .nodeName(nodeInfo.nodeName())
-                .nodeType(nodeInfo.nodeType())
-                .nodeConfig(nodeInfo.nodeConfig())
-                .cooldownSec(nodeInfo.cooldownSec())
-                .build();
-    }
-    public static Node create(Flow flow, TemplateNodeInfo nodeInfo){
-        return Node.builder().flow(flow)
-                .nodeName(nodeInfo.nodeName())
-                .nodeType(nodeInfo.nodeType())
-                .nodeConfig(nodeInfo.nodeConfig())
-                .cooldownSec(nodeInfo.cooldownSec())
-                .build();
-    }
-
-    public void update(NodeInfo nodeInfo) {
-        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
-        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
-        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
-        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
-    }
-    public void update(TemplateNodeInfo nodeInfo) {
-        if (nodeName != null) this.nodeName = nodeInfo.nodeName();
-        if (nodeType != null) this.nodeType = nodeInfo.nodeType();
-        if (nodeConfig != null) this.nodeConfig = nodeInfo.nodeConfig();
-        if (cooldownSec != null) this.cooldownSec = nodeInfo.cooldownSec();
     }
 }
