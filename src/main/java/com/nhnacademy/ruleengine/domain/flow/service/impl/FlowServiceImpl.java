@@ -13,6 +13,7 @@ import com.nhnacademy.ruleengine.domain.flow.repository.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
+import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class FlowServiceImpl implements FlowService {
     private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
     private final SensorStaticMetaService metaService;
+    private final FlowLoader flowLoader;
 
     @Transactional
     @Override
@@ -122,6 +124,9 @@ public class FlowServiceImpl implements FlowService {
         updateNodesNConnections(flow, request.nodes(), request.connections());
 
         validate(request.nodes(), request.connections());
+
+        //캐시 무효화
+        flowLoader.evictCache(roomId);
     }
 
     @Transactional
@@ -136,6 +141,9 @@ public class FlowServiceImpl implements FlowService {
             throw new InvalidFlowException();
         }
         flowRepository.deleteById(flowId);
+
+        //캐시 무효화
+        flowLoader.evictCache(roomId);
     }
 
 

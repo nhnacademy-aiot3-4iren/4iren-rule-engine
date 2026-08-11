@@ -33,5 +33,5 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
                                         @Param("flowId") Long flowId,
                                         @Param("roomId") Long roomId);
 
-    List<Flow> findAllByFlowIdIn(List<Long> flowIds);
+    List<FlowSchedule> findAllByFlowIdIn(List<Long> flowIds);
 }
