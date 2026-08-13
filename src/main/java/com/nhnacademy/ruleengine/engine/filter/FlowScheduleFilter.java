@@ -31,7 +31,7 @@ public class FlowScheduleFilter {
     }
 
     private boolean matches(ExecutableFlow.ExecutableSchedule schedule, DayOfWeek day, LocalTime time) {
-        if (schedule.dayOfWeek().equals(day)) {
+        if (!schedule.dayOfWeek().equals(day)) {
             return false;
         }
         if (schedule.startTime().isAfter(schedule.endTime())) {

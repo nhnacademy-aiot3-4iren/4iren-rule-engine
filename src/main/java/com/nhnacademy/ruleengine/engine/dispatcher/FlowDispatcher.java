@@ -2,7 +2,7 @@ package com.nhnacademy.ruleengine.engine.dispatcher;
 
 import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
-import com.nhnacademy.ruleengine.engine.model.SensorPayload;
+import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class FlowDispatcher {
     private final FlowScheduleFilter flowScheduleFilter;
 //    private final FlowExecutor flowExecutor;
 
-    public CompletableFuture<Void> dispatch(List<ExecutableFlow> flows, SensorPayload payload) {
+    public CompletableFuture<Void> dispatch(List<ExecutableFlow> flows, EnvironmentContext payload) {
         Instant triggeredAt = Instant.now();
 
         List<CompletableFuture<Void>> futures = flows.stream()
@@ -36,7 +36,7 @@ public class FlowDispatcher {
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private void runFlowPipeline(ExecutableFlow flow, SensorPayload payload, Instant triggeredAt) {
+    private void runFlowPipeline(ExecutableFlow flow, EnvironmentContext payload, Instant triggeredAt) {
         if(!flowScheduleFilter.isSchedulable(flow)) {
             log.debug("flow({}) - 스케줄 조건 불일치, 실행 스킵", flow.flowId());
             return;
