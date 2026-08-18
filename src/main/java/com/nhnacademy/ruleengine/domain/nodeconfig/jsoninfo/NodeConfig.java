@@ -10,6 +10,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNo
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
 
 
 @JsonTypeInfo(
@@ -26,7 +27,9 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig
 
         @JsonSubTypes.Type(value = OrNodeConfig.class, name = "OR"),
 
-        @JsonSubTypes.Type(value = AlertNodeConfig.class, name = "ALERT")
+        @JsonSubTypes.Type(value = AlertNodeConfig.class, name = "ALERT"),
+
+        @JsonSubTypes.Type(value = StartNodeConfig.class, name = "START")
 })
 public interface NodeConfig {
     // 공통 필드 있으면 여기
