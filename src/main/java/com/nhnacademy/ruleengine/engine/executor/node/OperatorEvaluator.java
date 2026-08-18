@@ -4,6 +4,9 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 
 public class OperatorEvaluator {
 
+    private OperatorEvaluator() {
+    }
+
     public static boolean evaluate(Operator operator, double currentValue, double targetValue) {
         return switch (operator) {
             case GT -> currentValue > targetValue;
