@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.engine.facade;
+package com.nhnacademy.ruleengine.engine.handler;
 
 import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RuleEngineFacade {
+public class RuleEngineHandler {
     private final FlowLoader flowLoader;
     private final FlowCacheRepository flowCacheRepository;
 
