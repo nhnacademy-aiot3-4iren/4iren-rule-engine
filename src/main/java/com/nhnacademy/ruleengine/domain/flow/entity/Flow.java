@@ -60,13 +60,13 @@ public class Flow {
 
     //일반 플로우 생성용
     @Builder(builderMethodName = "regularBuilder",  builderClassName = "RegularBuilder")
-    public Flow(Long roomId, String flowName, String description){
+    public Flow(Long roomId, boolean isActive,String flowName, String description){
         this.id = null;
         this.createdAt = null;
         this.updatedAt = null;
 
         this.roomId =roomId;
-        this.isActive = true;
+        this.isActive = isActive;
 
         this.flowName = flowName;
         this.description = description;

@@ -15,7 +15,7 @@ public record TemplateListResponse(
             List<Flow> templateFlow,
             Map<Long, List<MeasurementType>> measurementTypes
     ){
-        List<TemplateResponse> TemplateResponses =  TemplateResponse.fromList(templateFlow, measurementTypes);
-        return new TemplateListResponse(TemplateResponses);
+        List<TemplateResponse> templateResponses =  TemplateResponse.fromList(templateFlow, measurementTypes);
+        return new TemplateListResponse(templateResponses);
     }
 }

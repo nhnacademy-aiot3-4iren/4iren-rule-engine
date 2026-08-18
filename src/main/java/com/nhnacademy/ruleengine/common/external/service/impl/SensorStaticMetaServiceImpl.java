@@ -5,7 +5,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
-import com.nhnacademy.ruleengine.common.external.MeasurementMeasurementTypeMapper;
+import com.nhnacademy.ruleengine.common.external.MeasurementTypeMapper;
 import com.nhnacademy.ruleengine.common.external.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
     public final RoomDeviceCacheService roomDeviceCacheService;
-    public final MeasurementMeasurementTypeMapper measurementmeasurementTypeMapper;
+    public final MeasurementTypeMapper measurementmeasurementTypeMapper;
 
     @Override
     public List<SensorStaticMeta> getSensorStaticMetaList(Long roomId){
