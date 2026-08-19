@@ -1,6 +1,6 @@
 ### 변수 설정
 @hostname = localhost
-@port = 8080
+@port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
 @flowId = 2

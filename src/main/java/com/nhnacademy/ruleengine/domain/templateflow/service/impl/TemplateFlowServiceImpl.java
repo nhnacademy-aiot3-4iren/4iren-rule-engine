@@ -187,7 +187,7 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
                 ));
     }
 
-    //플로우 무결성 검사를 위한 메서드들    //TODO validator 패키지 만들어서 분리하기
+    //플로우 무결성 검사를 위한 메서드들
     public void validate(@NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections){
         List<String> errors =  new ArrayList<>();
 
@@ -250,7 +250,7 @@ public class TemplateFlowServiceImpl implements TemplateFlowService {
         }
     }
 
-    //TODO 검증
+
     //순환 참조 확인(DFS)
     private void validateNoCycle( List<TemplateNodeInfo> nodes, List<TemplateConnectionInfo> connections, List<String> errors) {
         //인접 맵 구정
