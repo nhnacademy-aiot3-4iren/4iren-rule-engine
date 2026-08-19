@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 //플로우 실행중 OrNode와 연결된 경로들의 상태를 저장 및 판단
+@Getter
 public class OrRuntimeState {
 
-    @Getter
+
     private final Long orNodeId;
     private final Map<LogicalInputKey, LogicalInputStatus> statusMap = new HashMap<>();
     private final Map<LogicalInputKey, List<AlertEvent.NodeResult>> arrivedHistoryMap = new HashMap<>();
