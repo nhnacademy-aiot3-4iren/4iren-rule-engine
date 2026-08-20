@@ -26,7 +26,7 @@ public class NodeExecutorRegistry {
         );
     }
 
-    public boolean execute(NodeType nodeType, ExecutableFlow.ExecutableNode node, FlowContext context, ExecutionPath path, FlowRuntime runtime){
+    public NodeExecutionResult execute(NodeType nodeType, ExecutableFlow.ExecutableNode node, FlowContext context, ExecutionPath path, FlowRuntime runtime){
         NodeExecutor nodeExecutor = registry.get(nodeType);
         if(nodeExecutor == null){
             throw new IllegalStateException("NodeExecutor 없음. nodeType:" + nodeType);
