@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class MeasurementMeasurementTypeMapper {
+public class MeasurementTypeMapper {
     //TODO MeasurementType, 단위 등 측정 데이터 정보에 대한 건 processing에게 의존하도록 바꿔야함. MeasurementType enum 따로 관리 안하도록
     private final Map<String, MeasurementType> measurementTypeMap = Map.of(
             "co2", MeasurementType.CO2,

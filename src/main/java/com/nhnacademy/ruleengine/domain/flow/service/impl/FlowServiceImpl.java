@@ -42,7 +42,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
         Flow flow = Flow.regularBuilder()
-                .roomId(roomId).flowName(request.flowName()).description(request.description()).build();
+                .roomId(roomId).flowName(request.flowName()).isActive(true).description(request.description()).build();
 
         validate(request.nodes(), request.connections());
         Flow savedFlow = flowRepository.save(flow);
@@ -84,7 +84,7 @@ public class FlowServiceImpl implements FlowService {
         List<Flow> allTemplateFlowList = flowRepository.findAllByIsTemplate(true);
 
         //템플릿 플로우 id별 필요한 MeasurementType List
-        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTyoesByTemplateIds(allTemplateFlowList);
+        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTypesByTemplateIds(allTemplateFlowList);
 
         //강의실에서 측정가능한 MeasurementType List
         List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
@@ -100,17 +100,17 @@ public class FlowServiceImpl implements FlowService {
 
     @Override
     public RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId) {
-        Flow tempalteFlow = flowRepository.findById(templateFlowId)
+        Flow templateFlow = flowRepository.findById(templateFlowId)
                 .orElseThrow(FlowNotFoundException::new);
 
-        if(!tempalteFlow.getIsTemplate()){
+        if(!templateFlow.getIsTemplate()){
             throw new InvalidFlowException();
         }
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
 
-        return RoomTemplateDetailResponse.from(tempalteFlow, nodes, connections);
+        return RoomTemplateDetailResponse.from(templateFlow, nodes, connections);
     }
 
     @Transactional
@@ -200,7 +200,7 @@ public class FlowServiceImpl implements FlowService {
 
     }
 
-    private Map<Long, List<MeasurementType>> getMeasurementTyoesByTemplateIds(List<Flow> templateFlows){
+    private Map<Long, List<MeasurementType>> getMeasurementTypesByTemplateIds(List<Flow> templateFlows){
         List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
         return allFlowTemplateMeasurementTypes.stream()
                 .collect(Collectors.groupingBy(

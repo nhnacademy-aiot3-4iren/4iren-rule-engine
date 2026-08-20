@@ -18,13 +18,13 @@ public record RoomTemplateDetailResponse(
         List<ConnectionResponse> connections
 ){
     public static RoomTemplateDetailResponse from(
-            Flow flowTempalte,
+            Flow flowTemplete,
             List<Node> nodes,
             List<Connection> connections
     ) {
         return RoomTemplateDetailResponse.builder()
-                .templateName(flowTempalte.getFlowName())
-                .description(flowTempalte.getDescription())
+                .templateName(flowTemplete.getFlowName())
+                .description(flowTemplete.getDescription())
                 .nodes(NodeResponse.fromList(nodes))
                 .connections(ConnectionResponse.fromList(connections)).build();
     }

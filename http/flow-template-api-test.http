@@ -1,6 +1,6 @@
 ### 변수 설정
 @hostname = localhost
-@port = 8080
+@port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule/templates
 @templateId = 1
 
@@ -46,7 +46,8 @@ Content-Type: application/json
   "connections": [
     {
       "sourceNodeId": -1,
-      "targetNodeId": -2
+      "targetNodeId": -2,
+      "branchType": "TRUE"
     }
   ]
 }
@@ -101,7 +102,8 @@ Content-Type: application/json
   "connections": [
     {
       "sourceNodeId": -3,
-      "targetNodeId": 2
+      "targetNodeId": 2,
+      "branchType": "FALSE"
     }
   ]
 }

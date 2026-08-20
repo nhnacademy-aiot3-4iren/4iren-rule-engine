@@ -78,23 +78,6 @@ public class FlowGraphBuilder {
                 ));
     }
 
-    //NodeId 별 다음 노드 Id 목록
-    private Map<Long, List<Long>> buildAdjacencyMap(
-            List<Connection> connections,
-            Map<Long, ExecutableFlow.ExecutableNode> nodeMap
-    ) {
-        Map<Long, List<Long>> adjacencyMap = new HashMap<>();
-        nodeMap.keySet().forEach(id -> adjacencyMap.put(id, new ArrayList<>()));
-
-        for (Connection connection : connections) {
-            adjacencyMap
-                    .get(connection.getSourceNode().getId())
-                    .add(connection.getTargetNode().getId());
-        }
-
-        return adjacencyMap;
-    }
-
     private Long findStartNodeId(Map<Long, ExecutableFlow.ExecutableNode> nodeMap, List<Connection> connections) {
         Set<Long> hasIncomingEdge = connections.stream()
                 .map(conn -> conn.getTargetNode().getId())
