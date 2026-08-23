@@ -26,8 +26,16 @@ public record ExecutionPath(
         return new ExecutionPath(currentNodeId, fromNodeId, fromBranchType, copied);
     }
 
+
     //다음 노드로 이동할때의 상태 객체를 새로 생성
     public ExecutionPath next(Long nextNodeId, BranchType arrivedBranchType) {
         return new ExecutionPath(nextNodeId, currentNodeId, arrivedBranchType, new ArrayList<>(history));
+    }
+
+    //or 노드에서 병합된 history로 바꿈
+    public ExecutionPath appendMergedResult(List<AlertEvent.NodeResult> nodeResult){
+        //결과에 따라서 여러 노드로 분산될 수 있는거라면 불변 객체를 반환해야함.
+        List<AlertEvent.NodeResult> copied = new ArrayList<>(nodeResult);
+        return new ExecutionPath(currentNodeId, fromNodeId, fromBranchType, copied);
     }
 }

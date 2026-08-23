@@ -26,8 +26,8 @@ public class FlowDispatcher {
 
         List<CompletableFuture<Void>> futures = flows.stream()
                 .map(flow -> CompletableFuture
-                        .runAsync(() -> runFlowPipeline(flow, payload, triggeredAt), flowExecutorService)
-                        .exceptionally(ex -> {
+                        .runAsync(() -> runFlowPipeline(flow, payload, triggeredAt), flowExecutorService)// runFlowPipeline 작업을 가상 스레드 풀(flowExecutorService)에서 실행하도록 지정
+                        .exceptionally(ex -> {//비동기 작업 중 예외 발생 시 처리
                             log.error("flow({}) 파이프라인 실행 중 처리되지 않은 예외 발생", flow.flowId(), ex);
                             return null;
                         }))

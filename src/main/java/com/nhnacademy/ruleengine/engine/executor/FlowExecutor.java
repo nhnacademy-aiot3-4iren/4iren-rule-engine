@@ -3,18 +3,18 @@ package com.nhnacademy.ruleengine.engine.executor;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutorRegistry;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.LogicalInputKey;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.OrRuntimeState;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
+import com.nhnacademy.ruleengine.engine.model.AlertEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
 
 @Slf4j
 @Component
@@ -23,11 +23,16 @@ public class FlowExecutor {
 
     private final NodeExecutorRegistry nodeExecutorRegistry;
 
-    public void execute(ExecutableFlow flow, FlowContext context){
+    public void execute(FlowContext context){
+        ExecutableFlow flow = context.flow();
+
         //FlowRuntime 초기화
         Queue<ExecutionPath> queue = new ArrayDeque<>();//queue 초기
         Map<Long, OrRuntimeState> orStateMap = initializeOrStateMap(flow);//OrRuntimeState 초기화
         FlowRuntime runtime = new FlowRuntime(queue, orStateMap);
+
+        //OR 전파 중복 실행 방지를 위해 저장
+        Set<Long> completedOrNodeIds = new HashSet<>();
 
         //startNode 바로 다음 노드들 큐에 저장
         enqueueStartNodes(flow, queue);
@@ -39,8 +44,13 @@ public class FlowExecutor {
 
             ExecutableFlow.ExecutableNode currentNode = flow.nodeMap().get(path.currentNodeId());
 
+            //이미 완료된 OR노드이면 다시 처리하지 않음
+            if(currentNode.nodeType() == NodeType.OR && completedOrNodeIds.contains(currentNode.nodeId())){
+                continue;
+            }
+
             //노드 executor 실행후 결과 반환.
-            boolean decision = nodeExecutorRegistry.execute(
+            NodeExecutionResult result = nodeExecutorRegistry.execute(
                     currentNode.nodeType(),
                     currentNode,
                     context,
@@ -48,55 +58,153 @@ public class FlowExecutor {
                     runtime
             );
 
+
             // 현재 노드가 OR 노드인데 OrRuntimeState가 아직 isReady상태가 아닐경우 다음 진행 안함
             if(currentNode.nodeType() == NodeType.OR){
                 OrRuntimeState orState = runtime.orStateMap().get(currentNode.nodeId());
                 if(!orState.isReady()){
                     continue;
                 }
+                completedOrNodeIds.add(currentNode.nodeId());
             }
 
-            BranchType selectedBranch = decision ? BranchType.TRUE : BranchType.FALSE;
-            enqueueNextPath(flow, queue, path, currentNode.nodeId(), selectedBranch);
-
-            //현재 노드의 결과 선택되지 않은 branch가 OR로간다면 Or노드로의 경로가 끊긴것이므로 BLOCKED 상태 반영
+            //선택되지 않은 branch이후에 OR노드가 있다면 경로가 끊긴것이므로 BLOCKED 상태 전파
+            BranchType selectedBranch = result.passed() ? BranchType.TRUE : BranchType.FALSE;
             BranchType blockedBranch = (selectedBranch == BranchType.TRUE) ?BranchType.FALSE : BranchType.TRUE;
+            propagateBlockedInputsOfUnselectedBranch(flow, currentNode.nodeId(),blockedBranch, runtime, queue, context, completedOrNodeIds);
 
-            blockOrInputsOfUnselectedBranch(flow, currentNode.nodeId(),blockedBranch, runtime);
-
+            enqueueNextPath(flow, queue, path, currentNode.nodeId(), selectedBranch);
         }
     }
 
-    //OrRuntimeState에 BLOCKED 상태 반영
-    private void blockOrInputsOfUnselectedBranch(
+    //선택되지 않은 branch가 죽었다는 사실을, 그 죽은 branch 끝에 도달 가능한 모든 OR 노드에게 알려주는 것
+    private void propagateBlockedInputsOfUnselectedBranch(
             ExecutableFlow flow,
             Long currentNodeId,
             BranchType blockedBranch,
-            FlowRuntime runtime
-    ) {
-        List<Long>  blackedTargets = getNextNodeIds(flow, currentNodeId, blockedBranch);
+            FlowRuntime runtime,
+
+            Queue<ExecutionPath> queue,
+            FlowContext context,
+            Set<Long> completedOrNodeIds) {
+        //현재 노드에서 선택되지 않은 브랜치로 갈 수 있었던 첫 노드 가져옴
+        List<Long> blockedTargets = getNextNodeIds(flow, currentNodeId, blockedBranch);
 
         //타겟 노드가 없다면 끝노드이므로 그냥 return
-        if(blackedTargets == null || blackedTargets.isEmpty()){
+        if(blockedTargets == null || blockedTargets.isEmpty()){
             return;
         }
 
-        for(Long targetNodeId: blackedTargets){
-            ExecutableFlow.ExecutableNode targetNode = flow.nodeMap().get(targetNodeId);
 
-            if(targetNode.nodeType() != NodeType.OR){
+        Deque<BlockedEdgeCursor> stack = new ArrayDeque<>();
+        Set<BlockedEdgeCursor> visited = new HashSet<>();
+
+        //탐색 시작점 enqueue
+        for(Long targetNodeId : blockedTargets){
+            stack.push(new BlockedEdgeCursor(currentNodeId, blockedBranch, targetNodeId));
+        }
+
+        //DFS
+        while (!stack.isEmpty()) {
+            BlockedEdgeCursor cursor = stack.pop();
+
+            //방문 노드 기록
+            if(!visited.add(cursor)){
                 continue;
             }
-            OrRuntimeState orState = runtime.orStateMap().get(targetNodeId);
 
-            LogicalInputKey blockedInput = new LogicalInputKey(
-                    currentNodeId,
-                    blockedBranch,
-                    targetNodeId
-            );
+            ExecutableFlow.ExecutableNode targetNode = flow.nodeMap().get(cursor.toNodeId());
 
-            orState.markBlocked(blockedInput);
+            //OR 입력이면 blocked 반영
+            if(targetNode.nodeType() == NodeType.OR){
+                OrRuntimeState orState = runtime.orStateMap().get(targetNode.nodeId());
+
+                boolean wasReady = orState.isReady();
+
+                LogicalInputKey blockedInput = new LogicalInputKey(
+                        cursor.fromNodeId(),
+                        cursor.branchType(),
+                        targetNode.nodeId()
+                );
+
+                orState.markBlocked(blockedInput);
+
+                //blocked반영으로 ready 상태가 된 OR노드는 다시 재평가
+                if(!wasReady && orState.isReady() && !completedOrNodeIds.contains(targetNode.nodeId())){
+                    reevaluateReadyOrNode(
+                            flow,
+                            targetNode.nodeId(),
+                            runtime,
+                            queue,
+                            context,
+                            completedOrNodeIds
+                    );
+                }
+
+                continue;
+            }
+
+            //OR 노드가 아니면 downstream 전체 탐색
+            for(Long nextTrueNodeId : flow.trueAdjacencyMap().getOrDefault(targetNode.nodeId(), List.of())){
+                stack.push(new BlockedEdgeCursor(targetNode.nodeId(),BranchType.TRUE, nextTrueNodeId));
+            }
+            for(Long nextFalseId : flow.falseAdjacencyMap().getOrDefault(targetNode.nodeId(), List.of())){
+                stack.push(new BlockedEdgeCursor(targetNode.nodeId(), BranchType.FALSE, nextFalseId));
+            }
+
+
         }
+
+    }
+    private void reevaluateReadyOrNode(
+            ExecutableFlow flow,
+            Long orNodeId,
+            FlowRuntime runtime,
+            Queue<ExecutionPath> queue,
+            FlowContext context,
+            Set<Long> completedOrNodeIds
+    ) {
+        if(completedOrNodeIds.contains(orNodeId)){
+            return;
+        }
+
+        ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(orNodeId);
+        if(orNode == null || orNode.nodeType() != NodeType.OR){
+            return;
+        }
+
+        OrRuntimeState orState = runtime.orStateMap().get(orNodeId);
+        if(orState == null || !orState.isReady()){
+            return;
+        }
+
+        boolean passed = orState.isSatisfied();   // 실행기 재호출 없이 상태만 읽음
+        BranchType selectedBranch = passed ? BranchType.TRUE : BranchType.FALSE;
+        BranchType blockedBranch  = passed ? BranchType.FALSE : BranchType.TRUE;
+
+        List<AlertEvent.NodeResult> mergedHistory = orState.mergeArrivedHistories();
+        mergedHistory.add(buildOrNodeResult(orNode));   // 아래 2번 항목 참고
+
+        ExecutionPath continuedPath = ExecutionPath
+                .start(orNodeId, orNodeId, selectedBranch)
+                .appendMergedResult(mergedHistory);
+
+        completedOrNodeIds.add(orNodeId);
+
+        propagateBlockedInputsOfUnselectedBranch(flow, orNodeId, blockedBranch, runtime, queue, context, completedOrNodeIds);
+        enqueueNextPath(flow, queue, continuedPath, orNodeId, selectedBranch);
+    }
+
+    private AlertEvent.NodeResult buildOrNodeResult(ExecutableFlow.ExecutableNode orNode) {
+        return new AlertEvent.NodeResult(orNode.nodeType().name(), null, null, null, null, null);
+    }
+
+    //blocked 전파가 시자가된 노드
+    private record BlockedEdgeCursor(
+            Long fromNodeId,
+            BranchType branchType,
+            Long toNodeId
+    ) {
     }
 
     //startNodeId 다음 노드들을 큐에 넣음
@@ -181,6 +289,4 @@ public class FlowExecutor {
         }
         return inputs;
     }
-
-
 }

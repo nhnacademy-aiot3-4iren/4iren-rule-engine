@@ -32,12 +32,18 @@ public class OrNodeExecutor implements NodeExecutor {
 
         OrRuntimeState state = runtime.orStateMap().computeIfAbsent(orNodeId, id -> new OrRuntimeState(id, resolveInputs(context.flow(), id)));
 
-        LogicalInputKey arrivedKey = new LogicalInputKey(path.arrivedFromNodeId(), path.arrivedBranchType(), orNodeId);
+        LogicalInputKey arrivedKey = new LogicalInputKey(path.fromNodeId(), path.fromBranchType(), orNodeId);
         state.markArrived(arrivedKey, path.history());
 
+        if(!state.isReady()) {
+            return NodeExecutionResult.of(false, path);
+        }
         boolean passed = state.isSatisfied();
 
         log.debug("node({}) OR 판단 - arrivedKey={}, satisfied={}, ready={}", orNodeId, arrivedKey, passed, state.isReady());
+
+        List<AlertEvent.NodeResult> mergedNodeResults = state.mergeArrivedHistories();
+
 
         AlertEvent.NodeResult nodeResult = new AlertEvent.NodeResult(
                 node.nodeType().name(),
@@ -47,8 +53,10 @@ public class OrNodeExecutor implements NodeExecutor {
                 null,
                 null
         );
+        mergedNodeResults.add(nodeResult);
 
-        return NodeExecutionResult.of(passed, path.append(nodeResult));
+        return NodeExecutionResult.of(passed, path.appendMergedResult(mergedNodeResults));
+
     }
 
     private List<LogicalInputKey> resolveInputs(ExecutableFlow flow, Long orNodeId) {

@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.engine.executor;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutorRegistry;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.OrRuntimeState;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
@@ -83,10 +84,12 @@ class FlowExecutorTest {
         ExecutableFlow flow = createFlow();
 
         FlowContext context = mock(FlowContext.class);
-        when(nodeExecutorRegistry.execute(eq(NodeType.THRESHOLD), eq(node1),eq(context), any(), any())).thenReturn(true);
-        when(nodeExecutorRegistry.execute(eq(NodeType.AVERAGE),eq(node2),eq(context), any(), any())).thenReturn(false);
+        NodeExecutionResult result = mock(NodeExecutionResult.class);
 
-        flowExecutor.execute(flow, context);
+        when(nodeExecutorRegistry.execute(eq(NodeType.THRESHOLD), eq(node1),eq(context), any(), any())).thenReturn(result);
+        when(nodeExecutorRegistry.execute(eq(NodeType.AVERAGE),eq(node2),eq(context), any(), any())).thenReturn(result);
+
+        flowExecutor.execute( context);
 
         verify(nodeExecutorRegistry, times(1))
                 .execute(eq(NodeType.THRESHOLD), eq(node1), eq(context), any(), any());
@@ -105,16 +108,17 @@ class FlowExecutorTest {
     void or_node_should_execute_twice_as_each_path_arrives() {
         ExecutableFlow flow = createFlow();
         FlowContext context = mock(FlowContext.class);
+        NodeExecutionResult result = mock(NodeExecutionResult.class);
 
 
-        when(nodeExecutorRegistry.execute(eq(NodeType.THRESHOLD),eq(node1), eq(context), any(), any())).thenReturn(false);
-        when(nodeExecutorRegistry.execute(eq(NodeType.AVERAGE),eq(node2),eq(context), any(), any())).thenReturn(true);
-        when(nodeExecutorRegistry.execute(eq(NodeType.OR),eq(node3), eq(context), any(), any())).thenReturn(true);
-        when(nodeExecutorRegistry.execute(eq(NodeType.GRADIENT),eq(node4), eq(context), any(), any())).thenReturn(true);
+        when(nodeExecutorRegistry.execute(eq(NodeType.THRESHOLD),eq(node1), eq(context), any(), any())).thenReturn(result);
+        when(nodeExecutorRegistry.execute(eq(NodeType.AVERAGE),eq(node2),eq(context), any(), any())).thenReturn(result);
+        when(nodeExecutorRegistry.execute(eq(NodeType.OR),eq(node3), eq(context), any(), any())).thenReturn(result);
+        when(nodeExecutorRegistry.execute(eq(NodeType.GRADIENT),eq(node4), eq(context), any(), any())).thenReturn(result);
 
 
 
-        flowExecutor.execute(flow, context);
+        flowExecutor.execute(context);
 
         verify(nodeExecutorRegistry,times(1)).execute(eq(NodeType.THRESHOLD), eq(node1), eq(context), any(), any());
         verify(nodeExecutorRegistry,times(1)).execute(eq(NodeType.AVERAGE), eq(node2), eq(context), any(), any());
@@ -125,6 +129,14 @@ class FlowExecutorTest {
 
 
     //
+    @Test
+    @DisplayName("FlowRuntime 초기화 확인")
+    void InitFlowRuntime(){
+
+    }
+
+
+
 
 
 }

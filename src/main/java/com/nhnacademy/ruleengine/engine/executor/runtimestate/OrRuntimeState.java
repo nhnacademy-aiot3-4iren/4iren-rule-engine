@@ -48,5 +48,12 @@ public class OrRuntimeState {
         return statusMap.values().stream()
                 .anyMatch(status -> status == LogicalInputStatus.ARRIVED);
     }
+    //도달한 경로의 history병함 -> arrivedHistoryMap
+    //arrivedHistoryMap -> or노드에서 나가는 경로의 PathExecution 새로 반환
+    public List<AlertEvent.NodeResult> mergeArrivedHistories(){
+        List<AlertEvent.NodeResult> merged = new ArrayList<>();
+        arrivedHistoryMap.values().forEach(merged::addAll);
+        return merged;
+    }
 
 }
