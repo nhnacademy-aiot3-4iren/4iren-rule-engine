@@ -7,6 +7,7 @@
 
 ### [플로우 생성] 새로운 플로우 등록 (음수 임시 ID 포함)
 POST {{baseUrl}}/rooms/{{roomId}}/flows
+
 Content-Type: application/json
 
 {

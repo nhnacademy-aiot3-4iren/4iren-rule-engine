@@ -3,10 +3,12 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
+//import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
 import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +36,8 @@ public class Node {
     @Column(name = "node_type", nullable = false, length = 20)
     private NodeType nodeType;
 
-    @Column(name = "node_config", nullable = false)
-    @Convert(converter = NodeConfigConverter.class)
+    @Column(name = "node_config",columnDefinition = "json", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
     private NodeConfig nodeConfig;
 
     @Column(name = "cooldown_sec")

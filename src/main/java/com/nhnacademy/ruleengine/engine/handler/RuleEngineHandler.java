@@ -1,9 +1,9 @@
-package com.nhnacademy.ruleengine.engine.facade;
+package com.nhnacademy.ruleengine.engine.handler;
 
 import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
-import com.nhnacademy.ruleengine.engine.model.SensorPayload;
+import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,24 +13,24 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RuleEngineOrchestrator {
+public class RuleEngineHandler {
     private final FlowLoader flowLoader;
     private final FlowCacheRepository flowCacheRepository;
 
 
-    public void process(SensorPayload sensorPayload){
-        Long roomId = sensorPayload.device().roomId();
+    public void process(EnvironmentContext payload){
+        Long roomId = payload.roomId();
 
-        log.info("센서 데이터 수신 roomId={} deviceEui={}", roomId, sensorPayload.device().devEui());
+        log.info("센서 데이터 수신 roomId={}", roomId);
 
         //1. 플로우 로드
         List<ExecutableFlow> flows = flowLoader.load(roomId);
         if(flows.isEmpty()){
+            return;
         }
 
 
         //flowDispatcher 호출
-
-        //
+        //dispatcher.dispatch(flows, payload);
     }
 }
