@@ -53,7 +53,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
         return roomDeviceInfoList.stream()
                 .map(room -> DeviceInfo.of(room.devEui(), room.deviceName()))
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
     }
     @Override
     public List<MeasurementType> getMeasurementTypeOptionsInRoom(Long roomId) {
@@ -66,7 +66,7 @@ public class SensorStaticMetaServiceImpl implements SensorStaticMetaService {
                 .flatMap(room -> room.measurement().keySet().stream())
                 .map(measurement -> measurementmeasurementTypeMapper.toMeasurementType(measurement).orElseThrow(MeasurementTypeNotFoundException::new))
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Map<MeasurementType, String> getUnitByMeasurementType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
