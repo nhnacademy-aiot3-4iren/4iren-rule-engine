@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator;
 
-
 import com.nhnacademy.ruleengine.common.exception.notfound.NodeTypeNotFoundException;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
