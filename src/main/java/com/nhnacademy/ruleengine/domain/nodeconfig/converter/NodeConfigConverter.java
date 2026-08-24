@@ -24,7 +24,7 @@ public class NodeConfigConverter implements AttributeConverter<NodeConfig, Strin
         try{
             return objectMapper.writeValueAsString(nodeConfig);
         } catch (Exception e) {
-        throw new IllegalArgumentException("MySQL JSON 직렬화 실패", e);
+            throw new IllegalArgumentException("MySQL JSON 직렬화 실패", e);
         }
     }
 
