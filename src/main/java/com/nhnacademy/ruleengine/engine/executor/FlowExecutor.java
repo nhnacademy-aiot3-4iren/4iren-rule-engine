@@ -14,6 +14,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+
+    /*
+    0(start) -true-> 1(condition) -false-> 3(or) -true-> 7(condition) -true-> 6(or)
+             -true-> 2(condition) -true-> 5(condition) -true-> 6(or)
+                                  -true-> 4(conditions) -false-> 3(or)
+                                  -false->
+    */
 import java.util.*;
 
 @Slf4j
@@ -73,11 +80,11 @@ public class FlowExecutor {
             BranchType blockedBranch = (selectedBranch == BranchType.TRUE) ?BranchType.FALSE : BranchType.TRUE;
             propagateBlockedInputsOfUnselectedBranch(flow, currentNode.nodeId(),blockedBranch, runtime, queue, context, completedOrNodeIds);
 
-            enqueueNextPath(flow, queue, path, currentNode.nodeId(), selectedBranch);
+            enqueueNextPath(flow, queue, result.path(), currentNode.nodeId(), selectedBranch);
         }
     }
 
-    //선택되지 않은 branch가 죽었다는 사실을, 그 죽은 branch 끝에 도달 가능한 모든 OR 노드에게 알려주는 것
+    //선택되지 않은 branch가 죽었다는 사실을, 그 죽은 branch 끝에 도달 가능한 모든 OR 노드에게 전파
     private void propagateBlockedInputsOfUnselectedBranch(
             ExecutableFlow flow,
             Long currentNodeId,
@@ -156,6 +163,7 @@ public class FlowExecutor {
         }
 
     }
+    //OR 노드 재실행
     private void reevaluateReadyOrNode(
             ExecutableFlow flow,
             Long orNodeId,
@@ -183,7 +191,7 @@ public class FlowExecutor {
         BranchType blockedBranch  = passed ? BranchType.FALSE : BranchType.TRUE;
 
         List<AlertEvent.NodeResult> mergedHistory = orState.mergeArrivedHistories();
-        mergedHistory.add(buildOrNodeResult(orNode));   // 아래 2번 항목 참고
+        mergedHistory.add(buildOrNodeResult(orNode));
 
         ExecutionPath continuedPath = ExecutionPath
                 .start(orNodeId, orNodeId, selectedBranch)
@@ -199,7 +207,7 @@ public class FlowExecutor {
         return new AlertEvent.NodeResult(orNode.nodeType().name(), null, null, null, null, null);
     }
 
-    //blocked 전파가 시자가된 노드
+    //blocked 경로 추적
     private record BlockedEdgeCursor(
             Long fromNodeId,
             BranchType branchType,
@@ -212,7 +220,7 @@ public class FlowExecutor {
         List<Long> startNextNodes = flow.trueAdjacencyMap()
                 .get(flow.startNodeId());
 
-        for(Long nextNodeId : startNextNodes){
+        for (Long nextNodeId : startNextNodes) {
             queue.offer(ExecutionPath.start(
                     nextNodeId,
                     flow.startNodeId(),
@@ -220,7 +228,6 @@ public class FlowExecutor {
             ));
         }
     }
-
 
     //다음에 실행할 노드를 큐에 넣음
     private void enqueueNextPath(

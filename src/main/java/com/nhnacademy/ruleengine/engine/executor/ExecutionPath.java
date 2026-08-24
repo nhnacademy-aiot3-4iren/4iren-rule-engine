@@ -14,8 +14,8 @@ public record ExecutionPath(
         List<AlertEvent.NodeResult> history
 ) {
     //ExecutionPath 첫 저장
-    public static ExecutionPath start(Long currentNodeId, Long arrivedFromNodeId, BranchType arrivedBranchType){
-        return new ExecutionPath(currentNodeId, arrivedFromNodeId, arrivedBranchType, List.of());
+    public static ExecutionPath start(Long currentNodeId, Long fromNodeId, BranchType fromBranchType){
+        return new ExecutionPath(currentNodeId, fromNodeId, fromBranchType, List.of());
     }
 
     //경로 history 추가.
@@ -28,8 +28,8 @@ public record ExecutionPath(
 
 
     //다음 노드로 이동할때의 상태 객체를 새로 생성
-    public ExecutionPath next(Long nextNodeId, BranchType arrivedBranchType) {
-        return new ExecutionPath(nextNodeId, currentNodeId, arrivedBranchType, new ArrayList<>(history));
+    public ExecutionPath next(Long nextNodeId, BranchType fromBranchType) {
+        return new ExecutionPath(nextNodeId, currentNodeId, fromBranchType, new ArrayList<>(history));
     }
 
     //or 노드에서 병합된 history로 바꿈

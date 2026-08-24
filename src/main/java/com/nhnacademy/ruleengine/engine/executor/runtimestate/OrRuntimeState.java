@@ -52,7 +52,7 @@ public class OrRuntimeState {
     //arrivedHistoryMap -> or노드에서 나가는 경로의 PathExecution 새로 반환
     public List<AlertEvent.NodeResult> mergeArrivedHistories(){
         List<AlertEvent.NodeResult> merged = new ArrayList<>();
-        arrivedHistoryMap.values().forEach(merged::addAll);
+        arrivedHistoryMap.values().forEach(history-> merged.addAll(history));
         return merged;
     }
 
