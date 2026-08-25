@@ -1,6 +1,5 @@
-package com.nhnacademy.ruleengine.domain.flowschedule.service.impl;
+package com.nhnacademy.ruleengine.domain.flowschedule.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.ruleengine.domain.flowschedule.controller.FlowScheduleController;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.*;
 import com.nhnacademy.ruleengine.domain.flowschedule.service.FlowScheduleService;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FlowScheduleController.class)
-class FlowScheduleServiceImplTest {
+class FlowScheduleControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
