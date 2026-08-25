@@ -3,6 +3,7 @@ package com.nhnacademy.ruleengine.engine.listener;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidPayloadException;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.engine.converter.SensorPayloadConverter;
+import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,9 @@ class SensorDataListenerTest {
     @Mock
     private SensorPayloadConverter converter;
 
+    @Mock
+    private RuleEngineHandler handler;
+
     @InjectMocks
     private SensorDataListener listener;
 
@@ -41,6 +45,7 @@ class SensorDataListenerTest {
         listener.receiveSensorData(rawMessage);
 
         verify(converter).convert(rawMessage);
+        verify(handler).process(environmentContext);
     }
 
     @Test
