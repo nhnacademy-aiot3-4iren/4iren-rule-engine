@@ -35,7 +35,7 @@ public class FlowScheduleFilter {
             return false;
         }
         if (schedule.startTime().isAfter(schedule.endTime())) {
-            return !time.isBefore(schedule.startTime()) || time.isBefore(schedule.endTime());
+            return false; //하루 24시간 이내에서만 스케술 설정 가능
         }
         return !time.isBefore(schedule.startTime()) && time.isBefore(schedule.endTime());
     }

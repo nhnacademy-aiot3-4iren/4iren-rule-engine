@@ -57,12 +57,23 @@ class FlowScheduleFilterTest {
     @Test
     @DisplayName("요일과 시간이 모두 일치하면 true 반환")
     void matched_schedule_returns_true(){
-        ExecutableFlow.ExecutableSchedule schedule =  createSchedule(DayOfWeek.TUESDAY, "09:00:00", "11:00:00");
+        ExecutableFlow.ExecutableSchedule schedule =  createSchedule(DayOfWeek.TUESDAY, "10:00:00", "11:00:00");// 시작 시간이 경계일경우 true
         ExecutableFlow flow =createMockFlow(List.of(schedule));
 
         boolean result = filter.isSchedulable(flow, baseTime);
 
         assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("요일은 일치하는데 시간이 불일치 하면 false 반환")
+    void mismatched_time_returns_false(){
+        ExecutableFlow.ExecutableSchedule schedule =  createSchedule(DayOfWeek.TUESDAY, "09:00:00", "10:00:00");//끝 시간이 경계일경우 false
+        ExecutableFlow flow =createMockFlow(List.of(schedule));
+
+        boolean result = filter.isSchedulable(flow, baseTime);
+
+        assertFalse(result);
     }
 
     @Test
