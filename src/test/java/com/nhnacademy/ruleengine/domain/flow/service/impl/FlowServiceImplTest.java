@@ -14,12 +14,14 @@ import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.flow.repository.ConnectionRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
+import com.nhnacademy.ruleengine.domain.flow.validator.FlowValidator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,8 +48,24 @@ class FlowServiceImplTest {
     @Mock private SensorStaticMetaService metaService;
     @Mock private FlowCacheRepository flowCacheRepository;
 
-    @InjectMocks
+    private FlowValidator flowValidator;
+
     private FlowServiceImpl flowService;
+
+    @BeforeEach
+    void setUp(){
+        flowValidator = new FlowValidator();
+
+        flowService = new FlowServiceImpl(
+                flowRepository,
+                nodeRepository,
+                connectionRepository,
+                flowTemplateMeasurementTypeRepository,
+                metaService,
+                flowCacheRepository,
+                flowValidator
+        );
+    }
 
     private NodeInfo createConditionNode(Long id) {
         return new NodeInfo(id, "condition", NodeType.THRESHOLD, mock(ThresholdNodeConfig.class), 0);

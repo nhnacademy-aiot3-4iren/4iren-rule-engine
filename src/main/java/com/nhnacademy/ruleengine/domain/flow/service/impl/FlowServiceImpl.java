@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.service.impl;
 
 import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
-import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
@@ -154,14 +153,7 @@ public class FlowServiceImpl implements FlowService {
         Map<Long, Long> tempIdMap = new HashMap<>();
 
         nodes.forEach(n -> {
-                    Node savedNode = nodeRepository.save(
-                            Node.builder()
-                                    .flow(savedFlow)
-                                    .nodeName(n.nodeName())
-                                    .nodeType(n.nodeType())
-                                    .nodeConfig(n.nodeConfig())
-                                    .cooldownSec(n.cooldownSec()).build()
-                    );
+                    Node savedNode = nodeRepository.save(Node.create(savedFlow, n));
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });
 
