@@ -5,6 +5,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class NodeConfigController {
     @PostMapping("/validate-config")
     public ResponseEntity<NodeConfigValidationResponse> validateNodeConfig(
             @PathVariable("room-id") Long roomId,
-            @RequestBody NodeConfigValidateRequest request
+            @RequestBody @Valid NodeConfigValidateRequest request
     ) {
         NodeConfigValidationResponse response = nodeConfigService.validate(roomId,request);
         return ResponseEntity.ok(response);
