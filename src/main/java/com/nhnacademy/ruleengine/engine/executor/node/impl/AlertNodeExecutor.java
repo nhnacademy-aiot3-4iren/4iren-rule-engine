@@ -9,6 +9,8 @@ import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutor;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
+import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +18,10 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AlertNodeExecutor implements NodeExecutor {
+
+    private final AlertEventPublisher alertEventPublisher;
 
     @Override
     public NodeType supportNodeType() {
@@ -42,7 +47,7 @@ public class AlertNodeExecutor implements NodeExecutor {
         log.info("[ALERT] flowId={} roomId={} title={} type={} channel={} history={}",
                 context.flowId(), context.roomId(), config.alertTitle(), config.alertType(), config.channel(), path.history());
 
-        // TODO: 알림발송/ 쿨다운 로직
+        alertEventPublisher.publish(alertEvent);
         return NodeExecutionResult.of(true, path);
     }
 }

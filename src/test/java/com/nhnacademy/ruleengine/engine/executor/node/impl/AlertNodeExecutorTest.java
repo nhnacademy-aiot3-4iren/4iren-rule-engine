@@ -9,8 +9,14 @@ import com.nhnacademy.ruleengine.engine.executor.FlowContext;
 import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
+import com.nhnacademy.ruleengine.engine.model.AlertEvent;
+import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -18,20 +24,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 class AlertNodeExecutorTest {
+    @Mock private AlertEventPublisher eventPublisher;
 
-    private final AlertNodeExecutor executor = new AlertNodeExecutor();
+    @InjectMocks
+    private AlertNodeExecutor executor;
 
     @Test
-    @DisplayName("supportNodeType은 ALERT를 반환한다")
+    @DisplayName("supportNodeType = ALERT")
     void supportNodeType() {
         assertThat(executor.supportNodeType()).isEqualTo(NodeType.ALERT);
     }
 
     @Test
-    @DisplayName("실행 시 항상 passed=true를 반환하고 전달받은 path를 그대로 유지한다")
-    void execute_alwaysPassesAndKeepsPathUnchanged() {
+    @DisplayName("실행 시 항상 passed=true를 반환하고 전달받은 path를 그대로 유지")
+    void execute() {
         AlertNodeConfig config = new AlertNodeConfig(
                 NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND
         );
@@ -43,6 +55,7 @@ class AlertNodeExecutorTest {
 
         assertThat(result.passed()).isTrue();
         assertThat(result.path()).isSameAs(path);
+        verify(eventPublisher, times(1)).publish(any(AlertEvent.class));
     }
 
     private FlowContext flowContext() {
