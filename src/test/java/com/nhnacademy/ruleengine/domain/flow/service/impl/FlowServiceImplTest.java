@@ -88,7 +88,7 @@ class FlowServiceImplTest {
         NodeInfo node2 = createActionNode(2L);
         ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
 
-        FlowCreateRequest request = new FlowCreateRequest("testFlow", "desc", List.of(node1, node2), List.of(conn));
+        FlowCreateRequest request = new FlowCreateRequest("testFlow", "desc",true, List.of(node1, node2), List.of(conn));
         Flow mockFlow = mock(Flow.class);
         when(mockFlow.getId()).thenReturn(100L);
         when(flowRepository.save(any(Flow.class))).thenReturn(mockFlow);
@@ -109,7 +109,7 @@ class FlowServiceImplTest {
     @DisplayName("노드 개수 2개 미만 -> FlowValidationFailed")
     void createFlow_nodeCount() {
         NodeInfo node1 = createConditionNode(1L);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", List.of(node1), List.of());
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1), List.of());
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -120,7 +120,7 @@ class FlowServiceImplTest {
         NodeInfo node1 = createConditionNode(1L);
         NodeInfo node2 = createConditionNode(2L);
         ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", List.of(node1, node2), List.of(conn));
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2), List.of(conn));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -132,7 +132,7 @@ class FlowServiceImplTest {
         NodeInfo node2 = createActionNode(2L);
         NodeInfo node3 = createConditionNode(3L);
         ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", List.of(node1, node2, node3), List.of(conn));
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2, node3), List.of(conn));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -144,7 +144,7 @@ class FlowServiceImplTest {
         NodeInfo node2 = createActionNode(2L);
         ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
         ConnectionInfo conn2 = new ConnectionInfo(2L, 1L, BranchType.FALSE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", List.of(node1, node2), List.of(conn1, conn2));
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2), List.of(conn1, conn2));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -159,7 +159,7 @@ class FlowServiceImplTest {
         ConnectionInfo invalidConn = new ConnectionInfo(2L, 3L, BranchType.TRUE);
 
         FlowCreateRequest request = new FlowCreateRequest(
-                "testFlow", "desc", List.of(node1, node2), List.of(validConn, invalidConn)
+                "testFlow", "desc", true, List.of(node1, node2), List.of(validConn, invalidConn)
         );
         Flow mockFlow = createMockFlow(100L, false);
 

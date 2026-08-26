@@ -91,6 +91,7 @@ class FlowControllerTest {
         return new FlowCreateRequest(
                 "테스트 플로우",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo(), alertNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -140,6 +141,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -156,6 +158,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "a".repeat(51),
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -172,6 +175,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "플로우",
                 "설명",
+                true,
                 List.of(),
                 List.of(sampleConnectionInfo())
         );
@@ -188,6 +192,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "플로우",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 null
         );

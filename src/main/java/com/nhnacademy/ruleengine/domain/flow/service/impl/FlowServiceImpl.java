@@ -43,7 +43,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
         Flow flow = Flow.regularBuilder()
-                .roomId(roomId).flowName(request.flowName()).isActive(true).description(request.description()).build();
+                .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
 
         flowValidator.validate(request.nodes(), request.connections());
         Flow savedFlow = flowRepository.save(flow);
