@@ -14,13 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-
-    /*
-    0(start) -true-> 1(condition) -false-> 3(or) -true-> 7(condition) -true-> 6(or)
-             -true-> 2(condition) -true-> 5(condition) -true-> 6(or)
-                                  -true-> 4(conditions) -false-> 3(or)
-                                  -false->
-    */
 import java.util.*;
 
 @Slf4j
