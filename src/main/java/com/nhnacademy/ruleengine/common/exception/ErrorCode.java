@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
+    //일반 응답용 (ErrorResponse)
     //400 bad request
     INVALID_CONNECTION(HttpStatus.BAD_REQUEST, "INVALID_CONNECTION", "유효하지 않은 Connection입니다."),
     INVALID_FLOW(HttpStatus.BAD_REQUEST, "INVALID_FLOW", "유효하지 않은 Flow입니다."),

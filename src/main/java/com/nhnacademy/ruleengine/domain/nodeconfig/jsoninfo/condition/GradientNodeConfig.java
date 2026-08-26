@@ -28,7 +28,7 @@ public record GradientNodeConfig(
         Operator operator,
 
         @NotNull
-        double gradient,
+        Double gradient,
 
         @NotNull
         @Positive

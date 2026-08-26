@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import lombok.Builder;
 
@@ -16,8 +17,10 @@ public record FlowResponse(
 
         boolean isActive,
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime createdAt,
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime updatedAt
 ) {
 

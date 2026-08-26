@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -24,8 +25,10 @@ public record FlowDetailResponse (
 
         List<ConnectionResponse> connections,
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime createdAt,
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime updatedAt
 ){
 
