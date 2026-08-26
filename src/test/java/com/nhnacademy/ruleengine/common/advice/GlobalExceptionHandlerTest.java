@@ -36,11 +36,11 @@ class GlobalExceptionHandlerTest {
         List<String> validationErrors = List.of("Node count is invalid", "Cycle detected");
         FlowValidationFailed exception = new FlowValidationFailed(validationErrors);
 
-        ResponseEntity<ValidationError> response = exceptionHandler.handleValidationError(exception);
+        ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().code()).isEqualTo(exception.getMessage());
+        assertThat(response.getBody().errorMessage()).isEqualTo(exception.getMessage());
         assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
     }
 }

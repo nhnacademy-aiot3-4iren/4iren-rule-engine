@@ -25,12 +25,11 @@ public class GlobalExceptionHandler {
 
     //
     @ExceptionHandler(FlowValidationFailed.class)
-    public ResponseEntity<ValidationError> handleValidationError(FlowValidationFailed e){
-
+    public ResponseEntity<ValidationErrorResponse> handleValidationError(FlowValidationFailed e){
 
         return ResponseEntity.badRequest()
                 .body(
-                    new ValidationError(
+                    new ValidationErrorResponse(
                             e.getMessage(),
                             e.getErrors())
                 );
