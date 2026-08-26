@@ -30,12 +30,11 @@ public class RuleEngineHandler {
             return;
         }
 
-        try {
-            //flowDispatcher 호출
-            dispatcher.dispatch(flows, payload);
+        dispatcher.dispatch(flows, payload).whenComplete((r, ex)->{
+            if(ex != null){
+                log.error("roomId={} 룰 엔진 플로우 실행 중 최종 실패 발생", roomId, ex);
+            }
+        });
 
-        }catch(CompletionException e){
-            log.error("roomId={} 룰 엔진 플로우 실행 중 최종 실패 발생", roomId, e.getCause());
-        }
     }
 }
