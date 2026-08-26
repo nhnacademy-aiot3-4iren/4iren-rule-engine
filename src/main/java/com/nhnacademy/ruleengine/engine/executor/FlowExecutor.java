@@ -37,14 +37,14 @@ public class FlowExecutor {
         //startNode 바로 다음 노드들 큐에 저장
         enqueueStartNodes(flow, queue);
 
-        log.debug("루프 시작");
+        log.info("루프 시작");
         //루프
         while(!queue.isEmpty()){
             //실행할 path 한개 꺼내기
             ExecutionPath path = queue.poll();
 
             ExecutableFlow.ExecutableNode currentNode = flow.nodeMap().get(path.currentNodeId());
-            log.debug("currentNodeId: " + path.currentNodeId() + "실행 중");
+            log.info("currentNodeId: " + path.currentNodeId() + "실행 중");
 
             //이미 완료된 OR노드이면 다시 처리하지 않음
             if(currentNode.nodeType() == NodeType.OR && completedOrNodeIds.contains(currentNode.nodeId())){
@@ -65,11 +65,11 @@ public class FlowExecutor {
             if(currentNode.nodeType() == NodeType.OR){
                 OrRuntimeState orState = runtime.orStateMap().get(currentNode.nodeId());
                 if(!orState.isReady()){
-                    log.debug("Or노드 도착, isReady 상태 아님: continue");
+                    log.info("Or노드 도착, isReady 상태 아님: continue");
                     continue;
                 }
                 completedOrNodeIds.add(currentNode.nodeId());
-                log.debug("Or노드 도착, isReady상대. currentNodeId: " + currentNode.nodeId());
+                log.info("Or노드 도착, isReady상대. currentNodeId: " + currentNode.nodeId());
 
             }
 
@@ -93,7 +93,7 @@ public class FlowExecutor {
             FlowContext context,
             Set<Long> completedOrNodeIds) {
         //현재 노드에서 선택되지 않은 브랜치로 갈 수 있었던 첫 노드 가져옴
-        log.debug("현재 노드에서 선택되지 않은 브랜치로 갈 수 있었던 첫 노드 가져옴, currentNodeId: "+ currentNodeId);
+        log.info("현재 노드에서 선택되지 않은 브랜치로 갈 수 있었던 첫 노드 가져옴, currentNodeId: "+ currentNodeId);
         List<Long> blockedTargets = getNextNodeIds(flow, currentNodeId, blockedBranch);
 
         //타겟 노드가 없다면 끝노드이므로 그냥 return
@@ -113,7 +113,7 @@ public class FlowExecutor {
         //DFS
         while (!stack.isEmpty()) {
             BlockedEdgeCursor cursor = stack.pop();
-            log.debug("blocked 상태 전파 DFS" + cursor.fromNodeId + " -> " + cursor.toNodeId);
+            log.info("blocked 상태 전파 DFS" + cursor.fromNodeId + " -> " + cursor.toNodeId);
             //방문 노드 기록
             if(!visited.add(cursor)){
                 continue;
@@ -134,7 +134,7 @@ public class FlowExecutor {
                 );
 
                 orState.markBlocked(blockedInput);
-                log.debug("OR노드 만다면 blocked 반영 targetNodeId: " + targetNode.nodeId());
+                log.info("OR노드 만다면 blocked 반영 targetNodeId: " + targetNode.nodeId());
 
                 //blocked반영으로 ready 상태가 된 OR노드는 다시 재평가
                 if(!wasReady && orState.isReady() && !completedOrNodeIds.contains(targetNode.nodeId())){
@@ -172,7 +172,7 @@ public class FlowExecutor {
             FlowContext context,
             Set<Long> completedOrNodeIds
     ) {
-       log.debug("blocked반영으로 ready 상태가 된 OR노드는 다시 재평가");
+       log.info("blocked반영으로 ready 상태가 된 OR노드는 다시 재평가");
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(orNodeId);
         if(orNode == null || orNode.nodeType() != NodeType.OR){
             return;
@@ -197,7 +197,7 @@ public class FlowExecutor {
         completedOrNodeIds.add(orNodeId);
 
 
-        log.debug("Or노드가 평가됨에 따라 뒤의 Or노드에도 blocked상태 전파");
+        log.info("Or노드가 평가됨에 따라 뒤의 Or노드에도 blocked상태 전파");
         propagateBlockedInputsOfUnselectedBranch(flow, orNodeId, blockedBranch, runtime, queue, context, completedOrNodeIds);
         enqueueNextPath(flow, queue, continuedPath, orNodeId, selectedBranch);
     }
@@ -216,7 +216,7 @@ public class FlowExecutor {
 
     //startNodeId 다음 노드들을 큐에 넣음
     private void enqueueStartNodes(ExecutableFlow flow, Queue<ExecutionPath> queue) {
-        log.debug("startNode 다음 노드들 enqueue");
+        log.info("startNode 다음 노드들 enqueue");
         List<Long> startNextNodes = flow.trueAdjacencyMap()
                 .getOrDefault(flow.startNodeId(), List.of());
 
@@ -237,11 +237,12 @@ public class FlowExecutor {
             Long currentNodeId,
             BranchType selectedBranch
     ){
-        log.debug("다음에 실행할 노드 enqueue");
+        log.info("currentNode " +currentNodeId +  " 다음에 실행할 노드 enqueue");
         List<Long> nextNodeIds = getNextNodeIds(flow, currentNodeId, selectedBranch);
 
         //다음 노드가 없다면 끝노드이므로 return
         if( nextNodeIds == null || nextNodeIds.isEmpty()){
+            log.info("다음 노드 없음, 해당 경로 종료.");
             return;
         }
         nextNodeIds.stream()
@@ -258,7 +259,7 @@ public class FlowExecutor {
 
     //플로우 안에 존재하는 모든 OrRuntimeState 초기화
     private Map<Long, OrRuntimeState> initializeOrStateMap(ExecutableFlow flow) {
-        log.debug("initializeOrStateMap: 플로우 안에 존에하는 OrRuntimeState 초기화");
+        log.info("initializeOrStateMap: 플로우 안에 존에하는 OrRuntimeState 초기화");
         Map<Long,OrRuntimeState> result = new HashMap<>();
 
         for(Map.Entry<Long, ExecutableFlow.ExecutableNode> entry : flow.nodeMap().entrySet()){
@@ -277,7 +278,7 @@ public class FlowExecutor {
 
     //Or노드로 입력되는 연결 경로 찾기 찾기
     private List<LogicalInputKey> collectOrInputs(ExecutableFlow flow, Long orNodeId) {
-        log.debug("Or 노드로 입력되는 연결 경로 찾기, orNodeId: " + orNodeId);
+        log.info("Or 노드로 입력되는 연결 경로 찾기, orNodeId: " + orNodeId);
         List<LogicalInputKey> inputs = new ArrayList<>();
 
         for(Map.Entry<Long, List<Long>> entry : flow.trueAdjacencyMap().entrySet() ){
