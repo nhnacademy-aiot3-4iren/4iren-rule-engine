@@ -6,6 +6,7 @@ import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -86,6 +87,10 @@ public class FlowGraphBuilder {
         List<Long> startNodes = nodeMap.keySet().stream()
                 .filter(id -> !hasIncomingEdge.contains(id))
                 .toList();
+
+       if(nodeMap.get(startNodes.getFirst()).nodeType() != NodeType.START && startNodes.size() != 1){
+           return null;
+       }
 
         return startNodes.isEmpty() ? null : startNodes.getFirst();
     }
