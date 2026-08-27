@@ -3,10 +3,10 @@ package com.nhnacademy.ruleengine.common.exception;
 import lombok.Getter;
 
 @Getter
-public class BusinessException extends RuntimeException {
+public class BaseException extends RuntimeException {
     private final ErrorCode errorCode;
 
-    public BusinessException(ErrorCode errorCode) {
+    public BaseException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
