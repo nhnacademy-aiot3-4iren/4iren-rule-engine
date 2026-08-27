@@ -73,6 +73,6 @@ class AlertNodeExecutorTest {
     }
 
     private FlowRuntime runtime() {
-        return new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        return new FlowRuntime( new HashMap<>());
     }
 }

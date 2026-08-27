@@ -41,7 +41,7 @@ class NodeExecutorRegistryTest {
     void setUp() {
         node = new ExecutableFlow.ExecutableNode(1L, "node", NodeType.THRESHOLD, null, null);
         path = ExecutionPath.start(1L, null, null);
-        runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        runtime = new FlowRuntime( new HashMap<>());
         context = null; // 이 테스트에서는 위임 여부만 확인하므로 FlowContext 내용은 중요하지 않음
     }
 

@@ -29,7 +29,7 @@ public class FlowExecutor {
         //FlowRuntime 초기화
         Queue<ExecutionPath> queue = new ArrayDeque<>();//queue 초기
         Map<Long, OrRuntimeState> orStateMap = initializeOrStateMap(flow);//OrRuntimeState 초기화
-        FlowRuntime runtime = new FlowRuntime(queue, orStateMap);
+        FlowRuntime runtime = new FlowRuntime( orStateMap);
 
         //OR 전파 중복 실행 방지를 위해 저장
         Set<Long> completedOrNodeIds = new HashSet<>();
