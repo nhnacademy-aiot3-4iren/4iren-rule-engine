@@ -19,7 +19,7 @@ public record FlowDetailResponse (
 
         String description,
 
-        boolean isActive,
+        Boolean isActive,
 
         List<NodeResponse> nodes,
 

@@ -133,9 +133,6 @@ public class FlowServiceImpl implements FlowService {
     @Transactional
     @Override
     public void deleteFlow(Long roomId, Long flowId) {
-        if(!flowRepository.existsByIdAndRoomId(flowId, roomId)){
-            throw new UnauthorizedFlowAccessException();
-        }
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
                 .orElseThrow(UnauthorizedFlowAccessException::new);
         if (flow.getIsTemplate()) {
@@ -145,6 +142,15 @@ public class FlowServiceImpl implements FlowService {
 
         //캐시 무효화
         flowCacheRepository.evict(roomId);
+    }
+
+    @Transactional
+    @Override
+    public void updateStatus(Long roomId, Long flowId, UpdateFlowStatusRequest request) {
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
+                .orElseThrow(UnauthorizedFlowAccessException::new);
+
+        flow.updateStatus(request.isActive());
     }
 
 

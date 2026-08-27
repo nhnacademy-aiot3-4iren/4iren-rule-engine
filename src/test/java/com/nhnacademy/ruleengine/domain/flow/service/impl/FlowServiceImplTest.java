@@ -294,7 +294,6 @@ class FlowServiceImplTest {
     void deleteFlow_success() {
         Flow mockFlow = mock(Flow.class);
         when(mockFlow.getIsTemplate()).thenReturn(false);
-        when(flowRepository.existsByIdAndRoomId(1L, 100L)).thenReturn(true);
         when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
 
         flowService.deleteFlow(100L, 1L);
@@ -306,7 +305,6 @@ class FlowServiceImplTest {
     @Test
     @DisplayName("존재하지 않음 -> UnauthorizedFlowAccessException")
     void deleteFlow_failsWhenNotExists() {
-        when(flowRepository.existsByIdAndRoomId(100L, 1L)).thenReturn(false);
 
         assertThatThrownBy(() -> flowService.deleteFlow(1L, 100L)).isInstanceOf(UnauthorizedFlowAccessException.class);
     }
@@ -316,9 +314,24 @@ class FlowServiceImplTest {
     void deleteFlow_failsWhenTemplate() {
         Flow mockFlow = mock(Flow.class);
         when(mockFlow.getIsTemplate()).thenReturn(true);
-        when(flowRepository.existsByIdAndRoomId(1L, 100L)).thenReturn(true);
         when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
 
         assertThatThrownBy(() -> flowService.deleteFlow(100L, 1L)).isInstanceOf(InvalidFlowException.class);
+    }
+
+    @Test
+    @DisplayName("플로우 비활성화")
+    void updateFlowStatus_isActive_false(){
+
+        UpdateFlowStatusRequest request = new UpdateFlowStatusRequest(false);
+        Flow mockFlow = mock(Flow.class);
+
+        when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
+
+        flowService.updateStatus(100L, 1L, request);
+
+        verify(flowRepository).findByIdAndRoomId(1L, 100L);
+        verify(mockFlow).updateStatus(false);
+
     }
 }

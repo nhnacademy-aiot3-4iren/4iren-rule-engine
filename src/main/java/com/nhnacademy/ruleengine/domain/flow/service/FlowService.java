@@ -28,4 +28,5 @@ public interface FlowService {
     void deleteFlow(Long roomId, Long flowId);
 
     //플로우 활성화/비활성화-> 보류
+     void updateStatus(Long roomId, Long flowId, UpdateFlowStatusRequest request);
 }

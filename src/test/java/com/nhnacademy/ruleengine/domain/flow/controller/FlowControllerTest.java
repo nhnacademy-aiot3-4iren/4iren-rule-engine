@@ -7,6 +7,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
+import io.micrometer.core.annotation.TimedSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,7 +237,7 @@ class FlowControllerTest {
         RoomTemplateListResponse response = new RoomTemplateListResponse(List.of());
         given(flowService.getFlowTemplateList(ROOM_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/templates", ROOM_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates", ROOM_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roomTemplateResponseList").isArray());
     }
@@ -253,7 +254,7 @@ class FlowControllerTest {
 
         given(flowService.getTemplateFlowDetail(TEMPLATE_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/templates/{template-id}",
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates/{template-id}",
                         ROOM_ID, TEMPLATE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.templateName").value("온도 알림 템플릿"))
@@ -330,6 +331,19 @@ class FlowControllerTest {
         willDoNothing().given(flowService).deleteFlow(ROOM_ID, FLOW_ID);
 
         mockMvc.perform(delete("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("플로우 활성 상태 수정 - 성공 204")
+    void updateFlowStatus_success() throws Exception{
+        UpdateFlowStatusRequest request = new UpdateFlowStatusRequest(true);
+
+        willDoNothing().given(flowService).updateStatus(ROOM_ID, FLOW_ID, request);
+
+        mockMvc.perform(patch("/api/rule/rooms/{room-id}/flows/{flow-id}/active", ROOM_ID, FLOW_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
     }
 }

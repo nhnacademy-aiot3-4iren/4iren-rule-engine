@@ -17,7 +17,7 @@ public record NodeResponse (
 
         NodeConfig nodeConfig,
 
-        int cooldownSec
+        Integer cooldownSec
 ){
     public static List<NodeResponse> fromList(
             List<Node> nodes
