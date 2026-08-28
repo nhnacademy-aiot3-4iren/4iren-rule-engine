@@ -12,4 +12,7 @@ public interface RoomDeviceClient {
 
     @GetMapping("/api/processing/sensors")
     List<ExternalRoomDeviceInfo> getRoomDevices(@RequestParam("room-id") Long roomId);
+
+    @GetMapping("/api/processing/internal/metric-catalog")
+    List<Void> getMetricCatalog();
 }
