@@ -17,7 +17,7 @@ public record TemplateNodeResponse(
 
         NodeConfig nodeConfig,
 
-        int cooldownSec
+        Integer cooldownSec
 ){
     public static List<TemplateNodeResponse> fromList(
             List<Node> nodes

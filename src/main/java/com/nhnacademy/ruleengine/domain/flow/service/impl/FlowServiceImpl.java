@@ -118,13 +118,13 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
+        flowValidator.validate(request.nodes(), request.connections());
 
         flow.updateRegular(request.flowName(),request.description(), request.isActive());
 
         //update
         updateNodesNConnections(flow, request.nodes(), request.connections());
 
-        flowValidator.validate(request.nodes(), request.connections());
 
         //캐시 무효화
         flowCacheRepository.evict(roomId);
