@@ -45,7 +45,7 @@ class AlertNodeExecutorTest {
     @DisplayName("실행 시 항상 passed=true를 반환하고 전달받은 path를 그대로 유지")
     void execute() {
         AlertNodeConfig config = new AlertNodeConfig(
-                NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND
+                NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, null
         );
         ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config, null);
         FlowContext context = flowContext();

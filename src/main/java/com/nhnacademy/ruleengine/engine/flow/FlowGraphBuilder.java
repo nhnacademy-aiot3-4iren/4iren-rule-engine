@@ -7,11 +7,13 @@ import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class FlowGraphBuilder {
 
@@ -44,6 +46,11 @@ public class FlowGraphBuilder {
 
         Long startNodeId = findStartNodeId(nodeMap, connections);
         List<ExecutableFlow.ExecutableSchedule> executableSchedules = buildSchedules(flowSchedules);
+
+        if(startNodeId == null){
+            log.error("startNodeId가 존재하지 않습니다. 플로우가 유효하지 않음");
+            throw new InvalidFlowException();
+        }
 
         return new ExecutableFlow(
                 flow.getId(),

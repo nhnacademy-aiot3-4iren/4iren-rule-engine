@@ -29,7 +29,7 @@ public class FlowExecutor {
         //FlowRuntime 초기화
         Queue<ExecutionPath> queue = new ArrayDeque<>();//queue 초기
         Map<Long, OrRuntimeState> orStateMap = initializeOrStateMap(flow);//OrRuntimeState 초기화
-        FlowRuntime runtime = new FlowRuntime( orStateMap);
+        FlowRuntime runtime = new FlowRuntime(orStateMap);
 
         //OR 전파 중복 실행 방지를 위해 저장
         Set<Long> completedOrNodeIds = new HashSet<>();
@@ -44,10 +44,11 @@ public class FlowExecutor {
             ExecutionPath path = queue.poll();
 
             ExecutableFlow.ExecutableNode currentNode = flow.nodeMap().get(path.currentNodeId());
-            log.info("currentNodeId: " + path.currentNodeId() + "실행 중");
+            log.info("currentNodeId: " + path.currentNodeId() + " 실행 중");
 
             //이미 완료된 OR노드이면 다시 처리하지 않음
             if(currentNode.nodeType() == NodeType.OR && completedOrNodeIds.contains(currentNode.nodeId())){
+                log.info("이미 완료된 OR 노드, skip");
                 continue;
             }
 
@@ -113,7 +114,7 @@ public class FlowExecutor {
         //DFS
         while (!stack.isEmpty()) {
             BlockedEdgeCursor cursor = stack.pop();
-            log.info("blocked 상태 전파 DFS" + cursor.fromNodeId + " -> " + cursor.toNodeId);
+            log.info("blocked 상태 전파 DFS " + cursor.fromNodeId + " -> " + cursor.toNodeId);
             //방문 노드 기록
             if(!visited.add(cursor)){
                 continue;
@@ -134,7 +135,7 @@ public class FlowExecutor {
                 );
 
                 orState.markBlocked(blockedInput);
-                log.info("OR노드 만다면 blocked 반영 targetNodeId: " + targetNode.nodeId());
+                log.info("OR노드 만나면 blocked 반영 targetNodeId: " + targetNode.nodeId());
 
                 //blocked반영으로 ready 상태가 된 OR노드는 다시 재평가
                 if(!wasReady && orState.isReady() && !completedOrNodeIds.contains(targetNode.nodeId())){
