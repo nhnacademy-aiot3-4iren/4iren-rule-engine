@@ -1,10 +1,8 @@
-package com.nhnacademy.ruleengine.domain.templateflow.service.impl;
+package com.nhnacademy.ruleengine.domain.templateflow.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
-import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
-import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
@@ -23,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,7 +34,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TemplateFlowServiceImplTest {
+class TemplateFlowServiceTest {
 
     @Mock private FlowRepository flowRepository;
     @Mock private NodeRepository nodeRepository;
@@ -47,13 +44,13 @@ class TemplateFlowServiceImplTest {
 
     private TemplateFlowValidator templateFlowValidator;
 
-    private TemplateFlowServiceImpl templateFlowService;
+    private TemplateFlowService templateFlowService;
 
     @BeforeEach
     void setUp(){
         templateFlowValidator = new TemplateFlowValidator();
 
-        templateFlowService = new TemplateFlowServiceImpl(
+        templateFlowService = new TemplateFlowService(
                 flowRepository,
                 nodeRepository,
                 connectionRepository,

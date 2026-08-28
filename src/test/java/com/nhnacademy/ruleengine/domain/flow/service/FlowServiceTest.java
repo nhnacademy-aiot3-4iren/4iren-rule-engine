@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flow.service.impl;
+package com.nhnacademy.ruleengine.domain.flow.service;
 
 import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -39,7 +38,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FlowServiceImplTest {
+class FlowServiceTest {
 
     @Mock private FlowRepository flowRepository;
     @Mock private NodeRepository nodeRepository;
@@ -50,13 +49,13 @@ class FlowServiceImplTest {
 
     private FlowValidator flowValidator;
 
-    private FlowServiceImpl flowService;
+    private FlowService flowService;
 
     @BeforeEach
     void setUp(){
         flowValidator = new FlowValidator();
 
-        flowService = new FlowServiceImpl(
+        flowService = new FlowService(
                 flowRepository,
                 nodeRepository,
                 connectionRepository,

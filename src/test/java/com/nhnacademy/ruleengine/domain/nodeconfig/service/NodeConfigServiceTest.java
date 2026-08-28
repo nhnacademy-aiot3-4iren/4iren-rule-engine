@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.service.impl;
+package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.external.service.SensorStaticMetaService;
@@ -28,14 +28,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NodeConfigServiceImplTest {
+class NodeConfigServiceTest {
 
     @Mock private NodeRepository nodeRepository;
     @Mock private SensorStaticMetaService sensorStaticMetaService;
     @Mock private NodeConfigValidatorRegistry validatorRegistry;
 
     @InjectMocks
-    private NodeConfigServiceImpl nodeConfigService;
+    private NodeConfigService nodeConfigService;
 
     @Test
     @DisplayName("액션 노드 조회 시 정적 메타데이터는 null을 반환한다")

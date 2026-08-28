@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.domain.flowschedule.service.impl;
+package com.nhnacademy.ruleengine.domain.flowschedule.service;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowScheduleNotFoundException;
@@ -28,13 +28,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FlowScheduleServiceImplTest {
+class FlowScheduleServiceTest {
 
     @Mock private FlowRepository flowRepository;
     @Mock private FlowScheduleRepository flowScheduleRepository;
 
     @InjectMocks
-    private FlowScheduleServiceImpl flowScheduleService;
+    private FlowScheduleService flowScheduleService;
 
     @Test
     @DisplayName("스케줄 생성")

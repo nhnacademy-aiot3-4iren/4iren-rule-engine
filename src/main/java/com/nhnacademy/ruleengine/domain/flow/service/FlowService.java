@@ -1,32 +1,204 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
+import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
+import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
+import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
+import com.nhnacademy.ruleengine.common.external.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
+import com.nhnacademy.ruleengine.domain.flow.entity.*;
+import com.nhnacademy.ruleengine.domain.flow.validator.FlowValidator;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.flow.repository.*;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
+import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
-public interface FlowService {
-    //플로우 생성
-    FlowCreateResponse createFlow(Long roomeId, FlowCreateRequest request);
+import java.util.*;
+import java.util.stream.Collectors;
 
-    //템플릿 기반 플로우 생성
-//    FlowCreateResponse createFlowFromTemplate(Long roomId, Long templateId, FlowCreateRequest request);
+@Transactional(readOnly = true)
+@Service
+@RequiredArgsConstructor
+@Validated
+public class FlowService {
 
-    //플로우 목록 조회
-    FlowListResponse getFlowList(Long roomId);
+    private final FlowRepository flowRepository;
+    private final NodeRepository nodeRepository;
+    private final ConnectionRepository connectionRepository;
+    private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
-    //플로우 상세 조회
-    FlowDetailResponse getFlowDetail(Long roomId, Long flowId);
+    private final SensorStaticMetaService metaService;
+    private final FlowCacheRepository flowCacheRepository;
+    private final FlowValidator flowValidator;
 
-    //강의실별 템플릿 플로우 제안 목록
-    RoomTemplateListResponse getFlowTemplateList(Long roomId);
+    @Transactional
+    public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
+        Flow flow = Flow.regularBuilder()
+                .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
 
-    //템플릿 기반 플로우 생성 폼 = 템플릿 플로우 상세
-    RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId);
+        flowValidator.validate(request.nodes(), request.connections());
+        Flow savedFlow = flowRepository.save(flow);
 
-    //플로우 수정
-    void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request);
+        Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
+        saveConnections(savedFlow, request.connections(),tempIdMap);
 
-    //플로우 삭제
-    void deleteFlow(Long roomId, Long flowId);
+        return FlowCreateResponse.of(savedFlow.getId());
+    }
 
-    //플로우 활성화/비활성화-> 보류
-     void updateStatus(Long roomId, Long flowId, UpdateFlowStatusRequest request);
+    public FlowListResponse getFlowList(Long roomId) {
+        List<Flow> flowList = flowRepository.findAllByRoomId(roomId);
+
+        if(flowList.isEmpty()){
+            return FlowListResponse.of(List.of());
+        }
+
+        List<FlowResponse> response = FlowResponse.fromList(flowList);
+        return FlowListResponse.of(response);
+    }
+
+    public FlowDetailResponse getFlowDetail(Long roomId, Long flowId) {
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
+
+        if(flow.getIsTemplate()){
+            throw new InvalidFlowException();
+        }
+        List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
+        List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
+
+        return FlowDetailResponse.from(flow,nodes,connections);
+    }
+
+    public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
+        List<Flow> allTemplateFlowList = flowRepository.findAllByIsTemplate(true);
+
+        //템플릿 플로우 id별 필요한 MeasurementType List
+        Map<Long,List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTypesByTemplateIds(allTemplateFlowList);
+
+        //강의실에서 측정가능한 MeasurementType List
+        List<MeasurementType> measurementTypesInRoom = metaService.getMeasurementTypeOptionsInRoom(roomId);
+
+        //강의실 MeasurementType List 기반 사용가능한 템플릿 플로우 리스트 필터링
+        List<Long> availableTemplateIds = measurementTypesByTemplateId.entrySet().stream()
+                .filter(entry -> new HashSet<>(measurementTypesInRoom).containsAll(entry.getValue()))
+                .map(Map.Entry::getKey).toList();
+        List<Flow> templateFlowList = flowRepository.findAllById(availableTemplateIds);
+
+        return RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
+    }
+
+    public RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId) {
+        Flow templateFlow = flowRepository.findById(templateFlowId)
+                .orElseThrow(FlowNotFoundException::new);
+
+        if(!templateFlow.getIsTemplate()){
+            throw new InvalidFlowException();
+        }
+
+        List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
+        List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
+
+        return RoomTemplateDetailResponse.from(templateFlow, nodes, connections);
+    }
+
+    @Transactional
+    public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
+        flowValidator.validate(request.nodes(), request.connections());
+
+        flow.updateRegular(request.flowName(),request.description(), request.isActive());
+
+        //update
+        updateNodesNConnections(flow, request.nodes(), request.connections());
+
+
+        //캐시 무효화
+        flowCacheRepository.evict(roomId);
+    }
+
+    @Transactional
+    public void deleteFlow(Long roomId, Long flowId) {
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
+                .orElseThrow(UnauthorizedFlowAccessException::new);
+        if (flow.getIsTemplate()) {
+            throw new InvalidFlowException();
+        }
+        flowRepository.deleteById(flowId);
+
+        //캐시 무효화
+        flowCacheRepository.evict(roomId);
+    }
+
+    @Transactional
+    public void updateStatus(Long roomId, Long flowId, UpdateFlowStatusRequest request) {
+        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
+                .orElseThrow(UnauthorizedFlowAccessException::new);
+
+        flow.updateStatus(request.isActive());
+    }
+
+
+    //
+    private Map<Long, Long> saveNodes(Flow savedFlow, @NotEmpty List<NodeInfo> nodes) {
+        Map<Long, Long> tempIdMap = new HashMap<>();
+
+        nodes.forEach(n -> {
+                    Node savedNode = nodeRepository.save(Node.create(savedFlow, n));
+                    tempIdMap.put(n.nodeId(), savedNode.getId());
+                });
+
+        return tempIdMap;
+    }
+
+    // FlowService.java 내 saveConnections 수정
+    private void saveConnections(Flow savedFlow, @NotNull List<ConnectionInfo> connections, Map<Long, Long> tempIdMap) {
+        if (connections.isEmpty()) {
+            return;
+        }
+
+        Set<Long> savedNodeIds = new HashSet<>(tempIdMap.values());
+        List<Connection> connectionList = connections.stream()
+                .map(c -> {
+                    Long sourceId = tempIdMap.get(c.sourceNodeId());
+                    Long targetId = tempIdMap.get(c.targetNodeId());
+                    if (sourceId == null || targetId == null ||
+                            !savedNodeIds.contains(sourceId) || !savedNodeIds.contains(targetId)) {
+                        throw new InvalidConnectionException(sourceId, targetId);
+                    }
+                    return Connection.builder()
+                            .flow(savedFlow)
+                            .sourceNode(nodeRepository.getReferenceById(sourceId))
+                            .targetNode(nodeRepository.getReferenceById(targetId))
+                            .branchType(String.valueOf(c.branchType()))
+                            .build();
+                })
+                .toList();
+        connectionRepository.saveAll(connectionList);
+    }
+
+    private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<NodeInfo> nodes, @NotNull List<ConnectionInfo> connections ) {
+        connectionRepository.deleteAllByFlowId(savedFlow.getId());
+        nodeRepository.deleteAllByFlowId(savedFlow.getId());
+        Map<Long, Long> tempIdMap = saveNodes(savedFlow,nodes);
+        saveConnections(savedFlow, connections,tempIdMap);
+
+    }
+
+    private Map<Long, List<MeasurementType>> getMeasurementTypesByTemplateIds(List<Flow> templateFlows){
+        List<FlowTemplateMeasurementType> allFlowTemplateMeasurementTypes = flowTemplateMeasurementTypeRepository.findAllByFlowIn(templateFlows);
+        return allFlowTemplateMeasurementTypes.stream()
+                .collect(Collectors.groupingBy(
+                        fts -> fts.getFlow().getId(),
+                        Collectors.mapping(
+                                FlowTemplateMeasurementType::getMeasurementType,
+                                Collectors.toList()
+                        )
+                ));
+    }
 }

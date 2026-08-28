@@ -1,4 +1,4 @@
-package com.nhnacademy.ruleengine.common.external.service.impl;
+package com.nhnacademy.ruleengine.common.external.service;
 
 import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
@@ -23,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SensorStaticMetaServiceImplTest {
+class SensorStaticMetaServiceTest {
 
     @Mock private RoomDeviceCacheService roomDeviceCacheService;
 
     @InjectMocks
-    private SensorStaticMetaServiceImpl sensorStaticMetaService;
+    private SensorStaticMetaService sensorStaticMetaService;
 
     @Test
     @DisplayName("방에 디바이스가 없을 경우 빈 메타 리스트 반환")
@@ -118,7 +118,7 @@ class SensorStaticMetaServiceImplTest {
         ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
         List<ExternalRoomDeviceInfo> list = List.of(device);
 
-        Method method = SensorStaticMetaServiceImpl.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
+        Method method = SensorStaticMetaService.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);
 
         Map<MeasurementType, List<DeviceInfo>> result = (Map<MeasurementType, List<DeviceInfo>>) method.invoke(sensorStaticMetaService, list);
@@ -134,7 +134,7 @@ class SensorStaticMetaServiceImplTest {
         ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
         List<ExternalRoomDeviceInfo> list = List.of(device);
 
-        Method method = SensorStaticMetaServiceImpl.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
+        Method method = SensorStaticMetaService.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);
 
         InvocationTargetException exception = assertThrows(InvocationTargetException.class, () ->
