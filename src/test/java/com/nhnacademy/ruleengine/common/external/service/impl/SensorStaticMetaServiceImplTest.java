@@ -1,8 +1,7 @@
 package com.nhnacademy.ruleengine.common.external.service.impl;
 
 import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
-import com.nhnacademy.ruleengine.common.exception.notfound.MeasurementTypeNotFoundException;
-import com.nhnacademy.ruleengine.common.external.MeasurementTypeMapper;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
@@ -18,18 +17,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SensorStaticMetaServiceImplTest {
 
     @Mock private RoomDeviceCacheService roomDeviceCacheService;
-    @Mock private MeasurementTypeMapper measurementTypeMapper;
 
     @InjectMocks
     private SensorStaticMetaServiceImpl sensorStaticMetaService;
@@ -50,8 +46,6 @@ class SensorStaticMetaServiceImplTest {
 
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device1, device2));
 
-        when(measurementTypeMapper.toMeasurementType("co2")).thenReturn(Optional.of(MeasurementType.CO2));
-        when(measurementTypeMapper.toMeasurementType("temperature")).thenReturn(Optional.of(MeasurementType.TEMPERATURE));
 
         List<SensorStaticMeta> result = sensorStaticMetaService.getSensorStaticMetaList(1L);
 
@@ -99,8 +93,6 @@ class SensorStaticMetaServiceImplTest {
         ExternalRoomDeviceInfo device2 = new ExternalRoomDeviceInfo(1L, "eui2", "dev2", Map.of("co2", "ppm", "temperature", "C"));
 
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device1, device2));
-        when(measurementTypeMapper.toMeasurementType("co2")).thenReturn(Optional.of(MeasurementType.CO2));
-        when(measurementTypeMapper.toMeasurementType("temperature")).thenReturn(Optional.of(MeasurementType.TEMPERATURE));
 
         List<MeasurementType> result = sensorStaticMetaService.getMeasurementTypeOptionsInRoom(1L);
 
@@ -113,9 +105,8 @@ class SensorStaticMetaServiceImplTest {
     void getMeasurementTypeOptionsInRoom_ExceptionThrown() {
         ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device));
-        when(measurementTypeMapper.toMeasurementType(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(MeasurementTypeNotFoundException.class, () ->
+        assertThrows(InvalidMeasurementTypeException.class, () ->
                 sensorStaticMetaService.getMeasurementTypeOptionsInRoom(1L)
         );
     }
@@ -126,7 +117,6 @@ class SensorStaticMetaServiceImplTest {
     void getDeviceInfoByMeasurementType_ReflectionTest_Success() throws Exception {
         ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
         List<ExternalRoomDeviceInfo> list = List.of(device);
-        when(measurementTypeMapper.toMeasurementType("co2")).thenReturn(Optional.of(MeasurementType.CO2));
 
         Method method = SensorStaticMetaServiceImpl.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);
@@ -143,7 +133,6 @@ class SensorStaticMetaServiceImplTest {
     void getDeviceInfoByMeasurementType_ReflectionTest_Exception() throws Exception {
         ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
         List<ExternalRoomDeviceInfo> list = List.of(device);
-        when(measurementTypeMapper.toMeasurementType("unknown")).thenReturn(Optional.empty());
 
         Method method = SensorStaticMetaServiceImpl.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);
@@ -152,6 +141,6 @@ class SensorStaticMetaServiceImplTest {
                 method.invoke(sensorStaticMetaService, list)
         );
 
-        assertThat(exception.getTargetException()).isInstanceOf(MeasurementTypeNotFoundException.class);
+        assertThat(exception.getTargetException()).isInstanceOf(InvalidMeasurementTypeException.class);
     }
 }

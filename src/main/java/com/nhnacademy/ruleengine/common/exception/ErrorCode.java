@@ -15,6 +15,7 @@ public enum ErrorCode {
     INVALID_FLOW_SCHEDULE(HttpStatus.BAD_REQUEST, "INVALID_FLOW_SCHEDULE", "유효하지 않은 Flow Schedule입니다."),
     INVALID_NODE(HttpStatus.BAD_REQUEST, "INVALID_NODE", "유효하지 않은 Node입니다."),
     INVALID_PAYLOAD(HttpStatus.BAD_REQUEST, "INVALID_PAYLOAD", "유효하지 않은 센서 페이로드입니다."),
+    INVALID_MEASUREMENT_TYPE(HttpStatus.BAD_REQUEST,  "INVALID_MEASUREMENT_TYPE", "유효하지 않은 MeasurementType 입니다."),
 
     //검증 응답용(ValidationError)
     FLOW_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FLOW_VALIDATION_FAILED","플로우 무결성 검증에 실패했습니다."),
