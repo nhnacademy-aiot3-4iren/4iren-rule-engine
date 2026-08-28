@@ -18,6 +18,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdN
 import com.nhnacademy.ruleengine.domain.templateflow.dto.*;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
+import com.nhnacademy.ruleengine.domain.templateflow.validator.TemplateFlowValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,8 +44,23 @@ class TemplateFlowServiceImplTest {
     @Mock private ConnectionRepository connectionRepository;
     @Mock private FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
-    @InjectMocks
+
+    private TemplateFlowValidator templateFlowValidator;
+
     private TemplateFlowServiceImpl templateFlowService;
+
+    @BeforeEach
+    void setUp(){
+        templateFlowValidator = new TemplateFlowValidator();
+
+        templateFlowService = new TemplateFlowServiceImpl(
+                flowRepository,
+                nodeRepository,
+                connectionRepository,
+                flowTemplateMeasurementTypeRepository,
+                templateFlowValidator
+        );
+    }
 
     private TemplateNodeInfo createConditionNode(Long id) {
         ThresholdNodeConfig config = mock(ThresholdNodeConfig.class);
