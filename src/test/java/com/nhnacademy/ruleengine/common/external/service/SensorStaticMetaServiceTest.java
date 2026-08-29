@@ -1,10 +1,11 @@
 package com.nhnacademy.ruleengine.common.external.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
+import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,8 +41,8 @@ class SensorStaticMetaServiceTest {
     @Test
     @DisplayName("정상적으로 센서 메타데이터 리스트를 반환하며, 중복된 측정 타입의 단위는 기존 값을 유지한다")
     void getSensorStaticMetaList_Success() {
-        ExternalRoomDeviceInfo device1 = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm", "temperature", "C"));
-        ExternalRoomDeviceInfo device2 = new ExternalRoomDeviceInfo(1L, "eui2", "dev2", Map.of("co2", "mg/m3"));
+        RoomDeviceInfo device1 = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm", "temperature", "C"));
+        RoomDeviceInfo device2 = new RoomDeviceInfo(1L, "eui2", "dev2", Map.of("co2", "mg/m3"));
 
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device1, device2));
 
@@ -67,8 +68,8 @@ class SensorStaticMetaServiceTest {
     @Test
     @DisplayName("방에 있는 디바이스 옵션 목록을 중복 없이 반환")
     void getDeviceOptionsInRoom_Success() {
-        ExternalRoomDeviceInfo device1 = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of());
-        ExternalRoomDeviceInfo device2 = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of());
+        RoomDeviceInfo device1 = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of());
+        RoomDeviceInfo device2 = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of());
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device1, device2));
 
         List<DeviceInfo> result = sensorStaticMetaService.getDeviceOptionsInRoom(1L);
@@ -88,8 +89,8 @@ class SensorStaticMetaServiceTest {
     @Test
     @DisplayName("정상적으로 방에 있는 디바이스들의 측정 타입 옵션을 중복 없이 반환")
     void getMeasurementTypeOptionsInRoom_Success() {
-        ExternalRoomDeviceInfo device1 = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
-        ExternalRoomDeviceInfo device2 = new ExternalRoomDeviceInfo(1L, "eui2", "dev2", Map.of("co2", "ppm", "temperature", "C"));
+        RoomDeviceInfo device1 = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
+        RoomDeviceInfo device2 = new RoomDeviceInfo(1L, "eui2", "dev2", Map.of("co2", "ppm", "temperature", "C"));
 
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device1, device2));
 
@@ -102,7 +103,7 @@ class SensorStaticMetaServiceTest {
     @Test
     @DisplayName("알 수 없는 측정 타입이 포함된 경우 예외 발생")
     void getMeasurementTypeOptionsInRoom_ExceptionThrown() {
-        ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
+        RoomDeviceInfo device = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
         when(roomDeviceCacheService.getRoomDevices(1L)).thenReturn(List.of(device));
 
         assertThrows(InvalidMeasurementTypeException.class, () ->
@@ -114,8 +115,8 @@ class SensorStaticMetaServiceTest {
     @SuppressWarnings("unchecked")
     @DisplayName("미사용 private 메서드인 getDeviceInfoByMeasurementType 리플렉션 정상 동작 검증")
     void getDeviceInfoByMeasurementType_ReflectionTest_Success() throws Exception {
-        ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
-        List<ExternalRoomDeviceInfo> list = List.of(device);
+        RoomDeviceInfo device = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of("co2", "ppm"));
+        List<RoomDeviceInfo> list = List.of(device);
 
         Method method = SensorStaticMetaService.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);
@@ -130,8 +131,8 @@ class SensorStaticMetaServiceTest {
     @Test
     @DisplayName("미사용 private 메서드 내에서 매핑 실패 시 예외 발생 검증")
     void getDeviceInfoByMeasurementType_ReflectionTest_Exception() throws Exception {
-        ExternalRoomDeviceInfo device = new ExternalRoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
-        List<ExternalRoomDeviceInfo> list = List.of(device);
+        RoomDeviceInfo device = new RoomDeviceInfo(1L, "eui1", "dev1", Map.of("unknown", "unit"));
+        List<RoomDeviceInfo> list = List.of(device);
 
         Method method = SensorStaticMetaService.class.getDeclaredMethod("getDeviceInfoByMeasurementType", List.class);
         method.setAccessible(true);

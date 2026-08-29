@@ -1,7 +1,9 @@
-package com.nhnacademy.ruleengine.common.external.service;
+package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
+import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
+import com.nhnacademy.ruleengine.common.external.service.MetricCatalogCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +15,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SensorStaticMetaService {
-    public final RoomDeviceCacheService roomDeviceCacheService;
-
+    private final RoomDeviceCacheService roomDeviceCacheService;
+    private final MetricCatalogCacheService metricCatalogCacheService;
 
     public List<SensorStaticMeta> getSensorStaticMetaList(Long roomId){
-        List<ExternalRoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
+        List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
 
         if(roomDeviceInfoList.isEmpty()){
             return List.of();
@@ -37,7 +39,7 @@ public class SensorStaticMetaService {
 
 
     public List<DeviceInfo> getDeviceOptionsInRoom(Long roomId) {
-        List<ExternalRoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
+        List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
 
         if (roomDeviceInfoList.isEmpty()) {
             return List.of();
@@ -51,7 +53,7 @@ public class SensorStaticMetaService {
     }
 
     public List<MeasurementType> getMeasurementTypeOptionsInRoom(Long roomId) {
-        List<ExternalRoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
+        List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
         if (roomDeviceInfoList.isEmpty()) {
             return List.of();
         }
@@ -63,7 +65,7 @@ public class SensorStaticMetaService {
                 .toList();
     }
 
-    private Map<MeasurementType, String> getUnitByMeasurementType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
+    private Map<MeasurementType, String> getUnitByMeasurementType(List<RoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().entrySet().stream())
                 .collect(Collectors.toMap(
@@ -74,7 +76,7 @@ public class SensorStaticMetaService {
                 ));
     }
 
-    private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoByMeasurementType(List<ExternalRoomDeviceInfo> roomDeviceInfoList){
+    private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoByMeasurementType(List<RoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementType>
                         .map(measurementType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>

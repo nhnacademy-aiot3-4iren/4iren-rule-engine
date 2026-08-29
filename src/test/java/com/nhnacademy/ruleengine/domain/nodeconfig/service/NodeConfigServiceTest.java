@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
-import com.nhnacademy.ruleengine.common.external.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;

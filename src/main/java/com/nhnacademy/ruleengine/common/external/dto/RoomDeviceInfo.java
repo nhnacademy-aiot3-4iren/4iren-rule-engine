@@ -1,11 +1,11 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.dto;
+package com.nhnacademy.ruleengine.common.external.dto;
 
 import lombok.Builder;
 
 import java.util.Map;
 
 @Builder
-public record ExternalRoomDeviceInfo(
+public record RoomDeviceInfo(
         Long roomId,
         String devEui,
         String deviceName,
