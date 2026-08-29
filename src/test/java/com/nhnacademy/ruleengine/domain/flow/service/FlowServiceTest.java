@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
-import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
@@ -45,7 +44,6 @@ class FlowServiceTest {
     @Mock private ConnectionRepository connectionRepository;
     @Mock private FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
     @Mock private SensorStaticMetaService metaService;
-    @Mock private FlowCacheRepository flowCacheRepository;
 
     private FlowValidator flowValidator;
 
@@ -61,7 +59,6 @@ class FlowServiceTest {
                 connectionRepository,
                 flowTemplateMeasurementTypeRepository,
                 metaService,
-                flowCacheRepository,
                 flowValidator
         );
     }
@@ -285,7 +282,7 @@ class FlowServiceTest {
         verify(nodeRepository).deleteAllByFlowId(100L);
         verify(nodeRepository, times(2)).save(any(Node.class));
         verify(connectionRepository).saveAll(anyList());
-        verify(flowCacheRepository).evict(1L);
+//        verify(flowCacheRepository).evict(1L);
     }
 
     @Test
@@ -298,7 +295,7 @@ class FlowServiceTest {
         flowService.deleteFlow(100L, 1L);
 
         verify(flowRepository).deleteById(1L);
-        verify(flowCacheRepository).evict(100L);
+//        verify(flowCacheRepository).evict(100L);
     }
 
     @Test

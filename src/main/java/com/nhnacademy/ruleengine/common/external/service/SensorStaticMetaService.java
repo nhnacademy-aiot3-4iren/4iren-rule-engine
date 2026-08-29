@@ -4,7 +4,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
-import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.common.external.service;
 
-import com.nhnacademy.ruleengine.common.cache.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.ExternalRoomDeviceInfo;

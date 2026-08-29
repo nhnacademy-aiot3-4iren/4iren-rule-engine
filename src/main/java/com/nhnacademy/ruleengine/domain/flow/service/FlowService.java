@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
-import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
@@ -16,6 +15,7 @@ import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeas
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -35,7 +35,7 @@ public class FlowService {
     private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
     private final SensorStaticMetaService metaService;
-    private final FlowCacheRepository flowCacheRepository;
+//    private final FlowCacheRepository flowCacheRepository;
     private final FlowValidator flowValidator;
 
     @Transactional
@@ -107,7 +107,9 @@ public class FlowService {
         return RoomTemplateDetailResponse.from(templateFlow, nodes, connections);
     }
 
+
     @Transactional
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
         flowValidator.validate(request.nodes(), request.connections());
@@ -119,10 +121,11 @@ public class FlowService {
 
 
         //캐시 무효화
-        flowCacheRepository.evict(roomId);
+//        flowCacheRepository.evict(roomId);
     }
 
     @Transactional
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void deleteFlow(Long roomId, Long flowId) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
                 .orElseThrow(UnauthorizedFlowAccessException::new);
@@ -132,7 +135,7 @@ public class FlowService {
         flowRepository.deleteById(flowId);
 
         //캐시 무효화
-        flowCacheRepository.evict(roomId);
+//        flowCacheRepository.evict(roomId);
     }
 
     @Transactional
