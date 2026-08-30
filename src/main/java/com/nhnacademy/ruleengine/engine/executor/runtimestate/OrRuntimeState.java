@@ -25,9 +25,14 @@ public class OrRuntimeState {
     }
 
     //각 경로에서 or노드에 도착시 해당 경로 arrived 처리
-    public void markArrived(LogicalInputKey key, List<AlertEvent.NodeResult> history){
+    public boolean markArrived(LogicalInputKey key, List<AlertEvent.NodeResult> history){
+        if(!statusMap.containsKey(key)){
+            return false;
+        }
+
         statusMap.put(key,LogicalInputStatus.ARRIVED);
         arrivedHistoryMap.put(key, new ArrayList<>(history));
+        return true;
     }
 
     //or노드로 향하는 경로가 막힐 경우 해당 경로 blocked 처리

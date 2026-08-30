@@ -27,7 +27,7 @@ public record ExecutionPath(
     }
 
 
-    //FlowExecutore에서 다음 경로를 enqueue할 때 사용. 이전에 실행한 노드의 다음 노드로 향하는 ExecutionPath 객체를 새로 생성
+    //FlowExecutor에서 다음 경로를 enqueue할 때 사용. 이전에 실행한 노드의 다음 노드로 향하는 ExecutionPath 객체를 새로 생성
     public ExecutionPath next(Long nextNodeId, BranchType fromBranchType) {
         return new ExecutionPath(nextNodeId, currentNodeId, fromBranchType, new ArrayList<>(history));
     }

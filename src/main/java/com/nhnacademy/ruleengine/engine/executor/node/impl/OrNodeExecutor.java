@@ -33,7 +33,11 @@ public class OrNodeExecutor implements NodeExecutor {
         OrRuntimeState state = runtime.orStateMap().computeIfAbsent(orNodeId, id -> new OrRuntimeState(id, resolveInputs(context.flow(), id)));
 
         LogicalInputKey arrivedKey = new LogicalInputKey(path.fromNodeId(), path.fromBranchType(), orNodeId);
-        state.markArrived(arrivedKey, path.history());
+
+        if(!state.markArrived(arrivedKey, path.history())){
+            log.error("OR node({})에 등록되지 않은 경로로 입력이 도착: {}", orNodeId, arrivedKey);
+            return NodeExecutionResult.of(false, path);
+        }
 
         if(!state.isReady()) {
             return NodeExecutionResult.of(false, path);

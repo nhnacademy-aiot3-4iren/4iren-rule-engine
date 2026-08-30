@@ -39,7 +39,7 @@ class OrNodeExecutorTest {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
 
@@ -54,7 +54,7 @@ class OrNodeExecutorTest {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
         ExecutionPath arrivedFromFalse = ExecutionPath.start(OR_NODE_ID, FALSE_SOURCE_NODE_ID, BranchType.FALSE);
@@ -73,7 +73,7 @@ class OrNodeExecutorTest {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime(new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
         executor.execute(orNode, context, arrivedFromTrue, runtime);
