@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.engine.listener;
 
 import com.nhnacademy.ruleengine.engine.converter.SensorPayloadConverter;
+import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class SensorDataListener {
 
     private final SensorPayloadConverter converter;
+    private final RuleEngineHandler handler;
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
     public void receiveSensorData(String rawMessage) {
@@ -23,5 +25,7 @@ public class SensorDataListener {
         log.info("센서 데이터 변환 완료 - RoomID: {}, Device: {}, Metrics Count: {}",
                 payload.roomId(),
                 payload.metrics().size());
+
+        handler.process(payload);
     }
 }

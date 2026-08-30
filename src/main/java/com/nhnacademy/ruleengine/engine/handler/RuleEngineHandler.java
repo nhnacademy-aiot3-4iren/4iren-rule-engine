@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.engine.handler;
 
-import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
+import com.nhnacademy.ruleengine.engine.dispatcher.FlowDispatcher;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
@@ -15,11 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RuleEngineHandler {
     private final FlowLoader flowLoader;
-    private final FlowCacheRepository flowCacheRepository;
+    private final FlowDispatcher dispatcher;
 
-
-    public void process(EnvironmentContext payload){
-        Long roomId = payload.roomId();
+    public void process(EnvironmentContext environmentContext){
+        Long roomId = environmentContext.roomId();
 
         log.info("센서 데이터 수신 roomId={}", roomId);
 
@@ -29,8 +28,11 @@ public class RuleEngineHandler {
             return;
         }
 
+        dispatcher.dispatch(flows, environmentContext).whenComplete((r, ex)->{
+            if(ex != null){
+                log.error("roomId={} 룰 엔진 플로우 실행 중 최종 실패 발생", roomId, ex);
+            }
+        });
 
-        //flowDispatcher 호출
-        //dispatcher.dispatch(flows, payload);
     }
 }

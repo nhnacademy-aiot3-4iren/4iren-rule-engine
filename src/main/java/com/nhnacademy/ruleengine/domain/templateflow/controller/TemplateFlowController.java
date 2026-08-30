@@ -26,7 +26,7 @@ public class TemplateFlowController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // [템플릿 플로우 목록 조회] GET /api/templates/
+    // [템플릿 플로우 목록 조회]
     @GetMapping
     public ResponseEntity<TemplateListResponse> getTemplateFlowList() {
 

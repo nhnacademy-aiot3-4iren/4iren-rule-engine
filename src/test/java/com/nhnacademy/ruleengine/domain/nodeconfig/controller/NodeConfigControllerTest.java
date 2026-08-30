@@ -1,0 +1,207 @@
+package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(NodeConfigController.class)
+class NodeConfigControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private NodeConfigService nodeConfigService;
+
+    private static final Long ROOM_ID = 1L;
+    private static final Long NODE_ID = 1L;
+
+    private static final String NODE_CONFIG_URL =
+            "/api/rule/rooms/{room-id}/node-config/{node-id}";
+    private static final String VALIDATE_URL =
+            "/api/rule/rooms/{room-id}/validate-config";
+
+
+    private NodeConfig sampleThresholdConfig() {
+        return new ThresholdNodeConfig(
+                NodeType.THRESHOLD,
+                0, 0,
+                MeasurementType.TEMPERATURE,
+                "°C",
+                Operator.GT,   // 실제 enum 값으로 교체
+                25.0
+        );
+    }
+
+    private SensorStaticMeta sampleSensorMeta() {
+        return SensorStaticMeta.of(MeasurementType.TEMPERATURE, "°C");
+    }
+
+    private NodeConfigResponse sampleNodeConfigResponse() {
+        return NodeConfigResponse.of(
+                NODE_ID,
+                sampleThresholdConfig(),
+                List.of(sampleSensorMeta())
+        );
+    }
+
+
+    @Test
+    @DisplayName("노드 설정 및 메타 조회 - 성공 200")
+    void getNodeConfigNMeta_success() throws Exception {
+        given(nodeConfigService.getNodeConfigNMeta(ROOM_ID, NODE_ID, NodeType.THRESHOLD))
+                .willReturn(sampleNodeConfigResponse());
+
+        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
+                        .param("nodeType", "THRESHOLD"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nodeId").value(NODE_ID))
+                .andExpect(jsonPath("$.nodeConfig").exists())
+                .andExpect(jsonPath("$.sensorStaticMetaList").isArray())
+                .andExpect(jsonPath("$.sensorStaticMetaList[0].measurementType")
+                        .value("TEMPERATURE"))
+                .andExpect(jsonPath("$.sensorStaticMetaList[0].unit").value("°C"));
+    }
+    @Test
+    @DisplayName("노드 설정 및 메타 조회 - nodeType 파라미터 없으면 400")
+    void getNodeConfigNMeta_missingNodeType_400() throws Exception {
+        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("노드 설정 및 메타 조회 - 잘못된 nodeType이면 400")
+    void getNodeConfigNMeta_invalidNodeType_400() throws Exception {
+        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
+                        .param("nodeType", "INVALID_TYPE"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("노드 설정 및 메타 조회 - ALERT 타입 조회")
+    void getNodeConfigNMeta_alertType_success() throws Exception {
+        NodeConfigResponse alertResponse = NodeConfigResponse.of(
+                NODE_ID,
+                null,  // AlertNodeConfig 픽스처로 교체
+                List.of()
+        );
+
+        given(nodeConfigService.getNodeConfigNMeta(ROOM_ID, NODE_ID, NodeType.ALERT))
+                .willReturn(alertResponse);
+
+        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
+                        .param("nodeType", "ALERT"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nodeId").value(NODE_ID))
+                .andExpect(jsonPath("$.sensorStaticMetaList").isArray());
+    }
+
+    @Test
+    @DisplayName("노드 설정 검증 - 유효한 설정이면 valid:true 반환")
+    void validateNodeConfig_valid() throws Exception {
+        NodeConfigValidateRequest request = new NodeConfigValidateRequest(
+                sampleThresholdConfig()
+        );
+
+        given(nodeConfigService.validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class)))
+                .willReturn(NodeConfigValidationResponse.success());
+
+        mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(true))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isEmpty());
+    }
+
+    @Test
+    @DisplayName("노드 설정 검증 - 유효하지 않은 설정이면 valid:false + errors 반환")
+    void validateNodeConfig_invalid() throws Exception {
+        NodeConfigValidateRequest request = new NodeConfigValidateRequest(
+                sampleThresholdConfig()
+        );
+
+        List<String> errors = List.of(
+                "threshold 값은 0보다 커야 합니다",
+                "measurementType은 필수입니다"
+        );
+
+        given(nodeConfigService.validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class)))
+                .willReturn(NodeConfigValidationResponse.failure(errors));
+
+        mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(false))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors[0]").value("threshold 값은 0보다 커야 합니다"))
+                .andExpect(jsonPath("$.errors[1]").value("measurementType은 필수입니다"));
+    }
+    @Test
+    @DisplayName("노드 설정 검증 - nodeConfig null이면 400")
+    void validateNodeConfig_nullNodeConfig_400() throws Exception {
+        // nodeConfig null → @NotNull 위반
+        String body = "{\"nodeConfig\": null}";
+
+        mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("노드 설정 검증 - 요청 바디 없으면 400")
+    void validateNodeConfig_emptyBody_400() throws Exception {
+        mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("노드 설정 검증 - OR 노드 설정 검증")
+    void validateNodeConfig_orNodeConfig_valid() throws Exception {
+        NodeConfig orConfig = new OrNodeConfig(
+                NodeType.OR,
+                0, 0
+        );
+        NodeConfigValidateRequest request = new NodeConfigValidateRequest(orConfig);
+
+        given(nodeConfigService.validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class)))
+                .willReturn(NodeConfigValidationResponse.success());
+
+        mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(true));
+    }
+}
+
+

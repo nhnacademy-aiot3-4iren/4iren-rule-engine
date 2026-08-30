@@ -2,9 +2,9 @@ package com.nhnacademy.ruleengine.engine.executor.node;
 
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.engine.executor.ExecutionPath;
+import com.nhnacademy.ruleengine.engine.executor.FlowContext;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
-import com.nhnacademy.ruleengine.engine.executor.FlowContext;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

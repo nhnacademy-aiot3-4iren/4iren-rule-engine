@@ -5,6 +5,9 @@ import lombok.Getter;
 
 @Getter
 public enum NodeType {
+    //start
+    START("시작 노드"),
+
     //condition
     THRESHOLD("임계치 판단"),
     GRADIENT("기울기 판단"),

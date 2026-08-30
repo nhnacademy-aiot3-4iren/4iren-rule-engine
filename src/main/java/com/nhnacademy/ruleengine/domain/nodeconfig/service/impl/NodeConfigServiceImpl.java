@@ -35,9 +35,9 @@ public class NodeConfigServiceImpl implements NodeConfigService {
             nodeConfig = node.getNodeConfig();
         }
 
-        List<SensorStaticMeta> sensorStaticMetaList = nodeType.isActionNode()
-                ? null
-                : sensorStaticMetaService.getSensorStaticMetaList(roomId);
+        List<SensorStaticMeta> sensorStaticMetaList = nodeType.isConditionNode()
+                ? sensorStaticMetaService.getSensorStaticMetaList(roomId)
+                : null;
 
         return NodeConfigResponse.of(nodeId,nodeConfig, sensorStaticMetaList);
     }

@@ -6,6 +6,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public record AlertNodeConfig(
 
@@ -25,7 +26,10 @@ public record AlertNodeConfig(
     String alertTitle,
 
     @NotNull
-    AlertType alertType
+    AlertType alertType,
+
+    @Positive
+    Integer dedupWindowSec
 ) implements NodeConfig {
 
 }

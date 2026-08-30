@@ -1,5 +1,7 @@
 package com.nhnacademy.ruleengine.engine.dispatcher;
 
+import com.nhnacademy.ruleengine.engine.executor.FlowContext;
+import com.nhnacademy.ruleengine.engine.executor.FlowExecutor;
 import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
@@ -19,14 +21,14 @@ public class FlowDispatcher {
 
     private final ExecutorService flowExecutorService;
     private final FlowScheduleFilter flowScheduleFilter;
-//    private final FlowExecutor flowExecutor;
+    private final FlowExecutor flowExecutor;
 
-    public CompletableFuture<Void> dispatch(List<ExecutableFlow> flows, EnvironmentContext payload) {
+    public CompletableFuture<Void> dispatch(List<ExecutableFlow> flows, EnvironmentContext environmentContext) {
         Instant triggeredAt = Instant.now();
 
         List<CompletableFuture<Void>> futures = flows.stream()
                 .map(flow -> CompletableFuture
-                        .runAsync(() -> runFlowPipeline(flow, payload, triggeredAt), flowExecutorService)
+                        .runAsync(() -> runFlowPipeline(flow, environmentContext, triggeredAt), flowExecutorService)// runFlowPipeline 작업을 가상 스레드 풀(flowExecutorService)에서 실행하도록 지정
                         .exceptionally(ex -> {
                             log.error("flow({}) 파이프라인 실행 중 처리되지 않은 예외 발생", flow.flowId(), ex);
                             return null;
@@ -36,12 +38,13 @@ public class FlowDispatcher {
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private void runFlowPipeline(ExecutableFlow flow, EnvironmentContext payload, Instant triggeredAt) {
+    private void runFlowPipeline(ExecutableFlow flow, EnvironmentContext environmentContext, Instant triggeredAt) {
         if(!flowScheduleFilter.isSchedulable(flow)) {
             log.debug("flow({}) - 스케줄 조건 불일치, 실행 스킵", flow.flowId());
             return;
         }
+        FlowContext context = FlowContext.of(flow, environmentContext, triggeredAt);
 
-//        flowExecutor.execute(flow, payload, triggeredAt);
+        flowExecutor.execute(context);
     }
 }

@@ -34,18 +34,18 @@ class OrNodeExecutorTest {
     }
 
     @Test
-    @DisplayName("두 입력 경로 중 하나만 도착해도 OR 조건은 즉시 만족된다")
+    @DisplayName("두 입력 경로 중 하나라도 pending상태이면 OR 조건은 판단하지 않는다 - 부조건 false반환")
     void execute_satisfiedWhenOneInputArrives() {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
 
         NodeExecutionResult result = executor.execute(orNode, context, arrivedFromTrue, runtime);
 
-        assertThat(result.passed()).isTrue();
+        assertThat(result.passed()).isFalse();
     }
 
     @Test
@@ -54,7 +54,7 @@ class OrNodeExecutorTest {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
         ExecutionPath arrivedFromFalse = ExecutionPath.start(OR_NODE_ID, FALSE_SOURCE_NODE_ID, BranchType.FALSE);
@@ -73,11 +73,15 @@ class OrNodeExecutorTest {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
         FlowContext context = FlowContext.of(flow, null, Instant.now());
-        FlowRuntime runtime = new FlowRuntime(new LinkedList<>(), new HashMap<>());
+        FlowRuntime runtime = new FlowRuntime(new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
+        executor.execute(orNode, context, arrivedFromTrue, runtime);
 
-        NodeExecutionResult result = executor.execute(orNode, context, arrivedFromTrue, runtime);
+        ExecutionPath arrivedFromFalse = ExecutionPath.start(OR_NODE_ID, FALSE_SOURCE_NODE_ID, BranchType.FALSE);
+        NodeExecutionResult result = executor.execute(orNode, context, arrivedFromFalse, runtime);
+
+        assertThat(result.passed()).isTrue();
 
         assertThat(result.path().history()).hasSize(1);
         assertThat(result.path().history().getFirst().nodeType()).isEqualTo(NodeType.OR.name());
