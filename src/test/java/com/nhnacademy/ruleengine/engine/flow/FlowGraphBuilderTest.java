@@ -7,7 +7,7 @@ import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
-import org.junit.jupiter.api.Assertions;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,7 +39,7 @@ class FlowGraphBuilderTest {
     @DisplayName("플로우를 ExecutableFlow로 변환")
     void build() {
 
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         Node node2 = mockNode(2L);
         Connection conn = mockConnection(node1, node2, "TRUE");
 
@@ -52,17 +51,17 @@ class FlowGraphBuilderTest {
         );
 
         assertNotNull(result);
-        assertEquals(result.flowId(),1L);
-        assertEquals(result.flowName(), "테스트 플로우");
-        assertEquals(result.roomId(), 1L);
+        assertEquals(1L,result.flowId());
+        assertEquals("테스트 플로우",result.flowName());
+        assertEquals(1L, result.roomId());
 
         //nodeMap 노드 정보 확인
-        assertEquals(result.nodeMap().size(), 2);
-        assertEquals(result.startNodeId(), 1L);
+        assertEquals(2,result.nodeMap().size());
+        assertEquals(1L,result.startNodeId());
         assertTrue(result.nodeMap().containsKey(1L));
         assertTrue(result.nodeMap().containsKey(2L));
-        assertEquals(result.nodeMap().get(1L).nodeId(), 1L);
-        assertEquals(result.nodeMap().get(2L).nodeId(), 2L);
+        assertEquals(1L,result.nodeMap().get(1L).nodeId());
+        assertEquals(2L,result.nodeMap().get(2L).nodeId());
 
         //인접 맵 정보 확인
         assertTrue(result.trueAdjacencyMap().get(1L).contains(2L));
@@ -76,7 +75,7 @@ class FlowGraphBuilderTest {
     @DisplayName("TRUE/FALSE 커넥션 동시 존재 - 각각 올바른 맵에 저장됨 + 대소문자 확인")
     void build_bothBranchTypes() {
 
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         Node node2 = mockNode(2L);
         Node node3 = mockNode(3L);
         Connection trueConn = mockConnection(node1, node2, "true");
@@ -114,20 +113,28 @@ class FlowGraphBuilderTest {
     @Test
     @DisplayName("스케줄 있을 때 - executableSchedules에 올바르게 담김")
     void build_withSchedules() {
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         FlowSchedule schedule = mockSchedule(DayOfWeek.MONDAY, LocalTime.of(9,0), LocalTime.of(12, 0));
 
         ExecutableFlow result = flowGraphBuilder.build(flow, List.of(node1), List.of(), List.of(schedule));
 
-        assertEquals(result.schedules().size(), 1);
-        assertEquals(result.schedules().getFirst().dayOfWeek(), DayOfWeek.MONDAY);
+        assertEquals(1, result.schedules().size());
+        assertEquals( DayOfWeek.MONDAY, result.schedules().getFirst().dayOfWeek());
         assertEquals(result.schedules().getFirst().startTime(), LocalTime.of(9,0));
         assertEquals(result.schedules().getFirst().endTime(), LocalTime.of(12, 0));
     }
 
 
-
-        private Node mockNode(Long id){
+    private Node mockStartNode(Long id){
+        Node node = mock(Node.class);
+        when(node.getId()).thenReturn(id);
+        when(node.getNodeName()).thenReturn("node-" + id);
+        when(node.getNodeType()).thenReturn(NodeType.START);
+        when(node.getNodeConfig()).thenReturn(mock(StartNodeConfig.class));
+        when(node.getCooldownSec()).thenReturn(0);
+        return node;
+    }
+    private Node mockNode(Long id){
         Node node = mock(Node.class);
         when(node.getId()).thenReturn(id);
         when(node.getNodeName()).thenReturn("node-" + id);

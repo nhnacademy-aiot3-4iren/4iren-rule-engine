@@ -59,7 +59,8 @@ class FlowControllerTest {
                 100, 0,
                 AlertChannel.TELEGRAM,
                 "온도 경고",
-                AlertType.COMFORT_LIMIT_EXCEEDED
+                AlertType.COMFORT_LIMIT_EXCEEDED,
+                300
         );
     }
 

@@ -42,31 +42,6 @@ class FlowLoaderTest {
 
     private final Long ROOM_ID = 1L;
 
-//    TODO 테스트 코드 수정
-//    @Test
-//    @DisplayName("캐시 히트 - DB 조회 없이 캐시 반환")
-//    void load_cacheHit() {
-//
-//        ExecutableFlow cachedFlow = mockExecutableFlow(1L);
-//        when(flowCacheRepository.get(ROOM_ID)).thenReturn(List.of(cachedFlow));
-//        when(cachedFlow.flowId()).thenReturn(1L);
-//
-//        List<ExecutableFlow> result = flowLoader.load(ROOM_ID);
-//
-//        assertThat(result).hasSize(1);
-//        assertThat(result.getFirst().flowId()).isEqualTo(1L);
-//
-//        //DB 접근 없음
-//        verifyNoInteractions(flowRepository);
-//        verifyNoInteractions(nodeRepository);
-//        verifyNoInteractions(connectionRepository);
-//        verifyNoInteractions(flowScheduleRepository);
-//        verifyNoInteractions(flowGraphBuilder);
-//
-//        //캐시 저장 없음
-//        verify(flowCacheRepository, never()).set(anyLong(), anyList());
-//    }
-
     @Test
     @DisplayName("캐시 미스 - DB에서 플로우 조회 후 반환")
     void load_cacheMiss(){

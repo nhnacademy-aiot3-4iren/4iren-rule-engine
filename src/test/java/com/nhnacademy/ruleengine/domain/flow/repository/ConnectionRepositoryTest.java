@@ -2,7 +2,6 @@ package com.nhnacademy.ruleengine.domain.flow.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.discovery.converters.Auto;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -13,14 +12,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import(JacksonAutoConfiguration.class)
@@ -107,11 +104,6 @@ class ConnectionRepositoryTest {
                 .flow(flow1).sourceNode(node1).targetNode(node2).branchType("FALSE").build());
         conn3 = connectionRepository.save(Connection.builder()
                 .flow(flow2).sourceNode(node3).targetNode(node4).branchType("TRUE").build());
-
-    }
-
-    @Test
-    void deleteInBatch() {
 
     }
 
