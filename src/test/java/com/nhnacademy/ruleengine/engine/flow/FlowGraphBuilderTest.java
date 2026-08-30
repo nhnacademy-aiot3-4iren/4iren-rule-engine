@@ -7,6 +7,7 @@ import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +41,7 @@ class FlowGraphBuilderTest {
     @DisplayName("플로우를 ExecutableFlow로 변환")
     void build() {
 
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         Node node2 = mockNode(2L);
         Connection conn = mockConnection(node1, node2, "TRUE");
 
@@ -76,7 +77,7 @@ class FlowGraphBuilderTest {
     @DisplayName("TRUE/FALSE 커넥션 동시 존재 - 각각 올바른 맵에 저장됨 + 대소문자 확인")
     void build_bothBranchTypes() {
 
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         Node node2 = mockNode(2L);
         Node node3 = mockNode(3L);
         Connection trueConn = mockConnection(node1, node2, "true");
@@ -114,7 +115,7 @@ class FlowGraphBuilderTest {
     @Test
     @DisplayName("스케줄 있을 때 - executableSchedules에 올바르게 담김")
     void build_withSchedules() {
-        Node node1 = mockNode(1L);
+        Node node1 = mockStartNode(1L);
         FlowSchedule schedule = mockSchedule(DayOfWeek.MONDAY, LocalTime.of(9,0), LocalTime.of(12, 0));
 
         ExecutableFlow result = flowGraphBuilder.build(flow, List.of(node1), List.of(), List.of(schedule));
@@ -125,7 +126,15 @@ class FlowGraphBuilderTest {
         assertEquals(result.schedules().getFirst().endTime(), LocalTime.of(12, 0));
     }
 
-
+        private Node mockStartNode(Long id){
+            Node node = mock(Node.class);
+            when(node.getId()).thenReturn(id);
+            when(node.getNodeName()).thenReturn("node-" + id);
+            when(node.getNodeType()).thenReturn(NodeType.START);
+            when(node.getNodeConfig()).thenReturn(mock(StartNodeConfig.class));
+            when(node.getCooldownSec()).thenReturn(0);
+            return node;
+        }
 
         private Node mockNode(Long id){
         Node node = mock(Node.class);
