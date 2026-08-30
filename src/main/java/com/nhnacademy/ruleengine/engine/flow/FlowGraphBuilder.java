@@ -95,11 +95,16 @@ public class FlowGraphBuilder {
                 .filter(id -> !hasIncomingEdge.contains(id))
                 .toList();
 
-       if(nodeMap.get(startNodes.getFirst()).nodeType() != NodeType.START && startNodes.size() != 1){
-           return null;
-       }
+        if (startNodes.size() != 1) {
+            return null;
+        }
 
-        return startNodes.isEmpty() ? null : startNodes.getFirst();
+        Long startNodeId = startNodes.getFirst();
+        if (nodeMap.get(startNodeId).nodeType() != NodeType.START) {
+            return null;
+        }
+
+        return startNodeId;
     }
 
     private List<ExecutableFlow.ExecutableSchedule> buildSchedules(List<FlowSchedule> schedules) {
