@@ -70,7 +70,7 @@ public class FlowExecutor {
                     continue;
                 }
                 completedOrNodeIds.add(currentNode.nodeId());
-                log.info("Or노드 도착, isReady상대. currentNodeId: " + currentNode.nodeId());
+                log.info("Or노드 도착, isReady상태. currentNodeId: " + currentNode.nodeId());
 
             }
 
@@ -115,7 +115,7 @@ public class FlowExecutor {
         while (!stack.isEmpty()) {
             BlockedEdgeCursor cursor = stack.pop();
             log.info("blocked 상태 전파 DFS " + cursor.fromNodeId + " -> " + cursor.toNodeId);
-            //방문 노드 기록
+            //방문 노드 기록 true: 처음 추가됨, false: 이미 존재함
             if(!visited.add(cursor)){
                 continue;
             }
@@ -260,7 +260,7 @@ public class FlowExecutor {
 
     //플로우 안에 존재하는 모든 OrRuntimeState 초기화
     private Map<Long, OrRuntimeState> initializeOrStateMap(ExecutableFlow flow) {
-        log.info("initializeOrStateMap: 플로우 안에 존에하는 OrRuntimeState 초기화");
+        log.info("initializeOrStateMap: 플로우 안에 존재하는 OrRuntimeState 초기화");
         Map<Long,OrRuntimeState> result = new HashMap<>();
 
         for(Map.Entry<Long, ExecutableFlow.ExecutableNode> entry : flow.nodeMap().entrySet()){

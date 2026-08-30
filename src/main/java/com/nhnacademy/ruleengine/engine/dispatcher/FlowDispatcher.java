@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.engine.dispatcher;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.engine.executor.FlowContext;
 import com.nhnacademy.ruleengine.engine.executor.FlowExecutor;
 import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;

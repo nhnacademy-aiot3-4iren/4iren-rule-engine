@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.engine.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.ruleengine.common.exception.invalid.InvalidPayloadException; // 커스텀 예외
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidPayloadException;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
