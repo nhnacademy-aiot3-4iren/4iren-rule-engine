@@ -73,7 +73,7 @@ public class FlowService {
             throw new InvalidFlowException();
         }
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
-        List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
+        List<Connection> connections = connectionRepository.findAllBySourceNodeFlowId(flowId);
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
 
@@ -107,7 +107,7 @@ public class FlowService {
         }
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
-        List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
+        List<Connection> connections = connectionRepository.findAllBySourceNodeFlowId(templateFlowId);
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
 
@@ -185,7 +185,6 @@ public class FlowService {
                         throw new InvalidConnectionException(sourceId, targetId);
                     }
                     return Connection.builder()
-                            .flow(savedFlow)
                             .sourceNode(nodeRepository.getReferenceById(sourceId))
                             .targetNode(nodeRepository.getReferenceById(targetId))
                             .branchType(String.valueOf(c.branchType()))
@@ -196,7 +195,7 @@ public class FlowService {
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<NodeInfo> nodes, @NotNull List<ConnectionInfo> connections ) {
-        connectionRepository.deleteAllByFlowId(savedFlow.getId());
+        connectionRepository.deleteAllByNodeFlowId(savedFlow.getId());
         nodeRepository.deleteAllByFlowId(savedFlow.getId());
         Map<Long, Long> tempIdMap = saveNodes(savedFlow,nodes);
         saveConnections(savedFlow, connections,tempIdMap);

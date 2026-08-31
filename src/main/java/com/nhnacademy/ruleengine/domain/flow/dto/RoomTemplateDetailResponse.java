@@ -29,6 +29,7 @@ public record RoomTemplateDetailResponse(
                 .templateName(flowTemplate.getFlowName())
                 .description(flowTemplate.getDescription())
                 .nodes(NodeResponse.fromList(nodes))
-                .connections(ConnectionResponse.fromList(connections)).build();
+                .connections(ConnectionResponse.fromList(connections))
+                .sensorMetaInfos(sensorMetaInfos).build();
     }
 }

@@ -71,7 +71,7 @@ public class TemplateFlowService {
         }
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateId);
-        List<Connection> connections = connectionRepository.findAllByFlowId(templateId);
+        List<Connection> connections = connectionRepository.findAllBySourceNodeFlowId(templateId);
 
 
 
@@ -134,7 +134,6 @@ public class TemplateFlowService {
                         throw new InvalidConnectionException(sourceId, targetId);
                     }
                     return Connection.builder()
-                            .flow(savedFlow)
                             .sourceNode(nodeRepository.getReferenceById(sourceId))
                             .targetNode(nodeRepository.getReferenceById(targetId))
                             .branchType(String.valueOf(c.branchType()))
@@ -146,7 +145,7 @@ public class TemplateFlowService {
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections ) {
-        connectionRepository.deleteAllByFlowId(savedFlow.getId());
+        connectionRepository.deleteAllByNodeFlowId(savedFlow.getId());
         nodeRepository.deleteAllByFlowId(savedFlow.getId());
         flowTemplateMeasurementTypeRepository.deleteAllByFlow(savedFlow);
 

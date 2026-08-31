@@ -49,9 +49,6 @@ public class Flow {
     private List<Node> nodes = new ArrayList<>();
 
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Connection> connections = new ArrayList<>();
-
-    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FlowSchedule> schedules = new ArrayList<>();
 
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)

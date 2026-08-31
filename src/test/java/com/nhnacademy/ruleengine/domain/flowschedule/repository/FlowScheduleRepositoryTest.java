@@ -51,7 +51,7 @@ class FlowScheduleRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByFlowId - 해당 플로우 스케줄만 반환")
+    @DisplayName("findAllBySourceNodeFlowId - 해당 플로우 스케줄만 반환")
     void findAllByFlowId_returnsSchedulesOfFlow() {
         List<FlowSchedule> result = flowScheduleRepository.findAllByFlowId(flow1.getId());
 
@@ -122,7 +122,7 @@ class FlowScheduleRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByFlowIdIn - 여러 플로우 스케줄 한번에 조회")
+    @DisplayName("findAllBySourceNodeFlowIdIn - 여러 플로우 스케줄 한번에 조회")
     void findAllByFlowIdIn_returnsAllSchedules() {
         List<FlowSchedule> result = flowScheduleRepository.findAllByFlowIdIn(
                 List.of(flow1.getId(), flow2.getId())

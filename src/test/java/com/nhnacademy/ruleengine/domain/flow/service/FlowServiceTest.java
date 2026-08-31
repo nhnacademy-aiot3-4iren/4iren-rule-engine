@@ -192,7 +192,7 @@ class FlowServiceTest {
         Flow mockFlow = createMockFlow(100L, false);
         when(flowRepository.findByIdAndRoomId(100L, 1L)).thenReturn(Optional.of(mockFlow));
         when(nodeRepository.findAllByFlowId(100L)).thenReturn(List.of());
-        when(connectionRepository.findAllByFlowId(100L)).thenReturn(List.of());
+        when(connectionRepository.findAllBySourceNodeFlowId(100L)).thenReturn(List.of());
 
         FlowDetailResponse response = flowService.getFlowDetail(1L, 100L);
 
@@ -242,7 +242,7 @@ class FlowServiceTest {
         Flow mockFlow = createMockFlow(200L, true);
         when(flowRepository.findById(200L)).thenReturn(Optional.of(mockFlow));
         when(nodeRepository.findAllByFlowId(200L)).thenReturn(List.of());
-        when(connectionRepository.findAllByFlowId(200L)).thenReturn(List.of());
+        when(connectionRepository.findAllBySourceNodeFlowId(200L)).thenReturn(List.of());
 
         RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(1L,200L);
 
@@ -277,7 +277,7 @@ class FlowServiceTest {
         flowService.updateFlow(1L, 100L, request);
 
         verify(mockFlow).updateRegular("updated flow", "desc", true);
-        verify(connectionRepository).deleteAllByFlowId(100L);
+        verify(connectionRepository).deleteAllByNodeFlowId(100L);
         verify(nodeRepository).deleteAllByFlowId(100L);
         verify(nodeRepository, times(2)).save(any(Node.class));
         verify(connectionRepository).saveAll(anyList());

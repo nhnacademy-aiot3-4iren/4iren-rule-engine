@@ -48,6 +48,7 @@ public record FlowDetailResponse (
                 .isActive(flow.getIsActive())
                 .nodes(NodeResponse.fromList(nodes))
                 .connections(ConnectionResponse.fromList(connections))
+                .sensorMetaInfos(sensorMetaInfos)
                 .createdAt(flow.getCreatedAt())
                 .updatedAt(flow.getUpdatedAt()).build();
     }

@@ -235,7 +235,7 @@ class TemplateFlowServiceTest {
         Flow mockFlow = createMockFlow(100L, true);
         when(flowRepository.findById(100L)).thenReturn(Optional.of(mockFlow));
         when(nodeRepository.findAllByFlowId(100L)).thenReturn(List.of());
-        when(connectionRepository.findAllByFlowId(100L)).thenReturn(List.of());
+        when(connectionRepository.findAllBySourceNodeFlowId(100L)).thenReturn(List.of());
 
         TemplateDetailResponse response = templateFlowService.getTemplateDetail(100L);
         assertThat(response.templateId()).isEqualTo(100L);
@@ -268,7 +268,7 @@ class TemplateFlowServiceTest {
         templateFlowService.updateTemplate(100L, request);
 
         verify(mockFlow).updateTemplate("updated", "desc");
-        verify(connectionRepository).deleteAllByFlowId(100L);
+        verify(connectionRepository).deleteAllByNodeFlowId(100L);
         verify(nodeRepository).deleteAllByFlowId(100L);
         verify(flowTemplateMeasurementTypeRepository).deleteAllByFlow(mockFlow);
         verify(connectionRepository).saveAll(anyList());

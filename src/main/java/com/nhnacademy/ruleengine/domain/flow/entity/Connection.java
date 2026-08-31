@@ -24,10 +24,6 @@ public class Connection {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "flow_id", nullable = false)
-    private Flow flow;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "source_node_id", nullable = false)
     private Node sourceNode;
 
@@ -39,16 +35,14 @@ public class Connection {
     private String branchType;
 
     @Builder
-    public Connection(Flow flow, Node sourceNode, Node targetNode, String branchType) {
-        this.flow = flow;
+    public Connection( Node sourceNode, Node targetNode, String branchType) {
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
         this.branchType = (branchType != null && !branchType.isBlank()) ? branchType.toUpperCase() : "TRUE";
     }
 
-    public static Connection create(Flow flow, Node sourceNode, Node targetNode, String branchType) {
+    public static Connection create( Node sourceNode, Node targetNode, String branchType) {
         return Connection.builder()
-                .flow(flow)
                 .sourceNode(sourceNode)
                 .targetNode(targetNode)
                 .branchType(branchType)
