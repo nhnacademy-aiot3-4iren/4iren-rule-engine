@@ -8,12 +8,9 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class FlowValidationFailed extends ValidationFailedException {
+public class NodeConfigValidationFailed extends ValidationFailedException {
 
-
-    public FlowValidationFailed(List<ValidationErrorResponse.ValidationError> errors) {
-        super(errors, ErrorCode.FLOW_VALIDATION_FAILED);
-
+    public NodeConfigValidationFailed(List<ValidationErrorResponse.ValidationError> errors) {
+        super(errors, ErrorCode.NODE_CONFIG_VALIDATION_FAILED);
     }
-
 }

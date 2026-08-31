@@ -22,6 +22,26 @@ public class AverageNodeConfigValidator implements NodeConfigValidator {
         AverageNodeConfig c = (AverageNodeConfig) nodeConfig;
         List<String> errors = new ArrayList<>();
 
+        if (c.x() == null) {
+            errors.add("x 좌표는 필수입니다");
+        }
+        if (c.y() == null) {
+            errors.add("y 좌표는 필수입니다");
+        }
+        if (c.measurementType() == null) {
+            errors.add("measurementType은 필수입니다");
+            return errors;
+        }
+        if (c.operator() == null) {
+            errors.add("operator는 필수입니다");
+        }
+        if (c.unit() == null || c.unit().isBlank()) {
+            errors.add("unit은 필수입니다");
+        }
+        if (c.average() == null) {
+            errors.add("average는 필수입니다");
+        }
+
         SensorMetaInfo targetMeta = sensorMetaInfoList.stream()
                 .filter(meta -> meta.measurementType() == c.measurementType())
                 .findFirst()
@@ -34,7 +54,9 @@ public class AverageNodeConfigValidator implements NodeConfigValidator {
 
 
         // windowSec 범위
-        if (c.windowSec() < 10 || c.windowSec() > 3600) {
+        if (c.windowSec() == null) {
+            errors.add("windowSec은 필수입니다");
+        } else if (c.windowSec() < 10 || c.windowSec() > 3600) {
             errors.add("windowSec 범위 초과 (10 ~ 3600): " + c.windowSec());
         }
 

@@ -22,6 +22,23 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
         ThresholdNodeConfig thresholdNodeConfig = (ThresholdNodeConfig) nodeConfig;
         List<String > errors = new ArrayList<>();
 
+        if (thresholdNodeConfig.x() == null) {
+            errors.add("x 좌표는 필수입니다");
+        }
+        if (thresholdNodeConfig.y() == null) {
+            errors.add("y 좌표는 필수입니다");
+        }
+        if (thresholdNodeConfig.measurementType() == null) {
+            errors.add("measurementType은 필수입니다");
+            return errors;
+        }
+        if (thresholdNodeConfig.operator() == null) {
+            errors.add("operator는 필수입니다");
+        }
+        if (thresholdNodeConfig.unit() == null || thresholdNodeConfig.unit().isBlank()) {
+            errors.add("unit은 필수입니다");
+        }
+
         boolean validMeasurementType = sensorMetaInfoList.stream()
                 .anyMatch(meta -> meta.measurementType() == thresholdNodeConfig.measurementType());
         if (!validMeasurementType) {

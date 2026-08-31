@@ -8,12 +8,9 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class FlowValidationFailed extends ValidationFailedException {
+public class FlowScheduleValidationFailed extends ValidationFailedException {
 
-
-    public FlowValidationFailed(List<ValidationErrorResponse.ValidationError> errors) {
-        super(errors, ErrorCode.FLOW_VALIDATION_FAILED);
-
+    public FlowScheduleValidationFailed(List<ValidationErrorResponse.ValidationError> errors) {
+        super(errors, ErrorCode.FLOW_SCHEDULE_VALIDATION_FAILED);
     }
-
 }

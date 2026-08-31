@@ -22,12 +22,24 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         AlertNodeConfig c = (AlertNodeConfig) nodeConfig;
         List<String> errors = new ArrayList<>();
 
+        if (c.x() == null) {
+            errors.add("x 좌표는 필수입니다");
+        }
+        if (c.y() == null) {
+            errors.add("y 좌표는 필수입니다");
+        }
         // sensorMetas 불필요 (액션 노드)
         if (c.channel() == null) {
             errors.add("알림 채널을 선택해주세요");
         }
         if (c.alertTitle() == null || c.alertTitle().isBlank()) {
             errors.add("알림 제목을 입력해주세요");
+        }
+        if (c.alertType() == null) {
+            errors.add("알림 타입을 선택해주세요");
+        }
+        if (c.dedupWindowSec() != null && c.dedupWindowSec() <= 0) {
+            errors.add("dedupWindowSec은 0보다 커야 합니다");
         }
 
 

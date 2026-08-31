@@ -22,6 +22,26 @@ public class DurationNodeConfigValidator implements NodeConfigValidator {
         DurationNodeConfig c = (DurationNodeConfig) nodeConfig;
         List<String> errors = new ArrayList<>();
 
+        if (c.x() == null) {
+            errors.add("x 좌표는 필수입니다");
+        }
+        if (c.y() == null) {
+            errors.add("y 좌표는 필수입니다");
+        }
+        if (c.measurementType() == null) {
+            errors.add("measurementType은 필수입니다");
+            return errors;
+        }
+        if (c.operator() == null) {
+            errors.add("operator는 필수입니다");
+        }
+        if (c.unit() == null || c.unit().isBlank()) {
+            errors.add("unit은 필수입니다");
+        }
+        if (c.threshold() == null) {
+            errors.add("threshold는 필수입니다");
+        }
+
         SensorMetaInfo targetMeta = sensorMetaInfoList.stream()
                 .filter(meta -> meta.measurementType() == c.measurementType())
                 .findFirst()
@@ -33,7 +53,9 @@ public class DurationNodeConfigValidator implements NodeConfigValidator {
         }
 
         // durationSec 범위 (최소 10초, 최대 24시간)
-        if (c.durationSec() < 10 || c.durationSec() > 86400) {
+        if (c.durationSec() == null) {
+            errors.add("durationSec은 필수입니다");
+        } else if (c.durationSec() < 10 || c.durationSec() > 86400) {
             errors.add("durationSec 범위 초과 (10 ~ 86400): " + c.durationSec());
         }
 
