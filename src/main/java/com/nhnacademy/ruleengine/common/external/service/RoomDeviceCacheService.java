@@ -16,11 +16,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RoomDeviceCacheService {
-//    private final RoomDeviceCacheRepository cacheRepository; // 리포지토리 주입
     private final RoomSensorClient roomSensorClient;
     private final ObjectMapper objectMapper;//추후 더미데이터와 함께 삭제
 
-    @Cacheable(value = "room:devices", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "deviceCacheManager")
+    @Cacheable(value = "room:devices", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<RoomDeviceInfo> getRoomDevices(Long roomId) {
         log.info("cache miss roomId = {}, 외부 API 조회", roomId);
 
@@ -31,20 +30,6 @@ public class RoomDeviceCacheService {
             return getDummyDevices();
         }
 
-//        List<RoomDeviceInfo> cached = cacheRepository.get(roomId);
-//        if (cached != null) {
-//            log.info("redis cache hit");
-//            return cached;
-//        }
-//
-//        try {
-//            List<RoomDeviceInfo> devices = roomDeviceClient.getRoomDevices(roomId);
-//            cacheRepository.set(roomId, devices);
-//            return devices;
-//        } catch (Exception e) {
-//            log.warn("External API unavailable. Using dummy payload.", e);
-//            return getDummyDevices();
-//        }
     }
     //TODO 테스트용 추후 삭제
     private List<RoomDeviceInfo> getDummyDevices() {

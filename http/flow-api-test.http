@@ -132,3 +132,7 @@ Content-Type: application/json
 {
   "isActive": true
 }
+
+### [플로우 빌드 폼 호출] 강의실 기준 센서 메타 정보 보냄
+GET {{baseUrl}}/rooms/{{roomId}}/flows/form
+Accept: application/json

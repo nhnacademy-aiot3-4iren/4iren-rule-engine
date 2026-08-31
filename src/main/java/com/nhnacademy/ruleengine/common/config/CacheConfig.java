@@ -1,9 +1,5 @@
 package com.nhnacademy.ruleengine.common.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.micrometer.observation.annotation.Observed;
-import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,7 +20,7 @@ import java.time.Duration;
 public class CacheConfig implements CachingConfigurer {
 
     @Bean
-    public CacheManager deviceCacheManager(RedisConnectionFactory connectionFactory){
+    public CacheManager sensorCacheManager(RedisConnectionFactory connectionFactory){
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))

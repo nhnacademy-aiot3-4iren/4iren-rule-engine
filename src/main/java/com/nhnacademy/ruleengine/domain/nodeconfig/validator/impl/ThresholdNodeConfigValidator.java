@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
@@ -18,11 +18,11 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
     }
 
     @Override
-    public List<String> validate(NodeConfig nodeConfig, List<SensorStaticMeta> sensorStaticMetaList) {
+    public List<String> validate(NodeConfig nodeConfig, List<SensorMetaInfo> sensorMetaInfoList) {
         ThresholdNodeConfig thresholdNodeConfig = (ThresholdNodeConfig) nodeConfig;
         List<String > errors = new ArrayList<>();
 
-        boolean validMeasurementType = sensorStaticMetaList.stream()
+        boolean validMeasurementType = sensorMetaInfoList.stream()
                 .anyMatch(meta -> meta.measurementType() == thresholdNodeConfig.measurementType());
         if (!validMeasurementType) {
             errors.add("해당 강의실에서 지원하지 않는 measurementType: " + thresholdNodeConfig.measurementType());

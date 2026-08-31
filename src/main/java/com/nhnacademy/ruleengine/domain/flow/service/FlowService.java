@@ -4,7 +4,8 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionExcep
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
-import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
 import com.nhnacademy.ruleengine.domain.flow.validator.FlowValidator;
@@ -34,11 +35,13 @@ public class FlowService {
     private final ConnectionRepository connectionRepository;
     private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
 
-    private final SensorStaticMetaService metaService;
+
+    private final RoomSensorMetaService metaService;
 //    private final FlowCacheRepository flowCacheRepository;
     private final FlowValidator flowValidator;
 
     @Transactional
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
         Flow flow = Flow.regularBuilder()
                 .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
@@ -71,8 +74,10 @@ public class FlowService {
         }
         List<Node> nodes = nodeRepository.findAllByFlowId(flowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(flowId);
+        List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
-        return FlowDetailResponse.from(flow,nodes,connections);
+
+        return FlowDetailResponse.from(flow,nodes,connections, sensorMetaInfoList);
     }
 
     public RoomTemplateListResponse getFlowTemplateList(Long roomId) {
@@ -93,7 +98,7 @@ public class FlowService {
         return RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
     }
 
-    public RoomTemplateDetailResponse getTemplateFlowDetail(Long templateFlowId) {
+    public RoomTemplateDetailResponse getTemplateFlowDetail(Long roomId, Long templateFlowId) {
         Flow templateFlow = flowRepository.findById(templateFlowId)
                 .orElseThrow(FlowNotFoundException::new);
 
@@ -103,8 +108,10 @@ public class FlowService {
 
         List<Node> nodes = nodeRepository.findAllByFlowId(templateFlowId);
         List<Connection> connections = connectionRepository.findAllByFlowId(templateFlowId);
+        List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
-        return RoomTemplateDetailResponse.from(templateFlow, nodes, connections);
+
+        return RoomTemplateDetailResponse.from(templateFlow, nodes, connections, sensorMetaInfoList);
     }
 
 
@@ -139,11 +146,19 @@ public class FlowService {
     }
 
     @Transactional
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void updateStatus(Long roomId, Long flowId, UpdateFlowStatusRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
                 .orElseThrow(UnauthorizedFlowAccessException::new);
 
         flow.updateStatus(request.isActive());
+    }
+
+    public SensorMetaResponse flowBuildForm(Long roomId) {
+
+        List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
+
+        return SensorMetaResponse.of(roomId, sensorMetaInfoList);
     }
 
 

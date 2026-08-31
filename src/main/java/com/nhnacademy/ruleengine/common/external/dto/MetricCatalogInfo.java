@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.common.external.dto;
 
 public record MetricCatalogInfo(
-        String memetricCode,
+        String metricCode,
         String displayName,
         String metricKind,
         String status,

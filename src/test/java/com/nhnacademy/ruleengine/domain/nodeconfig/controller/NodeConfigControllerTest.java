@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
@@ -58,68 +59,11 @@ class NodeConfigControllerTest {
         );
     }
 
-    private SensorStaticMeta sampleSensorMeta() {
-        return SensorStaticMeta.of(MeasurementType.TEMPERATURE, "°C");
-    }
-
-    private NodeConfigResponse sampleNodeConfigResponse() {
-        return NodeConfigResponse.of(
-                NODE_ID,
-                sampleThresholdConfig(),
-                List.of(sampleSensorMeta())
-        );
+    private SensorMetaInfo sampleSensorMeta() {
+        return new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C");
     }
 
 
-    @Test
-    @DisplayName("노드 설정 및 메타 조회 - 성공 200")
-    void getNodeConfigNMeta_success() throws Exception {
-        given(nodeConfigService.getNodeConfigNMeta(ROOM_ID, NODE_ID, NodeType.THRESHOLD))
-                .willReturn(sampleNodeConfigResponse());
-
-        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
-                        .param("nodeType", "THRESHOLD"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nodeId").value(NODE_ID))
-                .andExpect(jsonPath("$.nodeConfig").exists())
-                .andExpect(jsonPath("$.sensorStaticMetaList").isArray())
-                .andExpect(jsonPath("$.sensorStaticMetaList[0].measurementType")
-                        .value("TEMPERATURE"))
-                .andExpect(jsonPath("$.sensorStaticMetaList[0].unit").value("°C"));
-    }
-    @Test
-    @DisplayName("노드 설정 및 메타 조회 - nodeType 파라미터 없으면 400")
-    void getNodeConfigNMeta_missingNodeType_400() throws Exception {
-        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("노드 설정 및 메타 조회 - 잘못된 nodeType이면 400")
-    void getNodeConfigNMeta_invalidNodeType_400() throws Exception {
-        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
-                        .param("nodeType", "INVALID_TYPE"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("노드 설정 및 메타 조회 - ALERT 타입 조회")
-    void getNodeConfigNMeta_alertType_success() throws Exception {
-        NodeConfigResponse alertResponse = NodeConfigResponse.of(
-                NODE_ID,
-                null,  // AlertNodeConfig 픽스처로 교체
-                List.of()
-        );
-
-        given(nodeConfigService.getNodeConfigNMeta(ROOM_ID, NODE_ID, NodeType.ALERT))
-                .willReturn(alertResponse);
-
-        mockMvc.perform(get(NODE_CONFIG_URL, ROOM_ID, NODE_ID)
-                        .param("nodeType", "ALERT"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nodeId").value(NODE_ID))
-                .andExpect(jsonPath("$.sensorStaticMetaList").isArray());
-    }
 
     @Test
     @DisplayName("노드 설정 검증 - 유효한 설정이면 valid:true 반환")

@@ -9,6 +9,7 @@ import com.nhnacademy.ruleengine.domain.flowschedule.dto.*;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class FlowScheduleService {
     private final FlowRepository flowRepository;
     private final FlowScheduleRepository flowScheduleRepository;
 
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
@@ -41,6 +43,7 @@ public class FlowScheduleService {
     }
 
     @Transactional(readOnly = true)
+    @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowScheduleResponse getFlowScheduleDetail(Long roomId, Long flowId, Long scheduleId) {
 
         FlowSchedule flowSchedule = flowScheduleRepository.findSchedule(scheduleId, flowId, roomId)

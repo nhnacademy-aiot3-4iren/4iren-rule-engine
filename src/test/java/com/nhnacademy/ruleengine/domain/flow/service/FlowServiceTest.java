@@ -5,7 +5,6 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionExcep
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
-import com.nhnacademy.ruleengine.domain.nodeconfig.service.SensorStaticMetaService;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -43,7 +42,7 @@ class FlowServiceTest {
     @Mock private NodeRepository nodeRepository;
     @Mock private ConnectionRepository connectionRepository;
     @Mock private FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
-    @Mock private SensorStaticMetaService metaService;
+    @Mock private RoomSensorMetaService metaService;
 
     private FlowValidator flowValidator;
 
@@ -245,7 +244,7 @@ class FlowServiceTest {
         when(nodeRepository.findAllByFlowId(200L)).thenReturn(List.of());
         when(connectionRepository.findAllByFlowId(200L)).thenReturn(List.of());
 
-        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(200L);
+        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(1L,200L);
 
         assertThat(response.templateName()).isEqualTo("Flow 200");
     }
@@ -256,7 +255,7 @@ class FlowServiceTest {
         Flow mockFlow = createMockFlow(200L, false); // isTemplate = false
         when(flowRepository.findById(200L)).thenReturn(Optional.of(mockFlow));
 
-        assertThatThrownBy(() -> flowService.getTemplateFlowDetail(200L))
+        assertThatThrownBy(() -> flowService.getTemplateFlowDetail(1L,200L))
                 .isInstanceOf(InvalidFlowException.class);
     }
 

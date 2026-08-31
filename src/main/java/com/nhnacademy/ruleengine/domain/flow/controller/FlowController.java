@@ -15,6 +15,16 @@ public class FlowController {
 
     private final FlowService flowService;
 
+    //플로우 빌드 폼 호출
+    @GetMapping("/flows/form")
+    public ResponseEntity<SensorMetaResponse> buildForm(
+            @PathVariable("room-id") Long roomId
+    ){
+        SensorMetaResponse response = flowService.flowBuildForm(roomId);
+
+        return ResponseEntity.ok(response);
+    }
+
     //플로우 생성
     @PostMapping("/flows")
     public ResponseEntity<FlowCreateResponse> createFlow(
@@ -51,8 +61,10 @@ public class FlowController {
     //추천 템플릿 플로우 상세 조회 및 플로우 생성 폼 화면(강의실별 플로우 관리자 전용)
     @GetMapping("/flow-templates/{template-id}")
     public ResponseEntity<RoomTemplateDetailResponse> getTemplateFlowDetail(
-            @PathVariable("template-id") Long templateId) {
-        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(templateId);
+            @PathVariable("room-id") Long roomId,
+            @PathVariable("template-id") Long templateId)
+    {
+        RoomTemplateDetailResponse response = flowService.getTemplateFlowDetail(roomId,templateId);
         return ResponseEntity.ok(response);
     }
 
@@ -76,6 +88,7 @@ public class FlowController {
         return ResponseEntity.noContent().build();
     }
 
+    //플로우 활성화/비활성화 설정
     @PatchMapping("/flows/{flow-id}/active")
     public ResponseEntity<Void> updateStatus(
             @PathVariable("room-id") Long roomId,
@@ -86,5 +99,6 @@ public class FlowController {
 
         return ResponseEntity.noContent().build();
     }
+
 
 }

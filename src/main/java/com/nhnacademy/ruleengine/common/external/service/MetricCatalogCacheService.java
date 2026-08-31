@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.client.RoomSensorClient;
 import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
-import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,7 @@ public class MetricCatalogCacheService {
     private final RoomSensorClient roomSensorClient;
     private final ObjectMapper objectMapper;
 
-    @Cacheable(value = "sensor:catalog", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "sensor:catalog", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<MetricCatalogInfo> getMetricCatalog(){
         log.info("cache miss, 외부 API 조회");
 

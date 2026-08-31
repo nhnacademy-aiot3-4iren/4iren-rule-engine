@@ -252,7 +252,7 @@ class FlowControllerTest {
                 .connections(List.of())
                 .build();
 
-        given(flowService.getTemplateFlowDetail(TEMPLATE_ID)).willReturn(response);
+        given(flowService.getTemplateFlowDetail(ROOM_ID,TEMPLATE_ID)).willReturn(response);
 
         mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates/{template-id}",
                         ROOM_ID, TEMPLATE_ID))

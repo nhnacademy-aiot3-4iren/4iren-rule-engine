@@ -1,40 +1,61 @@
-package com.nhnacademy.ruleengine.domain.nodeconfig.service;
+package com.nhnacademy.ruleengine.domain.flow.service;
 
+import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
 import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
 import com.nhnacademy.ruleengine.common.external.service.MetricCatalogCacheService;
 import com.nhnacademy.ruleengine.common.external.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class SensorStaticMetaService {
+public class RoomSensorMetaService {
     private final RoomDeviceCacheService roomDeviceCacheService;
     private final MetricCatalogCacheService metricCatalogCacheService;
 
-    public List<SensorStaticMeta> getSensorStaticMetaList(Long roomId){
+    public List<SensorMetaInfo> getSensorMetaList(Long roomId){
         List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
+        List<MetricCatalogInfo> metricCatalogInfoList = metricCatalogCacheService.getMetricCatalog();
+
 
         if(roomDeviceInfoList.isEmpty()){
             return List.of();
         }
 
-        List<SensorStaticMeta> sensorStaticMetaList = new ArrayList<>();
+        Map<String, MetricCatalogInfo> catalogMap = metricCatalogInfoList.stream()
+                .collect(Collectors.toMap(
+                        catalog -> catalog.metricCode().toUpperCase(), // "co2" → "CO2"
+                        Function.identity(),
+                        (oldValue, newValue) -> oldValue
+                ));
 
-        List<MeasurementType> measurementTypeOptionsInRoom = getMeasurementTypeOptionsInRoom(roomId);
-        Map<MeasurementType, String> unitByMeasurementType = getUnitByMeasurementType(roomDeviceInfoList);
+        List<SensorMetaInfo> sensorMetaInfoList = roomDeviceInfoList.stream()
+                .flatMap(room -> room.measurement().keySet().stream())
+                .distinct()
+                .map(key->{
+                    MeasurementType measurementType = MeasurementType.fromString(key);
+                    MetricCatalogInfo catalogInfo = catalogMap.get(key.toUpperCase());
 
-        for(MeasurementType measurementType : measurementTypeOptionsInRoom){
-            sensorStaticMetaList.add(SensorStaticMeta.of(measurementType, unitByMeasurementType.get(measurementType)));
-        }
+                    if(catalogInfo == null){
+                        log.error("MetricCatalog에 존재하지 않는 측정 타입, key: ", key);
+                        return null;
+                    }
 
-        return sensorStaticMetaList;
+                    return SensorMetaInfo.of(measurementType, catalogInfo);
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        return sensorMetaInfoList;
     }
 
 

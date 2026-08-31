@@ -75,7 +75,6 @@ public class FlowValidator {
         }
     }
 
-    //순환 참조 확인(DFS) TODO 검증
     private void validateNoCycle( List<NodeInfo> nodes, List<ConnectionInfo> connections, List<String> errors) {
         //인접 맵 구정
         Map<Long, List<Long>> adjacency = new HashMap<>();

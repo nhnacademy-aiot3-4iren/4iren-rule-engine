@@ -25,6 +25,8 @@ public record FlowDetailResponse (
 
         List<ConnectionResponse> connections,
 
+        List<SensorMetaInfo> sensorMetaInfos,
+
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime createdAt,
 
@@ -35,7 +37,8 @@ public record FlowDetailResponse (
     public static FlowDetailResponse from(
             Flow flow,
             List<Node> nodes,
-            List<Connection> connections
+            List<Connection> connections,
+            List<SensorMetaInfo> sensorMetaInfos
     ){
         return FlowDetailResponse.builder()
                 .flowId(flow.getId())

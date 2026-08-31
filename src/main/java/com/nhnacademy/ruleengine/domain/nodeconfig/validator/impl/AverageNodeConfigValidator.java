@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
@@ -18,11 +18,11 @@ public class AverageNodeConfigValidator implements NodeConfigValidator {
     }
 
     @Override
-    public List<String> validate(NodeConfig nodeConfig, List<SensorStaticMeta> sensorStaticMetaList) {
+    public List<String> validate(NodeConfig nodeConfig, List<SensorMetaInfo> sensorMetaInfoList) {
         AverageNodeConfig c = (AverageNodeConfig) nodeConfig;
         List<String> errors = new ArrayList<>();
 
-        SensorStaticMeta targetMeta = sensorStaticMetaList.stream()
+        SensorMetaInfo targetMeta = sensorMetaInfoList.stream()
                 .filter(meta -> meta.measurementType() == c.measurementType())
                 .findFirst()
                 .orElse(null);
