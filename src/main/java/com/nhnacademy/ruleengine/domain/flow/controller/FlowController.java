@@ -20,7 +20,7 @@ public class FlowController {
     public ResponseEntity<SensorMetaResponse> buildForm(
             @PathVariable("room-id") Long roomId
     ){
-        SensorMetaResponse response = flowService.flowBuildForm(roomId);
+        SensorMetaResponse response = flowService.getFlowBuildForm(roomId);
 
         return ResponseEntity.ok(response);
     }

@@ -86,16 +86,6 @@ public class RoomSensorMetaService {
                 .toList();
     }
 
-    private Map<MeasurementType, String> getUnitByMeasurementType(List<RoomDeviceInfo> roomDeviceInfoList){
-        return roomDeviceInfoList.stream()
-                .flatMap(room -> room.measurement().entrySet().stream())
-                .collect(Collectors.toMap(
-                        entry -> MeasurementType.fromString(entry.getKey()),
-                        Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue,
-                        () -> new EnumMap<>(MeasurementType.class)
-                ));
-    }
 
     private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoByMeasurementType(List<RoomDeviceInfo> roomDeviceInfoList){
         return roomDeviceInfoList.stream()

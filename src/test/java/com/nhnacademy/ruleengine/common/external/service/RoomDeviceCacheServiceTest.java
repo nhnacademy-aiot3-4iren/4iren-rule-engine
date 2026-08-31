@@ -32,7 +32,7 @@ class RoomDeviceCacheServiceTest {
 
     @Test
     @DisplayName("비즈니스 검증: 외부 API 조회 성공 시, 받아온 디바이스 리스트를 그대로 정확하게 반환해야 한다")
-    void getRoomDevices_CacheHit() {
+    void getRoomDevices() {
         List<RoomDeviceInfo> apiList = List.of(new RoomDeviceInfo(ROOM_ID, "eui", "name", null));
 //        when(cacheRepository.get(1L)).thenReturn(cachedList);
         when(roomSensorClient.getRoomDevices(ROOM_ID)).thenReturn(apiList);

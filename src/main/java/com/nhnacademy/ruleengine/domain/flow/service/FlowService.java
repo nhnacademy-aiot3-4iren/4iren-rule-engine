@@ -125,10 +125,6 @@ public class FlowService {
 
         //update
         updateNodesNConnections(flow, request.nodes(), request.connections());
-
-
-        //캐시 무효화
-//        flowCacheRepository.evict(roomId);
     }
 
     @Transactional
@@ -141,8 +137,7 @@ public class FlowService {
         }
         flowRepository.deleteById(flowId);
 
-        //캐시 무효화
-//        flowCacheRepository.evict(roomId);
+
     }
 
     @Transactional
@@ -154,7 +149,7 @@ public class FlowService {
         flow.updateStatus(request.isActive());
     }
 
-    public SensorMetaResponse flowBuildForm(Long roomId) {
+    public SensorMetaResponse getFlowBuildForm(Long roomId) {
 
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 

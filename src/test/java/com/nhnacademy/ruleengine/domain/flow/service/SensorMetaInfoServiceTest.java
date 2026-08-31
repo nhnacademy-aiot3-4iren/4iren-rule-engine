@@ -1,12 +1,13 @@
-package com.nhnacademy.ruleengine.common.external.service;
+package com.nhnacademy.ruleengine.domain.flow.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
 import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
 import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
+import com.nhnacademy.ruleengine.common.external.service.MetricCatalogCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
-import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,18 +44,7 @@ class SensorMetaInfoServiceTest {
         List<SensorMetaInfo> result = roomSensorMetaService.getSensorMetaList(1L);
         assertThat(result).isEmpty();
     }
-/*
-{
-                        "metricCode": "temperature",
-                        "displayName": "온도",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 공기의 섭씨 온도",
-                        "ucumCode": "Cel",
-                        "unitDisplayName": "섭씨",
-                        "symbol": "°C"
-                      },
- */
+
     @Test
     @DisplayName("정상적으로 센서 메타데이터 리스트를 반환하며, 중복된 측정 타입의 단위는 기존 값을 유지한다")
     void getSensorStaticMetaList_Success() {

@@ -346,4 +346,23 @@ class FlowControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    @DisplayName("플로우 빌드 폼 호출")
+    void buildForm_success() throws Exception{
+        SensorMetaInfo metaInfo1 = new SensorMetaInfo(MeasurementType.CO2, "이산화탄소 농도", "실내 공기 중 이산화탄소 농도", "ppm");
+        SensorMetaInfo metaInfo2 = new SensorMetaInfo(MeasurementType.HUMIDITY, "상대습도", "실내 공기의 상대습도", "%");
+        SensorMetaInfo metaInfo3 = new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 공기의 섭씨 온도", "°C");
+        SensorMetaResponse response = new SensorMetaResponse(ROOM_ID, List.of(metaInfo1, metaInfo2, metaInfo3));
+
+        given(flowService.getFlowBuildForm(ROOM_ID)).willReturn(response);
+
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/form", ROOM_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roomId").value(ROOM_ID))
+                .andExpect(jsonPath("$.sensorMetaInfoList[0].measurementType").value("CO2"));
+
+
+
+    }
 }

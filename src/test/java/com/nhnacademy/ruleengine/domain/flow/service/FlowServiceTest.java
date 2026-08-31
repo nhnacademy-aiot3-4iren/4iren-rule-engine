@@ -329,4 +329,22 @@ class FlowServiceTest {
         verify(mockFlow).updateStatus(false);
 
     }
+
+    @Test
+    @DisplayName("플로우 빌드 폼 호출")
+    void getFlowVuildForm_success(){
+        Flow mockFlow = mock(Flow.class);
+
+        SensorMetaInfo metaInfo1 = new SensorMetaInfo(MeasurementType.CO2, "이산화탄소 농도", "실내 공기 중 이산화탄소 농도", "ppm");
+        SensorMetaInfo metaInfo2 = new SensorMetaInfo(MeasurementType.HUMIDITY, "상대습도", "실내 공기의 상대습도", "%");
+        SensorMetaInfo metaInfo3 = new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 공기의 섭씨 온도", "°C");
+
+        when(metaService.getSensorMetaList(1L)).thenReturn(List.of(metaInfo1, metaInfo2, metaInfo3));
+
+        SensorMetaResponse response = flowService.getFlowBuildForm(1L);
+
+        verify(metaService).getSensorMetaList(1L);
+        assertThat(response.roomId()).isEqualTo(1L);
+
+    }
 }
