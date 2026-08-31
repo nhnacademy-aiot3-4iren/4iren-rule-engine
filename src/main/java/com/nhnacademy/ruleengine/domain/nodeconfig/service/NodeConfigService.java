@@ -45,9 +45,10 @@ public class NodeConfigService {
         );
 
         if (!errors.isEmpty()) {
-            throw new NodeConfigValidationFailed(errors.stream()
-                    .map(error -> ValidationErrorResponse.ValidationError.of("nodeConfig", error))
-                    .toList());
+            throw new NodeConfigValidationFailed(ValidationErrorResponse.ValidationError.ofList(errors));
+//            throw new NodeConfigValidationFailed(errors.stream()
+//                    .map(error -> ValidationErrorResponse.ValidationError.of("nodeConfig", error))
+//                    .toList());
         }
 
         return NodeConfigValidationResponse.success();

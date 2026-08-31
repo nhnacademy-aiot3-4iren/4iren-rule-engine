@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.common.exception.invalid.NodeConfigValidationFailed;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
@@ -51,7 +51,7 @@ class NodeConfigServiceTest {
     }
 
     @Test
-    @DisplayName("NodeConfig Validate 시 에러가 있으면 Failure를 반환한다")
+    @DisplayName("NodeConfig Validate 시 에러가 있으면 NodeConfigValidationFailed가 발생한다")
     void validate_Failure() {
         NodeConfig mockConfig = mock(NodeConfig.class);
         when(mockConfig.nodeType()).thenReturn(NodeType.THRESHOLD);
@@ -60,17 +60,23 @@ class NodeConfigServiceTest {
         when(validatorRegistry.validate(eq(NodeType.THRESHOLD), eq(mockConfig), any()))
                 .thenReturn(List.of("설정 오류 발생"));
 
-        NodeConfigValidationResponse response = nodeConfigService.validate(100L, request);
-
-        assertThat(response.valid()).isFalse();
-        assertThat(response.errors()).containsExactly("설정 오류 발생");
+        assertThatThrownBy(() -> nodeConfigService.validate(100L, request))
+                .isInstanceOf(NodeConfigValidationFailed.class)
+                .satisfies(e -> {
+                    NodeConfigValidationFailed ex = (NodeConfigValidationFailed) e;
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("설정 오류 발생"));
+                });
     }
 
     @Test
-    @DisplayName("Validate 시 Config가 null이면 InvalidNodeException이 발생한다")
+    @DisplayName("Validate 시 Config가 null이면 NodeConfigValidationFailed가 발생한다")
     void validate_NullConfig() {
         NodeConfigValidateRequest request = new NodeConfigValidateRequest(null);
         assertThatThrownBy(() -> nodeConfigService.validate(100L, request))
-                .isInstanceOf(InvalidNodeException.class);
+                .isInstanceOf(NodeConfigValidationFailed.class)
+                .satisfies(e -> {
+                    NodeConfigValidationFailed ex = (NodeConfigValidationFailed) e;
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("nodeConfig는 필수입니다."));
+                });
     }
 }

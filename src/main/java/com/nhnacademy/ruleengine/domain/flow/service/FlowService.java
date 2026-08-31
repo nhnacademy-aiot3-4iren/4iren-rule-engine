@@ -46,7 +46,7 @@ public class FlowService {
         Flow flow = Flow.regularBuilder()
                 .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
 
-        flowValidator.validate(request.nodes(), request.connections());
+        flowValidator.validate(request.nodes(), request.connections(), metaService.getSensorMetaList(roomId));
         Flow savedFlow = flowRepository.save(flow);
 
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
@@ -119,7 +119,7 @@ public class FlowService {
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
-        flowValidator.validate(request.nodes(), request.connections());
+        flowValidator.validate(request.nodes(), request.connections(), metaService.getSensorMetaList(roomId));
 
         flow.updateRegular(request.flowName(),request.description(), request.isActive());
 
