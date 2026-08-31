@@ -4,7 +4,7 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionExcep
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
-import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaResponse;
+import com.nhnacademy.ruleengine.domain.flow.dto.FlowBuildFormResponse;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.entity.*;
@@ -149,11 +149,11 @@ public class FlowService {
         flow.updateStatus(request.isActive());
     }
 
-    public SensorMetaResponse getFlowBuildForm(Long roomId) {
+    public FlowBuildFormResponse getFlowBuildForm(Long roomId) {
 
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
-        return SensorMetaResponse.of(roomId, sensorMetaInfoList);
+        return FlowBuildFormResponse.of(roomId, sensorMetaInfoList);
     }
 
 

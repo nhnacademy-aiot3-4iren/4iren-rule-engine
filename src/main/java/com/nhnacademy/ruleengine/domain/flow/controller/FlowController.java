@@ -17,10 +17,10 @@ public class FlowController {
 
     //플로우 빌드 폼 호출
     @GetMapping("/flows/form")
-    public ResponseEntity<SensorMetaResponse> buildForm(
+    public ResponseEntity<FlowBuildFormResponse> buildForm(
             @PathVariable("room-id") Long roomId
     ){
-        SensorMetaResponse response = flowService.getFlowBuildForm(roomId);
+        FlowBuildFormResponse response = flowService.getFlowBuildForm(roomId);
 
         return ResponseEntity.ok(response);
     }

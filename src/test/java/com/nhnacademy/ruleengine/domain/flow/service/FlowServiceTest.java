@@ -341,7 +341,7 @@ class FlowServiceTest {
 
         when(metaService.getSensorMetaList(1L)).thenReturn(List.of(metaInfo1, metaInfo2, metaInfo3));
 
-        SensorMetaResponse response = flowService.getFlowBuildForm(1L);
+        FlowBuildFormResponse response = flowService.getFlowBuildForm(1L);
 
         verify(metaService).getSensorMetaList(1L);
         assertThat(response.roomId()).isEqualTo(1L);

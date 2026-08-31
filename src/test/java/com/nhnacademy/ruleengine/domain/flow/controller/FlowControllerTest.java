@@ -353,7 +353,7 @@ class FlowControllerTest {
         SensorMetaInfo metaInfo1 = new SensorMetaInfo(MeasurementType.CO2, "이산화탄소 농도", "실내 공기 중 이산화탄소 농도", "ppm");
         SensorMetaInfo metaInfo2 = new SensorMetaInfo(MeasurementType.HUMIDITY, "상대습도", "실내 공기의 상대습도", "%");
         SensorMetaInfo metaInfo3 = new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 공기의 섭씨 온도", "°C");
-        SensorMetaResponse response = new SensorMetaResponse(ROOM_ID, List.of(metaInfo1, metaInfo2, metaInfo3));
+        FlowBuildFormResponse response = new FlowBuildFormResponse(ROOM_ID, List.of(metaInfo1, metaInfo2, metaInfo3));
 
         given(flowService.getFlowBuildForm(ROOM_ID)).willReturn(response);
 
