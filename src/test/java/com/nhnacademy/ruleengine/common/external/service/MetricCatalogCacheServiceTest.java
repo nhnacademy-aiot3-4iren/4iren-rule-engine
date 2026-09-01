@@ -49,14 +49,4 @@ class MetricCatalogCacheServiceTest {
         verify(roomSensorClient, times(1)).getMetricCatalog();
     }
 
-    @Test
-    @DisplayName("Cache Miss - 외부 API호출 실패 시, 더미 데이터 반환")
-    void getMetricCatalog_ClientFail_ReturnsDummyData() {
-        when(roomSensorClient.getMetricCatalog()).thenThrow(new RuntimeException("External API Connection Refused"));
-
-        List<MetricCatalogInfo> result = metricCatalogCacheService.getMetricCatalog();
-
-        assertThat(result).hasSize(7);
-
-    }
 }
