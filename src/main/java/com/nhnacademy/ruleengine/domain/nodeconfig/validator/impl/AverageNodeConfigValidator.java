@@ -23,12 +23,7 @@ public class AverageNodeConfigValidator implements NodeConfigValidator {
         AverageNodeConfig c = (AverageNodeConfig) nodeConfig;
         List<NodeConfigError> errors = new ArrayList<>();
 
-        if (c.x() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.x", "x 좌표는 필수입니다"));
-        }
-        if (c.y() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.y", "y 좌표는 필수입니다"));
-        }
+
         if (c.measurementType() == null) {
             errors.add(NodeConfigError.of("nodeConfig.measurementType", "measurementType은 필수입니다"));
             return errors;

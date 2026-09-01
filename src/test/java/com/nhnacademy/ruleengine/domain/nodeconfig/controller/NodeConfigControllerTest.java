@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
@@ -25,6 +26,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -115,8 +117,11 @@ class NodeConfigControllerTest {
     @Test
     @DisplayName("노드 설정 검증 - nodeConfig null이면 400")
     void validateNodeConfig_nullNodeConfig_400() throws Exception {
-        // nodeConfig null → @NotNull 위반
         String body = "{\"nodeConfig\": null}";
+
+        willThrow(new InvalidNodeException())
+                .given(nodeConfigService)
+                .validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class));
 
         mockMvc.perform(post(VALIDATE_URL, ROOM_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,4 +156,3 @@ class NodeConfigControllerTest {
                 .andExpect(jsonPath("$.valid").value(true));
     }
 }
-

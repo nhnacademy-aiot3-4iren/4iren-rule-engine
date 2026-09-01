@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NodeConfigServiceTest {
 
-    @Mock private NodeRepository nodeRepository;
     @Mock private RoomSensorMetaService roomSensorMetaService;
     @Mock private NodeConfigValidatorRegistry validatorRegistry;
 
@@ -65,5 +65,13 @@ class NodeConfigServiceTest {
         assertThat(response.errors()).containsExactly(NodeConfigError.of("nodeConfig.threshold", "설정 오류 발생"));
     }
 
+    @Test
+    @DisplayName("Validate 시 Config가 null이면 InvalidNodeException이 발생한다")
+    void validate_NullConfig() {
+        NodeConfigValidateRequest request = new NodeConfigValidateRequest(null);
+
+        assertThatThrownBy(() -> nodeConfigService.validate(100L, request))
+                .isInstanceOf(InvalidNodeException.class);
+    }
 
 }
