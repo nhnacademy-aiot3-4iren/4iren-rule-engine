@@ -28,7 +28,7 @@ public record ThresholdNodeConfig (
         Operator operator,
 
         @NotNull
-        double threshold
+        Double threshold
 
 )implements NodeConfig {
         @Override
