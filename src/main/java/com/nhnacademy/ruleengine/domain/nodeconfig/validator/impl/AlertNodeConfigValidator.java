@@ -38,7 +38,9 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         if (c.alertType() == null) {
             errors.add("알림 타입을 선택해주세요");
         }
-        if (c.dedupWindowSec() != null && c.dedupWindowSec() <= 0) {
+        if (c.dedupWindowSec() == null) {
+            errors.add("dedupWindowSec은 필수입니다");
+        } else if (c.dedupWindowSec() <= 0) {
             errors.add("dedupWindowSec은 0보다 커야 합니다");
         }
 
