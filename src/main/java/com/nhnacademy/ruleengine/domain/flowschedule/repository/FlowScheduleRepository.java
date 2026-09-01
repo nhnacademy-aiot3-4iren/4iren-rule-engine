@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +34,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
                                         @Param("roomId") Long roomId);
 
     List<FlowSchedule> findAllByFlowIdIn(List<Long> flowIds);
+
+
+    List<FlowSchedule> findAllByFlowIdAndDayOfWeek(Long flowId, DayOfWeek dayOfWeek);
 }

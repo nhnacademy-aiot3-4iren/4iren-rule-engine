@@ -38,6 +38,9 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
         if (thresholdNodeConfig.unit() == null || thresholdNodeConfig.unit().isBlank()) {
             errors.add("unit은 필수입니다");
         }
+        if(thresholdNodeConfig.threshold() == null){
+            errors.add("임계값 설정은 필수잆니다.");
+        }
 
         boolean validMeasurementType = sensorMetaInfoList.stream()
                 .anyMatch(meta -> meta.measurementType() == thresholdNodeConfig.measurementType());
