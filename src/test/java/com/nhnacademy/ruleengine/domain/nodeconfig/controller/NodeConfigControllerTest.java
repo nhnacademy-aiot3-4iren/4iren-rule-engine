@@ -2,11 +2,12 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
 import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
-import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
@@ -31,8 +32,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(NodeConfigController.class)
 class NodeConfigControllerTest {

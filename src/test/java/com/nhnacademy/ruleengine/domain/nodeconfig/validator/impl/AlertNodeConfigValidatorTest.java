@@ -6,7 +6,9 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AlertNodeConfigValidatorTest {

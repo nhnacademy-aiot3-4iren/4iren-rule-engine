@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.engine.listener;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidPayloadException;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.engine.converter.SensorPayloadConverter;
 import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;

@@ -3,7 +3,6 @@ package com.nhnacademy.ruleengine.common.external.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.client.RoomSensorClient;
 import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
-import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

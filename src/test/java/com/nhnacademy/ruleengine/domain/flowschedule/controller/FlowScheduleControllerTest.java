@@ -1,8 +1,12 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
 import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
-import com.nhnacademy.ruleengine.domain.flowschedule.dto.*;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateResponse;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleListResponse;
+import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleResponse;
 import com.nhnacademy.ruleengine.domain.flowschedule.service.FlowScheduleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +27,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FlowScheduleController.class)
 class FlowScheduleControllerTest {

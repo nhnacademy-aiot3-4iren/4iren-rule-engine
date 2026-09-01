@@ -4,12 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.engine.converter.SensorPayloadConverter;
@@ -48,9 +43,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringJUnitConfig(classes = SensorDataListenerIntegrationTest.TestConfig.class)
 @TestPropertySource(properties = {

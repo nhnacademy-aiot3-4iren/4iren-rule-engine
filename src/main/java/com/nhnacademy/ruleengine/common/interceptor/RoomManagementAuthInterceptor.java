@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.common.interceptor;
 
-import com.nhnacademy.ruleengine.common.external.client.RoomManagementClient;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
 import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
 import jakarta.servlet.http.HttpServletRequest;

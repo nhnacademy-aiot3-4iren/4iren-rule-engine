@@ -8,7 +8,6 @@ import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,14 +1,14 @@
 package com.nhnacademy.ruleengine.engine.executor.runtimestate;
 
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OrRuntimeStateTest {
 

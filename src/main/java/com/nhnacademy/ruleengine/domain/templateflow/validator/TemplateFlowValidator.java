@@ -9,7 +9,6 @@ import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateConnectionInfo;
 import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import org.springframework.stereotype.Component;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
 

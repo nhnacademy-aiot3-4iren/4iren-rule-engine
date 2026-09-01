@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.common.config;
 
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
