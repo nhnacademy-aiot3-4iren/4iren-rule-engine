@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.NodeTypeNotFoundException;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class NodeConfigValidatorRegistryTest {
         NodeConfig config = mock(NodeConfig.class);
         when(validator.validate(config, List.of())).thenReturn(List.of());
 
-        List<String> errors = registry.validate(NodeType.THRESHOLD, config, List.of());
+        List<NodeConfigError> errors = registry.validate(NodeType.THRESHOLD, config, List.of());
 
         assertThat(errors).isEmpty();
         verify(validator).validate(config, List.of());

@@ -6,6 +6,7 @@ import com.nhnacademy.ruleengine.domain.flow.dto.ConnectionInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.flow.enums.BranchType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
@@ -140,14 +141,12 @@ public class FlowValidator {
             }
 
             if (nodeConfigValidatorRegistry != null) {
-                List<String> configErrors = nodeConfigValidatorRegistry.validate(node.nodeType(), nodeConfig, sensorMetaInfos);
-                if (!configErrors.isEmpty()) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(
-                            node.nodeId(),
-                            "nodeConfig",
-                            "해당 노드의 nodeConfig 검증에 실패했습니다."
-                    ));
-                }
+                List<NodeConfigValidationResponse.NodeConfigError> configErrors = nodeConfigValidatorRegistry.validate(node.nodeType(), nodeConfig, sensorMetaInfos);
+                configErrors.forEach(error -> errors.add(ValidationErrorResponse.ValidationError.of(
+                        node.nodeId(),
+                        error.field(),
+                        error.detailMessage()
+                )));
             }
         }
     }

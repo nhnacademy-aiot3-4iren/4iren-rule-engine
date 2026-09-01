@@ -4,6 +4,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
@@ -91,9 +92,9 @@ class NodeConfigControllerTest {
                 sampleThresholdConfig()
         );
 
-        List<String> errors = List.of(
-                "threshold 값은 0보다 커야 합니다",
-                "measurementType은 필수입니다"
+        List<NodeConfigError> errors = List.of(
+                NodeConfigError.of("nodeConfig.threshold", "threshold 값은 0보다 커야 합니다"),
+                NodeConfigError.of("nodeConfig.measurementType", "measurementType은 필수입니다")
         );
 
         given(nodeConfigService.validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class)))
@@ -104,9 +105,12 @@ class NodeConfigControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.valid").value(false))
+                .andExpect(jsonPath("$.message").value("노드 설정을 확인해주세요."))
                 .andExpect(jsonPath("$.errors").isArray())
-                .andExpect(jsonPath("$.errors[0]").value("threshold 값은 0보다 커야 합니다"))
-                .andExpect(jsonPath("$.errors[1]").value("measurementType은 필수입니다"));
+                .andExpect(jsonPath("$.errors[0].field").value("nodeConfig.threshold"))
+                .andExpect(jsonPath("$.errors[0].detailMessage").value("threshold 값은 0보다 커야 합니다"))
+                .andExpect(jsonPath("$.errors[1].field").value("nodeConfig.measurementType"))
+                .andExpect(jsonPath("$.errors[1].detailMessage").value("measurementType은 필수입니다"));
     }
     @Test
     @DisplayName("노드 설정 검증 - nodeConfig null이면 400")
@@ -147,5 +151,4 @@ class NodeConfigControllerTest {
                 .andExpect(jsonPath("$.valid").value(true));
     }
 }
-
 
