@@ -7,6 +7,8 @@
 
 ### [플로우 생성] 새로운 플로우 등록 (음수 임시 ID 포함)
 POST {{baseUrl}}/rooms/{{roomId}}/flows
+X-User-Id: 1
+X-User-Role: ADMIN
 Content-Type: application/json
 
 {
@@ -16,9 +18,18 @@ Content-Type: application/json
   "nodes": [
     {
       "nodeId": -1,
+      "nodeName": "시작",
+      "nodeType": "START",
+      "nodeConfig": {
+        "nodeType": "START",
+        "x": 0,
+        "y": 150
+      }
+    },
+    {
+      "nodeId": -2,
       "nodeName": "이산화탄소 임계치 판단 노드",
       "nodeType": "THRESHOLD",
-      "cooldownSec": 60,
       "nodeConfig": {
         "nodeType": "THRESHOLD",
         "x": 100,
@@ -30,24 +41,30 @@ Content-Type: application/json
       }
     },
     {
-      "nodeId": -2,
+      "nodeId": -3,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
-      "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
         "x": 300,
         "y": 150,
         "channel": "TELEGRAM",
         "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED"
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec":300
       }
     }
   ],
   "connections": [
     {
       "sourceNodeId": -1,
-      "targetNodeId": -2
+      "targetNodeId": -2,
+      "branchType": "TRUE"
+    },
+    {
+      "sourceNodeId": -2,
+      "targetNodeId": -3,
+      "branchType": "TRUE"
     }
   ]
 }
@@ -87,7 +104,6 @@ Content-Type: application/json
       "nodeId": 1,
       "nodeName": "온도 평균값 판단 노드",
       "nodeType": "AVERAGE",
-      "cooldownSec": 120,
       "nodeConfig": {
         "nodeType": "AVERAGE",
         "x": 120,
@@ -103,7 +119,6 @@ Content-Type: application/json
       "nodeId": -2,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
-      "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
         "x": 300,

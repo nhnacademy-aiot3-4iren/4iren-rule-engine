@@ -48,7 +48,7 @@ class AlertNodeExecutorTest {
         AlertNodeConfig config = new AlertNodeConfig(
                 NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, dedupWindowSec
         );
-        ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config, null);
+        ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config);
         FlowContext context = flowContext();
         ExecutionPath path = ExecutionPath.start(node.nodeId(), null, null);
 

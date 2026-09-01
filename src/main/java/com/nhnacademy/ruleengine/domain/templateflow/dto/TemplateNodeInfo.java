@@ -18,10 +18,7 @@ public record TemplateNodeInfo(
         NodeType nodeType,
 
         @NotNull
-        NodeConfig nodeConfig,
-
-        Integer cooldownSec
-
+        NodeConfig nodeConfig
 ) {
 
     public boolean isNew(){

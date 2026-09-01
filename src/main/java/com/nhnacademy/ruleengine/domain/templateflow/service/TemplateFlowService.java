@@ -111,7 +111,7 @@ public class TemplateFlowService {
                             .nodeName(n.nodeName())
                             .nodeType(n.nodeType())
                             .nodeConfig(n.nodeConfig())
-                            .cooldownSec(n.cooldownSec()).build()
+                            .build()
                     );
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });

@@ -133,7 +133,7 @@ class DurationNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(DurationNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "durationNode", NodeType.DURATION, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "durationNode", NodeType.DURATION, config);
     }
 
     private FlowContext flowContext(Instant triggeredAt) {

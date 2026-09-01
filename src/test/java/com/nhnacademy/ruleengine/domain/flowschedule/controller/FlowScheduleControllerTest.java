@@ -1,7 +1,10 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.*;
 import com.nhnacademy.ruleengine.domain.flowschedule.service.FlowScheduleService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -32,15 +36,32 @@ class FlowScheduleControllerTest {
     @MockitoBean
     private FlowScheduleService flowScheduleService;
 
+    @MockitoBean
+    private RoomManagementCacheService roomManagementCacheService;
+
     private static final Long ROOM_ID = 1L;
     private static final Long FLOW_ID = 1L;
     private static final Long SCHEDULE_ID = 1L;
+    private static final Long USER_ID = 1L;
 
     private static final String BASE_URL =
             "/api/rule/rooms/{room-id}/flows/{flow-id}/schedules";
     private static final String DETAIL_URL =
             "/api/rule/rooms/{room-id}/flows/{flow-id}/schedules/{schedule-id}";
 
+    @BeforeEach
+    void setUp() {
+        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+                .willReturn(new RoomManagementAccessResponse(true));
+    }
+
+    private RequestPostProcessor authHeaders() {
+        return request -> {
+            request.addHeader("X-User-Id", USER_ID.toString());
+            request.addHeader("X-User-Role", "ADMIN");
+            return request;
+        };
+    }
 
     @Test
     @DisplayName("스케줄 생성 - 성공 201")
@@ -50,6 +71,7 @@ class FlowScheduleControllerTest {
                 .willReturn(FlowScheduleCreateResponse.of(SCHEDULE_ID));
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleCreateRequest())))
                 .andExpect(status().isCreated())
@@ -66,6 +88,7 @@ class FlowScheduleControllerTest {
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -81,6 +104,7 @@ class FlowScheduleControllerTest {
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -96,6 +120,7 @@ class FlowScheduleControllerTest {
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -108,7 +133,8 @@ class FlowScheduleControllerTest {
         given(flowScheduleService.getFlowScheduleList(FLOW_ID, ROOM_ID))
                 .willReturn(sampleListResponse());
 
-        mockMvc.perform(get(BASE_URL, ROOM_ID, FLOW_ID))
+        mockMvc.perform(get(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flowId").value(FLOW_ID))
                 .andExpect(jsonPath("$.schedules").isArray())
@@ -127,7 +153,8 @@ class FlowScheduleControllerTest {
                         .schedules(List.of())
                         .build());
 
-        mockMvc.perform(get(BASE_URL, ROOM_ID, FLOW_ID))
+        mockMvc.perform(get(BASE_URL, ROOM_ID, FLOW_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.schedules").isEmpty());
     }
@@ -138,7 +165,8 @@ class FlowScheduleControllerTest {
         given(flowScheduleService.getFlowScheduleDetail(ROOM_ID, FLOW_ID, SCHEDULE_ID))
                 .willReturn(sampleScheduleResponse());
 
-        mockMvc.perform(get(DETAIL_URL, ROOM_ID, FLOW_ID, SCHEDULE_ID))
+        mockMvc.perform(get(DETAIL_URL, ROOM_ID, FLOW_ID, SCHEDULE_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.scheduleId").value(SCHEDULE_ID))
                 .andExpect(jsonPath("$.dayOfWeek").value("MONDAY"))
@@ -151,7 +179,8 @@ class FlowScheduleControllerTest {
         willDoNothing().given(flowScheduleService)
                 .deleteFlowSchedule(ROOM_ID, FLOW_ID, SCHEDULE_ID);
 
-        mockMvc.perform(delete(DETAIL_URL, ROOM_ID, FLOW_ID, SCHEDULE_ID))
+        mockMvc.perform(delete(DETAIL_URL, ROOM_ID, FLOW_ID, SCHEDULE_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isNoContent());
     }
 

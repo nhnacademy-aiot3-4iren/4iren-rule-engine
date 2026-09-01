@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class RoomManagementCacheService {
 
     private final RoomManagementClient managementClient;
-    @Cacheable(value = "management-access:", key = "#roomId + ':' + #userId", cacheManager = "roomManagementCacheManager")
+    @Cacheable(value = "management-access", key = "#roomId + ':' + #userId", cacheManager = "roomManagementCacheManager")
     public RoomManagementAccessResponse getManagementAllowed(Long roomId, Long userId){
         log.info("management-access:... cache miss, 외부 API 조회");
 

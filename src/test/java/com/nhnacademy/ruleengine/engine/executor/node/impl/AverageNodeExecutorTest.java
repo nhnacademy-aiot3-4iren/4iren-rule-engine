@@ -132,7 +132,7 @@ class AverageNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(AverageNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "averageNode", NodeType.AVERAGE, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "averageNode", NodeType.AVERAGE, config);
     }
 
     private FlowContext flowContext(Instant triggeredAt) {

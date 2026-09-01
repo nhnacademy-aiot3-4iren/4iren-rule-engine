@@ -136,7 +136,7 @@ class GradientNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(GradientNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "gradientNode", NodeType.GRADIENT, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "gradientNode", NodeType.GRADIENT, config);
     }
 
     private FlowContext flowContext(Instant triggeredAt) {

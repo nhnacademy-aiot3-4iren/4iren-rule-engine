@@ -147,11 +147,11 @@ class TemplateFlowControllerTest {
     }
 
     private TemplateNodeInfo thresholdNodeInfo() {
-        return new TemplateNodeInfo(-1L, "온도 임계값", NodeType.THRESHOLD, thresholdNodeConfig(), null);
+        return new TemplateNodeInfo(-1L, "온도 임계값", NodeType.THRESHOLD, thresholdNodeConfig());
     }
 
     private TemplateNodeInfo alertNodeInfo() {
-        return new TemplateNodeInfo(-2L, "알림", NodeType.ALERT, alertNodeConfig(), null);
+        return new TemplateNodeInfo(-2L, "알림", NodeType.ALERT, alertNodeConfig());
     }
 
     private TemplateConnectionInfo sampleConnectionInfo() {
@@ -182,7 +182,6 @@ class TemplateFlowControllerTest {
                 .nodeName("온도 임계값")
                 .nodeType(NodeType.THRESHOLD)
                 .nodeConfig(thresholdNodeConfig())
-                .cooldownSec(0)
                 .build();
     }
 

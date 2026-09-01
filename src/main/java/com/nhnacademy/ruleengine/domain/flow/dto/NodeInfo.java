@@ -18,12 +18,7 @@ public record NodeInfo(
         NodeType nodeType,
 
         @NotNull
-        NodeConfig nodeConfig,
-
-        Integer cooldownSec
-
-
-
+        NodeConfig nodeConfig
 ) {
         public boolean isNew() {
                 return nodeId < 0;

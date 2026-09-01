@@ -88,7 +88,7 @@ class OrNodeExecutorTest {
     }
 
     private ExecutableFlow twoInputFlow() {
-        ExecutableFlow.ExecutableNode orNode = new ExecutableFlow.ExecutableNode(OR_NODE_ID, "orNode", NodeType.OR, null, null);
+        ExecutableFlow.ExecutableNode orNode = new ExecutableFlow.ExecutableNode(OR_NODE_ID, "orNode", NodeType.OR, null);
 
         Map<Long, ExecutableFlow.ExecutableNode> nodeMap = new HashMap<>();
         nodeMap.put(OR_NODE_ID, orNode);

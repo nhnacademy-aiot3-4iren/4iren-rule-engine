@@ -112,7 +112,7 @@ class ThresholdNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(ThresholdNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "thresholdNode", NodeType.THRESHOLD, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "thresholdNode", NodeType.THRESHOLD, config);
     }
 
     private EnvironmentContext environmentContext(String metric, double value) {

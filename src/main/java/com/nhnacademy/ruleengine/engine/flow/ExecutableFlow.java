@@ -27,8 +27,7 @@ public record ExecutableFlow(
             Long nodeId,
             String nodeName,
             NodeType nodeType,
-            NodeConfig nodeConfig,
-            Integer cooldownSec
+            NodeConfig nodeConfig
     ) {}
 
     public record ExecutableSchedule(

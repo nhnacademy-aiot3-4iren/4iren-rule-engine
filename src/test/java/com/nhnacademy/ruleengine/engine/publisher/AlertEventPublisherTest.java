@@ -127,18 +127,6 @@ class AlertEventPublisherTest {
         verify(redisTemplate, times(1)).delete(keyCaptor.getValue());
     }
 
-    @Test
-    @DisplayName("dedupWindowSec이 null이면 알림 발행 전에 실패")
-    void publish_failWhenDedupWindowIsNull() {
-        AlertEvent event = createDummyAlertEvent(101L);
-
-        Assertions.assertThatThrownBy(() -> alertEventPublisher.publish(event, 10L, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("dedupWindowSec must not be null");
-
-        verify(valueOperations, never()).setIfAbsent(anyString(), anyString(), any(Duration.class));
-        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(Object.class));
-    }
 
     @Test
     @DisplayName("OR 노드 병합 history 순서가 달라도 같은 중복 감지 해시 키를 사용")

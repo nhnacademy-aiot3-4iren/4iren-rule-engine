@@ -68,17 +68,17 @@ class FlowServiceTest {
     private NodeInfo createConditionNode(Long id) {
         ThresholdNodeConfig nodeConfig = mock(ThresholdNodeConfig.class);
         lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.THRESHOLD);
-        return new NodeInfo(id, "condition", NodeType.THRESHOLD, nodeConfig, 0);
+        return new NodeInfo(id, "condition", NodeType.THRESHOLD, nodeConfig);
     }
     private NodeInfo createStartNode(Long id) {
         StartNodeConfig nodeConfig = mock(StartNodeConfig.class);
         lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.START);
-        return new NodeInfo(id, "start", NodeType.START, nodeConfig, 0);
+        return new NodeInfo(id, "start", NodeType.START, nodeConfig);
     }
     private NodeInfo createActionNode(Long id) {
         AlertNodeConfig nodeConfig = mock(AlertNodeConfig.class);
         lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.ALERT);
-        return new NodeInfo(id, "action", NodeType.ALERT, nodeConfig, 0);
+        return new NodeInfo(id, "action", NodeType.ALERT, nodeConfig);
     }
     private Flow createMockFlow(Long flowId, boolean isTemplate) {
         Flow flow = mock(Flow.class);

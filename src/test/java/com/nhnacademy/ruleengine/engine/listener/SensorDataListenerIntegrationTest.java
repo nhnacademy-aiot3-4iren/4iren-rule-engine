@@ -129,15 +129,13 @@ class SensorDataListenerIntegrationTest {
                 START_NODE_ID,
                 "start",
                 NodeType.START,
-                null,
                 null
         );
         ExecutableFlow.ExecutableNode thresholdNode = new ExecutableFlow.ExecutableNode(
                 THRESHOLD_NODE_ID,
                 "temperature threshold",
                 NodeType.THRESHOLD,
-                new ThresholdNodeConfig(NodeType.THRESHOLD, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 30.0),
-                null
+                new ThresholdNodeConfig(NodeType.THRESHOLD, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 30.0)
         );
         ExecutableFlow.ExecutableNode alertNode = new ExecutableFlow.ExecutableNode(
                 ALERT_NODE_ID,
@@ -151,8 +149,7 @@ class SensorDataListenerIntegrationTest {
                         "온도 경고",
                         AlertType.COMFORT_LIMIT_EXCEEDED,
                         DEDUP_WINDOW_SEC
-                ),
-                null
+                )
         );
 
         return new ExecutableFlow(
