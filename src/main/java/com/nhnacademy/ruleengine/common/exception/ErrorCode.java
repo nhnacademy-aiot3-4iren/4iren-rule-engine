@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
+    //일반 응답용 (ErrorResponse)
     //400 bad request
     INVALID_CONNECTION(HttpStatus.BAD_REQUEST, "INVALID_CONNECTION", "유효하지 않은 Connection입니다."),
     INVALID_FLOW(HttpStatus.BAD_REQUEST, "INVALID_FLOW", "유효하지 않은 Flow입니다."),
     INVALID_FLOW_SCHEDULE(HttpStatus.BAD_REQUEST, "INVALID_FLOW_SCHEDULE", "유효하지 않은 Flow Schedule입니다."),
     INVALID_NODE(HttpStatus.BAD_REQUEST, "INVALID_NODE", "유효하지 않은 Node입니다."),
     INVALID_PAYLOAD(HttpStatus.BAD_REQUEST, "INVALID_PAYLOAD", "유효하지 않은 센서 페이로드입니다."),
+    INVALID_MEASUREMENT_TYPE(HttpStatus.BAD_REQUEST,  "INVALID_MEASUREMENT_TYPE", "유효하지 않은 MeasurementType 입니다."),
 
     //검증 응답용(ValidationError)
     FLOW_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FLOW_VALIDATION_FAILED","플로우 무결성 검증에 실패했습니다."),

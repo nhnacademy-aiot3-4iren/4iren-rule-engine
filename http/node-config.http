@@ -3,12 +3,10 @@
 @port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
-@nodeId = 3
+@nodeId = 1
 @tempNodeId = -1
 
-### [노드 설정 조회 및 메타 정보] 특정 노드의 설정 양식 및 장비 옵션 추출
-GET {{baseUrl}}/rooms/{{roomId}}/node-config/{{tempNodeId}}?nodeType=DURATION
-Accept: application/json
+
 
 ### [노드 설정 유효성 검증] 정상 케이스 테스트
 POST {{baseUrl}}/rooms/{{roomId}}/validate-config

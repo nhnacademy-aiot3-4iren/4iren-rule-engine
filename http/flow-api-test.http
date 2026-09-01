@@ -3,16 +3,16 @@
 @port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
-@flowId = 2
+@flowId = 1
 
 ### [플로우 생성] 새로운 플로우 등록 (음수 임시 ID 포함)
 POST {{baseUrl}}/rooms/{{roomId}}/flows
-
 Content-Type: application/json
 
 {
   "flowName": "강의실 101호 쾌적도 제어 플로우",
   "description": "CO2 농도가 높을 때 텔레그램으로 환기 알림을 보내는 플로우",
+  "isActive": true,
   "nodes": [
     {
       "nodeId": -1,
@@ -124,3 +124,15 @@ Content-Type: application/json
 
 ### [플로우 삭제]
 DELETE {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+
+### [플로우 활성화/비활성화 설정]
+PATCH {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}/active
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+### [플로우 빌드 폼 호출] 강의실 기준 센서 메타 정보 보냄
+GET {{baseUrl}}/rooms/{{roomId}}/flows/form
+Accept: application/json

@@ -21,21 +21,21 @@ class AlertNodeConfigValidatorTest {
     @Test
     @DisplayName("정상 설정인 경우 빈 에러 반환")
     void validate_success() {
-        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "Title", AlertType.VENTILATION_RECOMMEND);
+        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "Title", AlertType.VENTILATION_RECOMMEND, 300);
         assertThat(validator.validate(config, List.of())).isEmpty();
     }
 
     @Test
     @DisplayName("채널 정보가 없으면 에러 반환")
     void validate_missingChannel() {
-        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, null, "Title", AlertType.VENTILATION_RECOMMEND);
+        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, null, "Title", AlertType.VENTILATION_RECOMMEND, 300);
         assertThat(validator.validate(config, List.of())).isNotEmpty();
     }
 
     @Test
     @DisplayName("알림 제목이 비어있으면 에러 반환")
     void validate_missingTitle() {
-        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "   ", AlertType.VENTILATION_RECOMMEND);
+        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "   ", AlertType.VENTILATION_RECOMMEND, 300);
         assertThat(validator.validate(config, List.of())).isNotEmpty();
     }
 }

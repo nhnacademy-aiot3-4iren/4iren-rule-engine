@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.common.advice;
 
-import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.BaseException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
@@ -18,9 +18,9 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
 
     @Test
-    @DisplayName("BusinessException 발생 시 해당 에러 코드의 상태 코드와 메시지를 반환")
+    @DisplayName("BaseException 발생 시 해당 에러 코드의 상태 코드와 메시지를 반환")
     void handleBusinessException_ReturnsErrorResponse() {
-        BusinessException exception = new InvalidNodeException();
+        BaseException exception = new InvalidNodeException();
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleBusinessException(exception);
 
@@ -36,11 +36,11 @@ class GlobalExceptionHandlerTest {
         List<String> validationErrors = List.of("Node count is invalid", "Cycle detected");
         FlowValidationFailed exception = new FlowValidationFailed(validationErrors);
 
-        ResponseEntity<ValidationError> response = exceptionHandler.handleValidationError(exception);
+        ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().code()).isEqualTo(exception.getMessage());
+        assertThat(response.getBody().errorMessage()).isEqualTo(exception.getMessage());
         assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
     }
 }

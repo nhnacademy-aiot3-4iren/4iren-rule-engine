@@ -5,6 +5,7 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public record DurationNodeConfig(
         @NotNull
@@ -29,6 +30,7 @@ public record DurationNodeConfig(
         Double threshold,
 
         @NotNull
+        @Positive
         Integer durationSec
 
 

@@ -23,7 +23,7 @@ public record FlowUpdateRequest(
         @NotEmpty
         List<@Valid NodeInfo> nodes,
 
-        @NotNull
+        @NotEmpty
         List<@Valid ConnectionInfo> connections
 ) {
 

@@ -92,7 +92,7 @@ class NodeRepositoryTest {
 
 
     @Test
-    @DisplayName("findAllByFlowId - 해당 플로우 노드만 반환")
+    @DisplayName("findAllBySourceNodeFlowId - 해당 플로우 노드만 반환")
     void findAllByFlowId_returnsNodesOfFlow() {
         List<Node> result = nodeRepository.findAllByFlowId(flow1.getId());
 
@@ -107,7 +107,7 @@ class NodeRepositoryTest {
     }
 
     @Test
-    @DisplayName("deleteAllByFlowId - 해당 플로우 노드 삭제")
+    @DisplayName("deleteAllByNodeFlowId - 해당 플로우 노드 삭제")
     void deleteAllByFlowId_deletesNodesOfFlow() {
         nodeRepository.deleteAllByFlowId(flow1.getId());
 
@@ -119,7 +119,7 @@ class NodeRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByFlowIdIn - 여러 플로우 노드 한번에 조회")
+    @DisplayName("findAllBySourceNodeFlowIdIn - 여러 플로우 노드 한번에 조회")
     void findAllByFlowIdIn_returnsAllNodes() {
         List<Node> result = nodeRepository.findAllByFlowIdIn(
                 List.of(flow1.getId(), flow2.getId())

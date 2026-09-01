@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementTypeException;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -37,6 +38,6 @@ public enum MeasurementType {
         if (type != null) {
             return type;
         }
-        throw new IllegalArgumentException("지원하지 않는 MeasurementType 입니다: " + value);
+        throw new InvalidMeasurementTypeException();
     }
 }

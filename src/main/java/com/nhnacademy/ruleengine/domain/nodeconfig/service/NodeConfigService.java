@@ -1,13 +1,44 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
+import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
+import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface NodeConfigService {
+import java.util.*;
 
-    NodeConfigResponse getNodeConfigNMeta(Long roomId, Long nodeId, NodeType nodeType);
-//    //nodeConfig검증 api
-    NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request);
+@Transactional(readOnly = true)
+@Service
+@RequiredArgsConstructor
+public class NodeConfigService {
+    private final NodeRepository nodeRepository;
+    private final NodeConfigValidatorRegistry validatorRegistry;
+    private final RoomSensorMetaService roomSensorMetaService;
+
+    public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
+        if (request.nodeConfig() == null) {
+            throw new InvalidNodeException();
+        }
+
+        // 액션 노드는 sensorMeta 조회 불필요
+        List<SensorMetaInfo> sensorMetas = request.nodeConfig().nodeType().isActionNode()
+                ? List.of()
+                : roomSensorMetaService.getSensorMetaList(roomId);
+
+        List<String> errors = validatorRegistry.validate(
+                request.nodeConfig().nodeType(),
+                request.nodeConfig(),
+                sensorMetas
+        );
+
+        return errors.isEmpty()
+                ? NodeConfigValidationResponse.success()
+                : NodeConfigValidationResponse.failure(errors);
+
+    }
 }

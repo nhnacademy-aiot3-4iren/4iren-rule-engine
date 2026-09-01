@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
@@ -28,7 +28,7 @@ class AverageNodeConfigValidatorTest {
         AverageNodeConfig config = new AverageNodeConfig(
                 NodeType.AVERAGE, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 25.0, 60
         );
-        List<SensorStaticMeta> metas = List.of(SensorStaticMeta.of(MeasurementType.TEMPERATURE, "C"));
+        List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C"));
 
         List<String> errors = validator.validate(config, metas);
         assertThat(errors).isEmpty();
@@ -40,7 +40,7 @@ class AverageNodeConfigValidatorTest {
         AverageNodeConfig config = new AverageNodeConfig(
                 NodeType.AVERAGE, 0, 0, MeasurementType.CO2, "ppm", Operator.GT, 1000.0, 60
         );
-        List<SensorStaticMeta> metas = List.of(SensorStaticMeta.of(MeasurementType.TEMPERATURE, "C")); // CO2 없음
+        List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C")); // CO2 없음
 
         List<String> errors = validator.validate(config, metas);
         assertThat(errors).hasSize(1);
@@ -53,7 +53,7 @@ class AverageNodeConfigValidatorTest {
         AverageNodeConfig config = new AverageNodeConfig(
                 NodeType.AVERAGE, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 25.0, 5 // 10 미만
         );
-        List<SensorStaticMeta> metas = List.of(SensorStaticMeta.of(MeasurementType.TEMPERATURE, "C"));
+        List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C"));
 
         List<String> errors = validator.validate(config, metas);
 

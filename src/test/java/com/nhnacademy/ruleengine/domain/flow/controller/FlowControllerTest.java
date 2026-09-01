@@ -59,7 +59,8 @@ class FlowControllerTest {
                 100, 0,
                 AlertChannel.TELEGRAM,
                 "온도 경고",
-                AlertType.COMFORT_LIMIT_EXCEEDED
+                AlertType.COMFORT_LIMIT_EXCEEDED,
+                300
         );
     }
 
@@ -91,6 +92,7 @@ class FlowControllerTest {
         return new FlowCreateRequest(
                 "테스트 플로우",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo(), alertNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -140,6 +142,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -156,6 +159,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "a".repeat(51),
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 List.of(sampleConnectionInfo())
         );
@@ -172,6 +176,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "플로우",
                 "설명",
+                true,
                 List.of(),
                 List.of(sampleConnectionInfo())
         );
@@ -188,6 +193,7 @@ class FlowControllerTest {
         FlowCreateRequest invalid = new FlowCreateRequest(
                 "플로우",
                 "설명",
+                true,
                 List.of(thresholdNodeInfo()),
                 null
         );
@@ -231,7 +237,7 @@ class FlowControllerTest {
         RoomTemplateListResponse response = new RoomTemplateListResponse(List.of());
         given(flowService.getFlowTemplateList(ROOM_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/templates", ROOM_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates", ROOM_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roomTemplateResponseList").isArray());
     }
@@ -246,9 +252,9 @@ class FlowControllerTest {
                 .connections(List.of())
                 .build();
 
-        given(flowService.getTemplateFlowDetail(TEMPLATE_ID)).willReturn(response);
+        given(flowService.getTemplateFlowDetail(ROOM_ID,TEMPLATE_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/templates/{template-id}",
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates/{template-id}",
                         ROOM_ID, TEMPLATE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.templateName").value("온도 알림 템플릿"))
@@ -326,5 +332,37 @@ class FlowControllerTest {
 
         mockMvc.perform(delete("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("플로우 활성 상태 수정 - 성공 204")
+    void updateFlowStatus_success() throws Exception{
+        UpdateFlowStatusRequest request = new UpdateFlowStatusRequest(true);
+
+        willDoNothing().given(flowService).updateStatus(ROOM_ID, FLOW_ID, request);
+
+        mockMvc.perform(patch("/api/rule/rooms/{room-id}/flows/{flow-id}/active", ROOM_ID, FLOW_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("플로우 빌드 폼 호출")
+    void buildForm_success() throws Exception{
+        SensorMetaInfo metaInfo1 = new SensorMetaInfo(MeasurementType.CO2, "이산화탄소 농도", "실내 공기 중 이산화탄소 농도", "ppm");
+        SensorMetaInfo metaInfo2 = new SensorMetaInfo(MeasurementType.HUMIDITY, "상대습도", "실내 공기의 상대습도", "%");
+        SensorMetaInfo metaInfo3 = new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 공기의 섭씨 온도", "°C");
+        FlowBuildFormResponse response = new FlowBuildFormResponse(ROOM_ID, List.of(metaInfo1, metaInfo2, metaInfo3));
+
+        given(flowService.getFlowBuildForm(ROOM_ID)).willReturn(response);
+
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/form", ROOM_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roomId").value(ROOM_ID))
+                .andExpect(jsonPath("$.sensorMetaInfoList[0].measurementType").value("CO2"));
+
+
+
     }
 }

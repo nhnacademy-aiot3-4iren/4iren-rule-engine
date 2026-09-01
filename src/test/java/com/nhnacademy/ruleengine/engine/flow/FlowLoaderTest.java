@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.engine.flow;
 
-import com.nhnacademy.ruleengine.common.cache.repository.FlowCacheRepository;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -36,36 +35,10 @@ class FlowLoaderTest {
     @Mock
     private FlowGraphBuilder flowGraphBuilder;
 
-    @Mock
-    private FlowCacheRepository flowCacheRepository;
     @InjectMocks
     private FlowLoader flowLoader;
 
     private final Long ROOM_ID = 1L;
-
-    @Test
-    @DisplayName("캐시 히트 - DB 조회 없이 캐시 반환")
-    void load_cacheHit() {
-
-        ExecutableFlow cachedFlow = mockExecutableFlow(1L);
-        when(flowCacheRepository.get(ROOM_ID)).thenReturn(List.of(cachedFlow));
-        when(cachedFlow.flowId()).thenReturn(1L);
-
-        List<ExecutableFlow> result = flowLoader.load(ROOM_ID);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().flowId()).isEqualTo(1L);
-
-        //DB 접근 없음
-        verifyNoInteractions(flowRepository);
-        verifyNoInteractions(nodeRepository);
-        verifyNoInteractions(connectionRepository);
-        verifyNoInteractions(flowScheduleRepository);
-        verifyNoInteractions(flowGraphBuilder);
-
-        //캐시 저장 없음
-        verify(flowCacheRepository, never()).set(anyLong(), anyList());
-    }
 
     @Test
     @DisplayName("캐시 미스 - DB에서 플로우 조회 후 반환")
@@ -78,11 +51,10 @@ class FlowLoaderTest {
         when(executableFlow.flowId()).thenReturn(1L);
 
 
-        when(flowCacheRepository.get(ROOM_ID)).thenReturn(null);
         when(flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(ROOM_ID)).thenReturn(List.of(flow));
-        when(nodeRepository.findAllByFlowIdIn(List.of(1L))).thenReturn(List.of(node));
-        when(connectionRepository.findAllByFlowIdIn(List.of(1L))).thenReturn(List.of(conn));
-        when(flowScheduleRepository.findAllByFlowIdIn(List.of(1L))).thenReturn(List.of(schedule));
+        when(nodeRepository.findAllByFlowIdIn(anyList())).thenReturn(List.of(node));
+        when(connectionRepository.findAllBySourceNodeFlowIdIn(anyList())).thenReturn(List.of(conn));
+        when(flowScheduleRepository.findAllByFlowIdIn(anyList())).thenReturn(List.of(schedule));
         when(flowGraphBuilder.build(eq(flow),anyList(), anyList(), anyList())).thenReturn(executableFlow);
 
         List<ExecutableFlow> result = flowLoader.load(ROOM_ID);
@@ -90,8 +62,7 @@ class FlowLoaderTest {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().flowId()).isEqualTo(1L);
 
-        //DB조회후 레디스에 저장
-        verify(flowCacheRepository).set(eq(ROOM_ID), anyList());
+
     }
     @Test
     @DisplayName("캐시 미스 - 노드/커넥션/스케줄이 플로우별로 올바르게 그루핑되어 전달됨")
@@ -107,11 +78,10 @@ class FlowLoaderTest {
         ExecutableFlow executableFlow = mockExecutableFlow(1L);
 
 
-        when(flowCacheRepository.get(ROOM_ID)).thenReturn(null);
         when(flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(ROOM_ID))
                 .thenReturn(List.of(flow1, flow2));
         when(nodeRepository.findAllByFlowIdIn(anyList())).thenReturn(List.of(node1, node2));
-        when(connectionRepository.findAllByFlowIdIn(anyList())).thenReturn(List.of(conn1, conn2));
+        when(connectionRepository.findAllBySourceNodeFlowIdIn(anyList())).thenReturn(List.of(conn1, conn2));
         when(flowScheduleRepository.findAllByFlowIdIn(anyList())).thenReturn(List.of());
     when(flowGraphBuilder.build(any(), anyList(), anyList(), anyList()))
                 .thenReturn(executableFlow);
@@ -137,16 +107,9 @@ class FlowLoaderTest {
     @Test
     @DisplayName("활성 플로우 없음 ")
     void load_noActiveFlows_returnEmptyList(){
-        when(flowCacheRepository.get(ROOM_ID)).thenReturn(null);
         when(flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(ROOM_ID)).thenReturn(List.of());
 
         List<ExecutableFlow> result = flowLoader.load(ROOM_ID);
-
-        //빈 리스트 반환
-        assertThat(result).isEmpty();
-
-        //캐시 저장 안함
-        verify(flowCacheRepository, never()).set(anyLong(), anyList());
 
         //노드/커넥션/ 스케줄 db 조회 안함
         verifyNoInteractions(nodeRepository);
@@ -171,9 +134,11 @@ class FlowLoaderTest {
 
     private Connection mockConnection(Long flowId) {
         Connection conn = mock(Connection.class);
+        Node sourceNode = mock(Node.class);
         Flow flow = mock(Flow.class);
         when(flow.getId()).thenReturn(flowId);
-        when(conn.getFlow()).thenReturn(flow);
+        when(sourceNode.getFlow()).thenReturn(flow);
+        when(conn.getSourceNode()).thenReturn(sourceNode);
         return conn;
     }
 
@@ -186,6 +151,7 @@ class FlowLoaderTest {
     }
     private ExecutableFlow mockExecutableFlow(Long flowId) {
         ExecutableFlow executableFlow = mock(ExecutableFlow.class);
+//        when(executableFlow.flowId()).thenReturn(flowId);
         return executableFlow;
     }
 

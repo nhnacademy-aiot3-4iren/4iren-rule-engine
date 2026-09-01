@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.common.advice;
 
-import com.nhnacademy.ruleengine.common.exception.BusinessException;
+import com.nhnacademy.ruleengine.common.exception.BaseException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BaseException e) {
 
         ErrorCode errorCode = e.getErrorCode();
 
@@ -25,12 +25,11 @@ public class GlobalExceptionHandler {
 
     //
     @ExceptionHandler(FlowValidationFailed.class)
-    public ResponseEntity<ValidationError> handleValidationError(FlowValidationFailed e){
-
+    public ResponseEntity<ValidationErrorResponse> handleValidationError(FlowValidationFailed e){
 
         return ResponseEntity.badRequest()
                 .body(
-                    new ValidationError(
+                    new ValidationErrorResponse(
                             e.getMessage(),
                             e.getErrors())
                 );

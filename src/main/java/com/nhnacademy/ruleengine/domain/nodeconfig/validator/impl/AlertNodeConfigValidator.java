@@ -1,6 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.SensorStaticMeta;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
@@ -18,7 +18,7 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
     }
 
     @Override
-    public List<String> validate(NodeConfig nodeConfig, List<SensorStaticMeta> sensorStaticMetaList) {
+    public List<String> validate(NodeConfig nodeConfig, List<SensorMetaInfo> sensorMetaInfoList) {
         AlertNodeConfig c = (AlertNodeConfig) nodeConfig;
         List<String> errors = new ArrayList<>();
 
