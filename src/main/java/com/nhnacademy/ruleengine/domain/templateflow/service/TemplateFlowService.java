@@ -81,6 +81,7 @@ public class TemplateFlowService {
     @Transactional
     public void updateTemplate(Long templateId, TemplateFlowUpdateRequest request) {
         Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
+        templateFlowValidator.validate(request.nodes(), request.connections());
 
         if (!templateFlow.getIsTemplate()) {
             throw new InvalidFlowException();
@@ -88,7 +89,6 @@ public class TemplateFlowService {
 
         templateFlow.updateTemplate(request.flowName(), request.description());
         updateNodesNConnections(templateFlow, request.nodes(), request.connections());
-        templateFlowValidator.validate(request.nodes(), request.connections());
     }
 
     @Transactional

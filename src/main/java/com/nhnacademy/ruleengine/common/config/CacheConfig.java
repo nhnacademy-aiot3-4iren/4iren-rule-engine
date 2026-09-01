@@ -17,7 +17,7 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-public class CacheConfig implements CachingConfigurer {
+public class CacheConfig {
 
     @Bean
     public CacheManager sensorCacheManager(RedisConnectionFactory connectionFactory){
@@ -44,8 +44,5 @@ public class CacheConfig implements CachingConfigurer {
                 .build();
     }
 
-    @Override
-    public CacheManager cacheManager() {
-        return null;
-    }
+
 }

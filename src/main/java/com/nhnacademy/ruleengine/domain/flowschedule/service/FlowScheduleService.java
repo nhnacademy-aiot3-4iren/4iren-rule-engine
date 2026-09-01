@@ -55,6 +55,7 @@ public class FlowScheduleService {
 
         return FlowScheduleResponse.from(flowSchedule);
     }
+
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void deleteFlowSchedule( Long roomId, Long flowId, Long scheduleId) {
         if (!flowScheduleRepository.existsFlowSchedule(scheduleId, flowId, roomId)) {
