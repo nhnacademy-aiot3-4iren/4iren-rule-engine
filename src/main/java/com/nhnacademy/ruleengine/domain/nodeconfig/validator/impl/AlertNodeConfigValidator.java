@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
@@ -33,8 +32,11 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         if (c.alertType() == null) {
             errors.add(NodeConfigError.of("nodeConfig.alertType", "알림 타입을 선택해주세요"));
         }
-        if (c.dedupWindowSec() != null && c.dedupWindowSec() <= 0) {
-            errors.add(NodeConfigError.of("nodeConfig.dedupWindowSec", "dedupWindowSec은 0보다 커야 합니다"));
+
+        if (c.dedupWindowSec() == null) {
+            errors.add("dedupWindowSec은 필수입니다");
+        } else if (c.dedupWindowSec() <= 0) {
+            errors.add("dedupWindowSec은 0보다 커야 합니다");
         }
 
 

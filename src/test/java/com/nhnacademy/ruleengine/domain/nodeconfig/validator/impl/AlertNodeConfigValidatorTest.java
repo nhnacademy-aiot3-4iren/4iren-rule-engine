@@ -38,4 +38,11 @@ class AlertNodeConfigValidatorTest {
         AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "   ", AlertType.VENTILATION_RECOMMEND, 300);
         assertThat(validator.validate(config, List.of())).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("중복 감지 시간이 없으면 에러 반환")
+    void validate_missingDedupWindowSec() {
+        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "Title", AlertType.VENTILATION_RECOMMEND, null);
+        assertThat(validator.validate(config, List.of())).contains("dedupWindowSec은 필수입니다");
+    }
 }
