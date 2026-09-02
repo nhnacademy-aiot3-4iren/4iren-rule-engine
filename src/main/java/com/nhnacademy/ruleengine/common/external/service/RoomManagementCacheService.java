@@ -22,8 +22,8 @@ public class RoomManagementCacheService {
         try {
             return managementClient.getManagementAccessAllowed(roomId, userId);
         } catch (Exception e){
-        log.info("External API unavailable. Using dummy payload.", e);
-        return new RoomManagementAccessResponse(true);
+        log.info("외부 API 호출 실패. 권한 검증 불가능", e);
+        return new RoomManagementAccessResponse(false);
     }
 
     }

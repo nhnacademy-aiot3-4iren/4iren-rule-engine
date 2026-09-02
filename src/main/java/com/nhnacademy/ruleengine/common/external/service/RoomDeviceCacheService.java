@@ -26,8 +26,8 @@ public class RoomDeviceCacheService {
         try{
             return roomSensorClient.getRoomDevices(roomId);
         }catch (Exception e){
-            log.info("External API unavailable. Using dummy payload.", e);
-            return getDummyDevices();
+            log.info("외부 API 호출 실패", e);
+            return List.of();
         }
 
     }
