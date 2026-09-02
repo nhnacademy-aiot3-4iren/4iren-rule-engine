@@ -10,6 +10,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationRespo
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
+import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateConnectionInfo;
+import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +58,28 @@ public class FlowValidator {
         validateNodeConfig(nodes, sensorMetaInfos == null ? List.of() : sensorMetaInfos, errors);
         validateConnectionReferences(connections, nodeMap, errors);
         validatePortRules(nodes, connections, degrees, errors);
+        validateNoIsolatedNode(nodes, connections, errors);
         validateSingleEntryPoint(nodes,connections, errors);
         validateNoCycle(nodes, connections, errors);
 
         if(!errors.isEmpty()){
             throw new FlowValidationFailed( errors);
         }
+    }
+
+    // 고립 노드가 존재하는지 검증한다.
+    private void validateNoIsolatedNode(List<NodeInfo> nodes, List<ConnectionInfo> connections, List<ValidationErrorResponse.ValidationError> errors){
+        Set<Long> connectionNodeIds = new HashSet<>();
+        connections.forEach(
+                conn ->{
+                    connectionNodeIds.add(conn.sourceNodeId());
+                    connectionNodeIds.add(conn.targetNodeId());
+                }
+        );
+
+        nodes.stream()
+                .filter(node -> !connectionNodeIds.contains(node.nodeId()))
+                .forEach(node -> errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodes", "연결되지 않은 고립 노드가 있습니다: " + node.nodeName())));
     }
 
     // nodes, connections 자체가 null인지 먼저 확인해 이후 검증에서 NPE가 발생하지 않게 한다.

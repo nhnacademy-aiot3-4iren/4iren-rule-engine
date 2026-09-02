@@ -39,7 +39,7 @@ public class TemplateFlowValidator {
         validateConnectionReferences(connections, nodeMap, errors);
         validatePortRules(nodes, connections, degrees, errors);
         validateNoIsolatedNode(nodes, connections, errors);
-        validateSingleStartNode(nodes,connections, errors);
+        validateSingleEntryPoint(nodes,connections, errors);
         validateNoCycle(nodes, connections, errors);
 
         if(!errors.isEmpty()){
@@ -227,7 +227,7 @@ public class TemplateFlowValidator {
     }
 
     // incoming connection이 없는 시작 지점이 정확히 하나인지 검증한다.
-    private void validateSingleStartNode(List<TemplateNodeInfo> nodes, List<TemplateConnectionInfo> connections, List<ValidationErrorResponse.ValidationError> errors) {
+    private void validateSingleEntryPoint(List<TemplateNodeInfo> nodes, List<TemplateConnectionInfo> connections, List<ValidationErrorResponse.ValidationError> errors) {
         Set<Long> hasIncoming = connections.stream()
                 .map(TemplateConnectionInfo::targetNodeId)
                 .collect(Collectors.toSet());
