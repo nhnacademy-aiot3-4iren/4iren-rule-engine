@@ -18,7 +18,7 @@ public enum MeasurementType {
     TEMPERATURE("온도"),
     PRESSURE("대기압"),
     TVOC("총유기화합물"),
-    INFRARED("적외선");
+    DOOR("문열림");
 
     private final String sensorDesc;
 

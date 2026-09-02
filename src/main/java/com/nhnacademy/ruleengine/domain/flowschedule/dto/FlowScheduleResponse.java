@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import lombok.Builder;
 
@@ -13,8 +14,10 @@ public record FlowScheduleResponse (
 
         DayOfWeek dayOfWeek,
 
+        @JsonFormat(pattern = "HH:mm:ss")
         LocalTime startTime,
 
+        @JsonFormat(pattern = "HH:mm:ss")
         LocalTime endTime
 ){
     public static FlowScheduleResponse from(FlowSchedule schedule){
