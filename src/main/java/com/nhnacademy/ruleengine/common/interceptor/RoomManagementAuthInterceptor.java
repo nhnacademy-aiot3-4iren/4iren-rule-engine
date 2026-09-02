@@ -56,20 +56,20 @@ public class RoomManagementAuthInterceptor implements HandlerInterceptor {
         //외부 API 호출
         RoomManagementAccessResponse apiResponse = roomManagementCacheServiceProvider.getObject().getManagementAllowed(roomId, userId);
 
-            if (apiResponse != null && apiResponse.allowed()) {
-                return true;//최종 검증 성공 -> 컨트롤러로 진입 허용
-            } else {
-                response.sendError(HttpStatus.FORBIDDEN.value(), "해당 강의실의 관리팀 멤버가 아닙니다");
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "잘못된 형식의 ID 값입니다.");
-            return false;
-        } catch (Exception e) {
-            // 외부 서버 통신 실패 시 에러 처리 (Fail-Close)
-            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "관리팀 정보 검증 중 서버 오류가 발생했습니다.");
+        if (apiResponse != null && apiResponse.allowed()) {
+            return true;//최종 검증 성공 -> 컨트롤러로 진입 허용
+        } else {
+            response.sendError(HttpStatus.FORBIDDEN.value(), "해당 강의실의 관리팀 멤버가 아닙니다");
             return false;
         }
+    } catch (NumberFormatException e) {
+        response.sendError(HttpStatus.BAD_REQUEST.value(), "잘못된 형식의 ID 값입니다.");
+        return false;
+    } catch (Exception e) {
+        // 외부 서버 통신 실패 시 에러 처리 (Fail-Close)
+        response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "관리팀 정보 검증 중 서버 오류가 발생했습니다.");
+        return false;
+    }
 
     }
 }

@@ -2,11 +2,12 @@
 @hostname = localhost
 @port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule/templates
-@templateId = 1
+@templateId = 2
 
-### [템플릿 플로우 생성] 사이트 관리자의 마스터 템플릿 등록
+### [템플릿 플로우 생성] START -> GRADIENT -> ALERT
 POST {{baseUrl}}
 Content-Type: application/json
+Accept: application/json
 
 {
   "flowName": "표준 환기 권장 템플릿",
@@ -14,12 +15,22 @@ Content-Type: application/json
   "nodes": [
     {
       "nodeId": -1,
-      "nodeName": "기울기 판단 노드",
+      "nodeName": "시작",
+      "nodeType": "START",
+      "nodeConfig": {
+        "nodeType": "START",
+        "x": 0,
+        "y": 100
+      }
+    },
+    {
+      "nodeId": -2,
+      "nodeName": "TVOC 기울기 판단 노드",
       "nodeType": "GRADIENT",
       "nodeConfig": {
         "nodeType": "GRADIENT",
-        "x": 50,
-        "y": 50,
+        "x": 160,
+        "y": 100,
         "measurementType": "TVOC",
         "unit": "ppb",
         "operator": "GT",
@@ -28,16 +39,17 @@ Content-Type: application/json
       }
     },
     {
-      "nodeId": -2,
+      "nodeId": -3,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 300,
-        "y": 150,
+        "x": 320,
+        "y": 100,
         "channel": "TELEGRAM",
-        "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED"
+        "alertTitle": "실내 TVOC 증가 추세 감지",
+        "alertType": "VENTILATION_RECOMMEND",
+        "dedupWindowSec": 300
       }
     }
   ],
@@ -46,33 +58,69 @@ Content-Type: application/json
       "sourceNodeId": -1,
       "targetNodeId": -2,
       "branchType": "TRUE"
+    },
+    {
+      "sourceNodeId": -2,
+      "targetNodeId": -3,
+      "branchType": "TRUE"
     }
   ]
 }
+
+> {%
+    client.test("템플릿 플로우 생성 응답은 201 Created", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("생성 응답에 templateFlowId가 포함됨", function() {
+        client.assert(response.body.templateFlowId !== undefined, "templateFlowId is missing");
+    });
+%}
 
 ### [템플릿 플로우 목록 조회]
 GET {{baseUrl}}
 Accept: application/json
 
+> {%
+    client.test("템플릿 플로우 목록 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### [템플릿 플로우 상세 조회]
 GET {{baseUrl}}/{{templateId}}
 Accept: application/json
 
-### [템플릿 플로우 수정]
+> {%
+    client.test("템플릿 플로우 상세 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [템플릿 플로우 수정] START -> DURATION -> ALERT
 PUT {{baseUrl}}/{{templateId}}
 Content-Type: application/json
 
 {
-  "flowName": "표준 환기 권장 템플릿 (업데이트)",
-  "description": "지속시간 판단 조건으로 교체된 템플릿",
+  "flowName": "표준 환기 권장 템플릿 수정",
+  "description": "습도 지속시간 판단 조건으로 교체된 템플릿",
   "nodes": [
     {
-      "nodeId": -3,
-      "nodeName": "지속시간 판단 노드",
+      "nodeId": -1,
+      "nodeName": "시작",
+      "nodeType": "START",
+      "nodeConfig": {
+        "nodeType": "START",
+        "x": 0,
+        "y": 150
+      }
+    },
+    {
+      "nodeId": -2,
+      "nodeName": "습도 지속시간 판단 노드",
       "nodeType": "DURATION",
       "nodeConfig": {
         "nodeType": "DURATION",
-        "x": 150,
+        "x": 160,
         "y": 150,
         "measurementType": "HUMIDITY",
         "unit": "%",
@@ -82,27 +130,45 @@ Content-Type: application/json
       }
     },
     {
-      "nodeId": 2,
+      "nodeId": -3,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 300,
+        "x": 320,
         "y": 150,
         "channel": "TELEGRAM",
-        "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED"
+        "alertTitle": "실내 습도 장시간 낮음",
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec": 600
       }
     }
   ],
   "connections": [
     {
-      "sourceNodeId": -3,
-      "targetNodeId": 2,
-      "branchType": "FALSE"
+      "sourceNodeId": -1,
+      "targetNodeId": -2,
+      "branchType": "TRUE"
+    },
+    {
+      "sourceNodeId": -2,
+      "targetNodeId": -3,
+      "branchType": "TRUE"
     }
   ]
 }
 
+> {%
+    client.test("템플릿 플로우 수정 응답은 204 No Content", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
+
 ### [템플릿 플로우 삭제]
 DELETE {{baseUrl}}/{{templateId}}
+
+> {%
+    client.test("템플릿 플로우 삭제 응답은 204 No Content", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
