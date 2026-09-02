@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.engine.executor.node.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
@@ -46,7 +45,7 @@ class AlertNodeExecutorTest {
     void execute() {
         Integer dedupWindowSec = 120;
         AlertNodeConfig config = new AlertNodeConfig(
-                NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, dedupWindowSec
+                NodeType.ALERT, 0, 0, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, dedupWindowSec
         );
         ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config);
         FlowContext context = flowContext();

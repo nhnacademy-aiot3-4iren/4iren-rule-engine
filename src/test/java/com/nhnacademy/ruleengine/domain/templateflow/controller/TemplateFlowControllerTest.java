@@ -139,7 +139,6 @@ class TemplateFlowControllerTest {
         return new AlertNodeConfig(
                 NodeType.ALERT,
                 100, 0,
-                AlertChannel.TELEGRAM,
                 "온도 경고",
                 AlertType.COMFORT_LIMIT_EXCEEDED,
                 300

@@ -138,7 +138,6 @@ class SensorDataListenerIntegrationTest {
                         NodeType.ALERT,
                         100,
                         0,
-                        AlertChannel.TELEGRAM,
                         "온도 경고",
                         AlertType.COMFORT_LIMIT_EXCEEDED,
                         DEDUP_WINDOW_SEC
