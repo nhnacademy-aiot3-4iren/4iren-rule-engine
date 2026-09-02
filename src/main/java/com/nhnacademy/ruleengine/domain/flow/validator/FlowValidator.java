@@ -31,7 +31,7 @@ public class FlowValidator {
     // 플로우 저장/수정 요청의 노드, 연결, 노드 설정 전체 무결성을 검증한다.
     public void validate(
             @NotEmpty List<NodeInfo> nodes,
-            @NotNull List<ConnectionInfo> connections,
+            @NotEmpty List<ConnectionInfo> connections,
             List<SensorMetaInfo> sensorMetaInfos
     ){
         List<ValidationErrorResponse.ValidationError> errors =  new ArrayList<>();
