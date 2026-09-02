@@ -12,6 +12,7 @@ import com.nhnacademy.ruleengine.domain.flow.repository.ConnectionRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flow.validator.FlowValidator;
+import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
@@ -43,6 +44,7 @@ class FlowServiceTest {
     @Mock private NodeRepository nodeRepository;
     @Mock private ConnectionRepository connectionRepository;
     @Mock private FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
+    @Mock private FlowScheduleRepository flowScheduleRepository;
     @Mock private RoomSensorMetaService metaService;
     @Mock private NodeConfigValidatorRegistry nodeConfigValidatorRegistry;
 
@@ -60,6 +62,7 @@ class FlowServiceTest {
                 nodeRepository,
                 connectionRepository,
                 flowTemplateMeasurementTypeRepository,
+                flowScheduleRepository,
                 metaService,
                 flowValidator
         );
