@@ -63,19 +63,19 @@ class TemplateFlowServiceTest {
         ThresholdNodeConfig config = mock(ThresholdNodeConfig.class);
         lenient().when(config.nodeType()).thenReturn(NodeType.THRESHOLD);
         lenient().when(config.measurementType()).thenReturn(MeasurementType.TEMPERATURE);
-        return new TemplateNodeInfo(id, "condition-" + id, NodeType.THRESHOLD, config, 0);
+        return new TemplateNodeInfo(id, "condition-" + id, NodeType.THRESHOLD, config);
     }
 
     private TemplateNodeInfo createStartNode(Long id) {
         StartNodeConfig config = mock(StartNodeConfig.class);
         lenient().when(config.nodeType()).thenReturn(NodeType.START);
-        return new TemplateNodeInfo(id, "start-" + id, NodeType.START, config, 0);
+        return new TemplateNodeInfo(id, "start-" + id, NodeType.START, config);
     }
 
     private TemplateNodeInfo createActionNode(Long id) {
         AlertNodeConfig config = mock(AlertNodeConfig.class);
         lenient().when(config.nodeType()).thenReturn(NodeType.ALERT);
-        return new TemplateNodeInfo(id, "action-" + id, NodeType.ALERT, config, 0);
+        return new TemplateNodeInfo(id, "action-" + id, NodeType.ALERT, config);
     }
 
     private Flow createMockFlow(Long flowId, boolean isTemplate) {

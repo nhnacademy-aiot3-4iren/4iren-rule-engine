@@ -7,7 +7,9 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DurationNodeConfigValidatorTest {

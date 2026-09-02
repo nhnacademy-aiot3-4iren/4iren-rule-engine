@@ -81,9 +81,9 @@ class NodeRepositoryTest {
 
 
         try {
-        nodeRepository.save(Node.builder().flow(flow1).nodeName("노드1").nodeType(NodeType.THRESHOLD).nodeConfig(objectMapper.readValue(thresholdJson, NodeConfig.class)).cooldownSec(500).build());
-        nodeRepository.save(Node.builder().flow(flow1).nodeName("노드2").nodeType(NodeType.ALERT).nodeConfig(objectMapper.readValue(alertJson, NodeConfig.class)).cooldownSec(300).build());
-        nodeRepository.save(Node.builder().flow(flow2).nodeName("노드3").nodeType(NodeType.AVERAGE).nodeConfig(objectMapper.readValue(alertJson, NodeConfig.class)).cooldownSec(300).build());
+        nodeRepository.save(Node.builder().flow(flow1).nodeName("노드1").nodeType(NodeType.THRESHOLD).nodeConfig(objectMapper.readValue(thresholdJson, NodeConfig.class)).build());
+        nodeRepository.save(Node.builder().flow(flow1).nodeName("노드2").nodeType(NodeType.ALERT).nodeConfig(objectMapper.readValue(alertJson, NodeConfig.class)).build());
+        nodeRepository.save(Node.builder().flow(flow2).nodeName("노드3").nodeType(NodeType.AVERAGE).nodeConfig(objectMapper.readValue(alertJson, NodeConfig.class)).build());
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

@@ -3,14 +3,15 @@
 @port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
-@nodeId = 1
-@tempNodeId = -1
+@userId = 1
+@userRole = ADMIN
 
-
-
-### [노드 설정 유효성 검증] 정상 케이스 테스트
+### [노드 설정 유효성 검증] THRESHOLD 정상
 POST {{baseUrl}}/rooms/{{roomId}}/validate-config
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Content-Type: application/json
+Accept: application/json
 
 {
   "nodeConfig": {
@@ -24,9 +25,43 @@ Content-Type: application/json
   }
 }
 
-### [노드 설정 유효성 검증] 실패 케이스 테스트 (잘못된 필드 누락 등)
+> {%
+    client.test("THRESHOLD 검증 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [노드 설정 유효성 검증] ALERT 정상
 POST {{baseUrl}}/rooms/{{roomId}}/validate-config
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Content-Type: application/json
+Accept: application/json
+
+{
+  "nodeConfig": {
+    "nodeType": "ALERT",
+    "x": 320,
+    "y": 200,
+    "channel": "TELEGRAM",
+    "alertTitle": "실내 환경 알림",
+    "alertType": "COMFORT_LIMIT_EXCEEDED",
+    "dedupWindowSec": 300
+  }
+}
+
+> {%
+    client.test("ALERT 검증 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [노드 설정 유효성 검증] AVERAGE 실패
+POST {{baseUrl}}/rooms/{{roomId}}/validate-config
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
+Content-Type: application/json
+Accept: application/json
 
 {
   "nodeConfig": {
@@ -34,9 +69,15 @@ Content-Type: application/json
     "x": 200,
     "y": 200,
     "measurementType": "TEMPERATURE",
-    "unit": "°C",
+    "unit": "C",
     "operator": "LT",
     "average": 22.0,
     "windowSec": -60
   }
 }
+
+> {%
+    client.test("검증 실패도 HTTP 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

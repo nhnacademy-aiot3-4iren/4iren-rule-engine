@@ -20,11 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -44,10 +44,11 @@ class AlertNodeExecutorTest {
     @Test
     @DisplayName("실행 시 항상 passed=true를 반환하고 전달받은 path를 그대로 유지")
     void execute() {
+        Integer dedupWindowSec = 120;
         AlertNodeConfig config = new AlertNodeConfig(
-                NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, null
+                NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "CO2 농도 경고", AlertType.VENTILATION_RECOMMEND, dedupWindowSec
         );
-        ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config, null);
+        ExecutableFlow.ExecutableNode node = new ExecutableFlow.ExecutableNode(1L, "alertNode", NodeType.ALERT, config);
         FlowContext context = flowContext();
         ExecutionPath path = ExecutionPath.start(node.nodeId(), null, null);
 
@@ -55,7 +56,7 @@ class AlertNodeExecutorTest {
 
         assertThat(result.passed()).isTrue();
         assertThat(result.path()).isSameAs(path);
-        verify(eventPublisher, times(1)).publish(any(AlertEvent.class));
+        verify(eventPublisher, times(1)).publish(any(AlertEvent.class), eq(node.nodeId()), eq(dedupWindowSec));
     }
 
     private FlowContext flowContext() {

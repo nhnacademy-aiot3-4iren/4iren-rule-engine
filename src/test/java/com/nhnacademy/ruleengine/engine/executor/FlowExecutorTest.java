@@ -50,14 +50,14 @@ class FlowExecutorTest {
         schedule = new ExecutableFlow.ExecutableSchedule(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(18, 0));
 
 
-        node0 = new ExecutableFlow.ExecutableNode(0L, "시작노드", NodeType.START, null, 300);
-        node1 = new ExecutableFlow.ExecutableNode(1L, "노드1", NodeType.THRESHOLD, null, 300);
-        node2 = new ExecutableFlow.ExecutableNode(2L, "노드2", NodeType.AVERAGE, null, 300);
-        node3 = new ExecutableFlow.ExecutableNode(3L, "노드3", NodeType.OR, null, 300);
-        node4 = new ExecutableFlow.ExecutableNode(4L, "노드4", NodeType.GRADIENT, null, 300);
-        node5 = new ExecutableFlow.ExecutableNode(5L, "노드5", NodeType.THRESHOLD, null, 300);
-        node6 = new ExecutableFlow.ExecutableNode(6L, "노드6", NodeType.OR, null, 300);
-        node7 = new ExecutableFlow.ExecutableNode(7L, "노드7", NodeType.DURATION, null, 300);
+        node0 = new ExecutableFlow.ExecutableNode(0L, "시작노드", NodeType.START, null);
+        node1 = new ExecutableFlow.ExecutableNode(1L, "노드1", NodeType.THRESHOLD, null);
+        node2 = new ExecutableFlow.ExecutableNode(2L, "노드2", NodeType.AVERAGE, null);
+        node3 = new ExecutableFlow.ExecutableNode(3L, "노드3", NodeType.OR, null);
+        node4 = new ExecutableFlow.ExecutableNode(4L, "노드4", NodeType.GRADIENT, null );
+        node5 = new ExecutableFlow.ExecutableNode(5L, "노드5", NodeType.THRESHOLD, null);
+        node6 = new ExecutableFlow.ExecutableNode(6L, "노드6", NodeType.OR, null);
+        node7 = new ExecutableFlow.ExecutableNode(7L, "노드7", NodeType.DURATION, null);
 
     }
 

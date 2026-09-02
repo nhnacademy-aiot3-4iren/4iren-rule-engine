@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,7 +111,7 @@ class ThresholdNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(ThresholdNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "thresholdNode", NodeType.THRESHOLD, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "thresholdNode", NodeType.THRESHOLD, config);
     }
 
     private EnvironmentContext environmentContext(String metric, double value) {

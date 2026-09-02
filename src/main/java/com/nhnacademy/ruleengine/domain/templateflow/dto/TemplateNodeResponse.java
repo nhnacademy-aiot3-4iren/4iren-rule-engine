@@ -15,9 +15,7 @@ public record TemplateNodeResponse(
 
         NodeType nodeType,
 
-        NodeConfig nodeConfig,
-
-        Integer cooldownSec
+        NodeConfig nodeConfig
 ){
     public static List<TemplateNodeResponse> fromList(
             List<Node> nodes
@@ -28,7 +26,7 @@ public record TemplateNodeResponse(
                         .nodeName(n.getNodeName())
                         .nodeType(n.getNodeType())
                         .nodeConfig(n.getNodeConfig())
-                        .cooldownSec(n.getCooldownSec()).build()
+                        .build()
                 ).toList();
     }
 }

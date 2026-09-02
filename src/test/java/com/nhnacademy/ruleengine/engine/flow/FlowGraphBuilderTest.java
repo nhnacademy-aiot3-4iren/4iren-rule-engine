@@ -131,7 +131,6 @@ class FlowGraphBuilderTest {
         when(node.getNodeName()).thenReturn("node-" + id);
         when(node.getNodeType()).thenReturn(NodeType.START);
         when(node.getNodeConfig()).thenReturn(mock(StartNodeConfig.class));
-        when(node.getCooldownSec()).thenReturn(0);
         return node;
     }
     private Node mockNode(Long id){
@@ -140,7 +139,6 @@ class FlowGraphBuilderTest {
         when(node.getNodeName()).thenReturn("node-" + id);
         when(node.getNodeType()).thenReturn(NodeType.THRESHOLD);
         when(node.getNodeConfig()).thenReturn(mock(ThresholdNodeConfig.class));
-        when(node.getCooldownSec()).thenReturn(0);
         return node;
     }
 

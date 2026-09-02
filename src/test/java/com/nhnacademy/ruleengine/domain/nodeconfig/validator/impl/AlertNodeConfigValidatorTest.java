@@ -6,7 +6,9 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AlertNodeConfigValidatorTest {
@@ -37,5 +39,12 @@ class AlertNodeConfigValidatorTest {
     void validate_missingTitle() {
         AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "   ", AlertType.VENTILATION_RECOMMEND, 300);
         assertThat(validator.validate(config, List.of())).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("중복 감지 시간이 없으면 에러 반환")
+    void validate_missingDedupWindowSec() {
+        AlertNodeConfig config = new AlertNodeConfig(NodeType.ALERT, 0, 0, AlertChannel.TELEGRAM, "Title", AlertType.VENTILATION_RECOMMEND, null);
+        assertThat(validator.validate(config, List.of()).getFirst().detailMessage()).contains("dedupWindowSec은 필수입니다");
     }
 }

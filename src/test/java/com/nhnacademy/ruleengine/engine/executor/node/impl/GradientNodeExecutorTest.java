@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,7 +135,7 @@ class GradientNodeExecutorTest {
     }
 
     private ExecutableFlow.ExecutableNode node(GradientNodeConfig config) {
-        return new ExecutableFlow.ExecutableNode(1L, "gradientNode", NodeType.GRADIENT, config, null);
+        return new ExecutableFlow.ExecutableNode(1L, "gradientNode", NodeType.GRADIENT, config);
     }
 
     private FlowContext flowContext(Instant triggeredAt) {

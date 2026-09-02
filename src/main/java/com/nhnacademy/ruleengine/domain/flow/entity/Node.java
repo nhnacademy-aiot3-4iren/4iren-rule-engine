@@ -3,7 +3,6 @@ package com.nhnacademy.ruleengine.domain.flow.entity;
 import com.nhnacademy.ruleengine.domain.flow.dto.NodeInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
-//import com.nhnacademy.ruleengine.domain.nodeconfig.converter.NodeConfigConverter;
 import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,8 +39,6 @@ public class Node {
     @JdbcTypeCode(SqlTypes.JSON)
     private NodeConfig nodeConfig;
 
-    @Column(name = "cooldown_sec")
-    private Integer cooldownSec;
 
     @OneToMany(mappedBy = "targetNode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Connection> incomingConnections = new ArrayList<>();
@@ -50,12 +47,11 @@ public class Node {
     private List<Connection> outgoingConnections = new ArrayList<>();
 
     @Builder
-    public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig, Integer cooldownSec) {
+    public Node(Flow flow, String nodeName, NodeType nodeType, NodeConfig nodeConfig ) {
         this.flow = flow;
         this.nodeName = nodeName;
         this.nodeType = nodeType;
         this.nodeConfig = nodeConfig;
-        this.cooldownSec = cooldownSec;
     }
 
     public static Node create(Flow flow, NodeInfo nodeInfo){
@@ -63,7 +59,6 @@ public class Node {
                 .nodeName(nodeInfo.nodeName())
                 .nodeType(nodeInfo.nodeType())
                 .nodeConfig(nodeInfo.nodeConfig())
-                .cooldownSec(nodeInfo.cooldownSec())
                 .build();
     }
     public static Node create(Flow flow, TemplateNodeInfo nodeInfo){
@@ -71,7 +66,6 @@ public class Node {
                 .nodeName(nodeInfo.nodeName())
                 .nodeType(nodeInfo.nodeType())
                 .nodeConfig(nodeInfo.nodeConfig())
-                .cooldownSec(nodeInfo.cooldownSec())
                 .build();
     }
 

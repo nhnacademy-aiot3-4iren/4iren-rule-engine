@@ -13,15 +13,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NodeExecutorRegistryTest {
@@ -39,7 +36,7 @@ class NodeExecutorRegistryTest {
 
     @BeforeEach
     void setUp() {
-        node = new ExecutableFlow.ExecutableNode(1L, "node", NodeType.THRESHOLD, null, null);
+        node = new ExecutableFlow.ExecutableNode(1L, "node", NodeType.THRESHOLD, null);
         path = ExecutionPath.start(1L, null, null);
         runtime = new FlowRuntime( new HashMap<>());
         context = null; // 이 테스트에서는 위임 여부만 확인하므로 FlowContext 내용은 중요하지 않음

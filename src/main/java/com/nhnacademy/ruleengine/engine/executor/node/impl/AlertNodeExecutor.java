@@ -47,7 +47,7 @@ public class AlertNodeExecutor implements NodeExecutor {
         log.info("[ALERT] flowId={} roomId={} title={} type={} channel={} history={}",
                 context.flowId(), context.roomId(), config.alertTitle(), config.alertType(), config.channel(), path.history());
 
-        alertEventPublisher.publish(alertEvent);
+        alertEventPublisher.publish(alertEvent, node.nodeId(), config.dedupWindowSec());
         return NodeExecutionResult.of(true, path);
     }
 }

@@ -80,8 +80,7 @@ public class FlowGraphBuilder {
                                 node.getId(),
                                 node.getNodeName(),
                                 node.getNodeType(),
-                                node.getNodeConfig(),
-                                node.getCooldownSec()
+                                node.getNodeConfig()
                         )
                 ));
     }

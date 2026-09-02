@@ -1,12 +1,15 @@
 package com.nhnacademy.ruleengine.domain.flow.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +27,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FlowController.class)
 class FlowControllerTest {
@@ -37,10 +42,27 @@ class FlowControllerTest {
     @MockitoBean
     private FlowService flowService;
 
+    @MockitoBean
+    private RoomManagementCacheService roomManagementCacheService;
+
     private static final Long ROOM_ID = 1L;
     private static final Long FLOW_ID = 1L;
     private static final Long TEMPLATE_ID = 1L;
+    private static final Long USER_ID = 1L;
 
+    @BeforeEach
+    void setUp() {
+        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+                .willReturn(new RoomManagementAccessResponse(true));
+    }
+
+    private RequestPostProcessor authHeaders() {
+        return request -> {
+            request.addHeader("X-User-Id", USER_ID.toString());
+            request.addHeader("X-User-Role", "ADMIN");
+            return request;
+        };
+    }
 
     private NodeConfig thresholdNodeConfig() {
         return new ThresholdNodeConfig(
@@ -69,8 +91,7 @@ class FlowControllerTest {
                 -1L,
                 "온도 임계값",
                 NodeType.THRESHOLD,
-                thresholdNodeConfig(),
-                null
+                thresholdNodeConfig()
         );
     }
 
@@ -79,8 +100,7 @@ class FlowControllerTest {
                 -2L,
                 "알림",
                 NodeType.ALERT,
-                alertNodeConfig(),
-                null
+                alertNodeConfig()
         );
     }
 
@@ -130,6 +150,7 @@ class FlowControllerTest {
                 .willReturn(FlowCreateResponse.of(FLOW_ID));
 
         mockMvc.perform(post("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleCreateRequest())))
                 .andExpect(status().isCreated())
@@ -148,6 +169,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(post("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -165,6 +187,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(post("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -182,6 +205,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(post("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -199,6 +223,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(post("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -211,7 +236,8 @@ class FlowControllerTest {
         FlowListResponse response = FlowListResponse.of(List.of());
         given(flowService.getFlowList(ROOM_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows", ROOM_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows", ROOM_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flowResponseList").isArray());
     }
@@ -223,7 +249,8 @@ class FlowControllerTest {
         given(flowService.getFlowDetail(ROOM_ID, FLOW_ID))
                 .willReturn(sampleDetailResponse());
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flowId").value(FLOW_ID))
                 .andExpect(jsonPath("$.roomId").value(ROOM_ID))
@@ -237,7 +264,8 @@ class FlowControllerTest {
         RoomTemplateListResponse response = new RoomTemplateListResponse(List.of());
         given(flowService.getFlowTemplateList(ROOM_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates", ROOM_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates", ROOM_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roomTemplateResponseList").isArray());
     }
@@ -255,7 +283,8 @@ class FlowControllerTest {
         given(flowService.getTemplateFlowDetail(ROOM_ID,TEMPLATE_ID)).willReturn(response);
 
         mockMvc.perform(get("/api/rule/rooms/{room-id}/flow-templates/{template-id}",
-                        ROOM_ID, TEMPLATE_ID))
+                        ROOM_ID, TEMPLATE_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.templateName").value("온도 알림 템플릿"))
                 .andExpect(jsonPath("$.nodes").isArray())
@@ -269,6 +298,7 @@ class FlowControllerTest {
                 .updateFlow(eq(ROOM_ID), eq(FLOW_ID), any(FlowUpdateRequest.class));
 
         mockMvc.perform(put("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleUpdateRequest())))
                 .andExpect(status().isNoContent());
@@ -286,6 +316,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(put("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -303,6 +334,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(put("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -320,6 +352,7 @@ class FlowControllerTest {
         );
 
         mockMvc.perform(put("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -330,7 +363,8 @@ class FlowControllerTest {
     void deleteFlow_success() throws Exception {
         willDoNothing().given(flowService).deleteFlow(ROOM_ID, FLOW_ID);
 
-        mockMvc.perform(delete("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID))
+        mockMvc.perform(delete("/api/rule/rooms/{room-id}/flows/{flow-id}", ROOM_ID, FLOW_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isNoContent());
     }
 
@@ -342,6 +376,7 @@ class FlowControllerTest {
         willDoNothing().given(flowService).updateStatus(ROOM_ID, FLOW_ID, request);
 
         mockMvc.perform(patch("/api/rule/rooms/{room-id}/flows/{flow-id}/active", ROOM_ID, FLOW_ID)
+                        .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
@@ -357,7 +392,8 @@ class FlowControllerTest {
 
         given(flowService.getFlowBuildForm(ROOM_ID)).willReturn(response);
 
-        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/form", ROOM_ID))
+        mockMvc.perform(get("/api/rule/rooms/{room-id}/flows/form", ROOM_ID)
+                        .with(authHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roomId").value(ROOM_ID))
                 .andExpect(jsonPath("$.sensorMetaInfoList[0].measurementType").value("CO2"));

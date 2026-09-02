@@ -5,14 +5,14 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
-import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.flow.repository.ConnectionRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
-import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.dto.*;
+import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
+import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
 import com.nhnacademy.ruleengine.domain.templateflow.validator.TemplateFlowValidator;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -111,7 +111,7 @@ public class TemplateFlowService {
                             .nodeName(n.nodeName())
                             .nodeType(n.nodeType())
                             .nodeConfig(n.nodeConfig())
-                            .cooldownSec(n.cooldownSec()).build()
+                            .build()
                     );
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });
