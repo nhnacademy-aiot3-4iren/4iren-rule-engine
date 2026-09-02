@@ -135,9 +135,9 @@ class NodeConfigControllerTest {
                 .andExpect(jsonPath("$.message").value("노드 설정을 확인해주세요."))
                 .andExpect(jsonPath("$.errors").isArray())
                 .andExpect(jsonPath("$.errors[0].field").value("nodeConfig.threshold"))
-                .andExpect(jsonPath("$.errors[0].detailMessage").value("threshold 값은 0보다 커야 합니다"))
+                .andExpect(jsonPath("$.errors[0].message").value("threshold 값은 0보다 커야 합니다"))
                 .andExpect(jsonPath("$.errors[1].field").value("nodeConfig.measurementType"))
-                .andExpect(jsonPath("$.errors[1].detailMessage").value("measurementType은 필수입니다"));
+                .andExpect(jsonPath("$.errors[1].message").value("measurementType은 필수입니다"));
     }
     @Test
     @DisplayName("노드 설정 검증 - nodeConfig null이면 400")
