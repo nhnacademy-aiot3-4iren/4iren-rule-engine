@@ -2,7 +2,6 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
-import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.*;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
@@ -16,12 +15,14 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class NodeConfigService {
-    private final NodeRepository nodeRepository;
     private final NodeConfigValidatorRegistry validatorRegistry;
     private final RoomSensorMetaService roomSensorMetaService;
 
     public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
-        if (request.nodeConfig() == null) {
+        if(request.nodeConfig() == null){
+            throw new InvalidNodeException();
+        }
+        if(request.nodeConfig().nodeType() == null){
             throw new InvalidNodeException();
         }
 
@@ -30,15 +31,17 @@ public class NodeConfigService {
                 ? List.of()
                 : roomSensorMetaService.getSensorMetaList(roomId);
 
-        List<String> errors = validatorRegistry.validate(
+        List<NodeConfigValidationResponse.NodeConfigError> errors = validatorRegistry.validate(
                 request.nodeConfig().nodeType(),
                 request.nodeConfig(),
                 sensorMetas
         );
 
-        return errors.isEmpty()
-                ? NodeConfigValidationResponse.success()
-                : NodeConfigValidationResponse.failure(errors);
+        if (!errors.isEmpty()) {
+            return NodeConfigValidationResponse.failure(errors);
+        }
+
+        return NodeConfigValidationResponse.success();
 
     }
 }

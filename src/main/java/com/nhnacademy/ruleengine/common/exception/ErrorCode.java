@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     //검증 응답용(ValidationError)
     FLOW_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FLOW_VALIDATION_FAILED","플로우 무결성 검증에 실패했습니다."),
+    NODE_CONFIG_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "NODE_CONFIG_VALIDATION_FAILED","노드 설정 검증에 실패했습니다."),
+    FLOW_SCHEDULE_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "FLOW_SCHEDULE_VALIDATION_FAILED","플로우 스케줄 검증에 실패했습니다."),
 
     //401 unauthorized
     UNAUTHORIZED_FLOW_ACCESS(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED_FLOW_ACCESS", "해당 Flow에 접근 권한이 없습니다."),

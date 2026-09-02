@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.validator.impl;
 
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse.NodeConfigError;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
@@ -30,7 +31,7 @@ class AverageNodeConfigValidatorTest {
         );
         List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C"));
 
-        List<String> errors = validator.validate(config, metas);
+        List<NodeConfigError> errors = validator.validate(config, metas);
         assertThat(errors).isEmpty();
     }
 
@@ -42,9 +43,9 @@ class AverageNodeConfigValidatorTest {
         );
         List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C")); // CO2 없음
 
-        List<String> errors = validator.validate(config, metas);
+        List<NodeConfigError> errors = validator.validate(config, metas);
         assertThat(errors).hasSize(1);
-        assertThat(errors.getFirst()).contains("지원하지 않는 sensorType");
+        assertThat(errors.getFirst().detailMessage()).contains("지원하지 않는 sensorType");
     }
 
     @Test
@@ -55,9 +56,9 @@ class AverageNodeConfigValidatorTest {
         );
         List<SensorMetaInfo> metas = List.of(new SensorMetaInfo(MeasurementType.TEMPERATURE, "온도", "실내 온도","C"));
 
-        List<String> errors = validator.validate(config, metas);
+        List<NodeConfigError> errors = validator.validate(config, metas);
 
         assertThat(errors).hasSize(1);
-        assertThat(errors.getFirst()).contains("windowSec 범위 초과");
+        assertThat(errors.getFirst().detailMessage()).contains("windowSec 범위 초과");
     }
 }

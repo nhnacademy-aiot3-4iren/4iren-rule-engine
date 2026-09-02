@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
-import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
@@ -17,6 +16,8 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,7 @@ class FlowServiceTest {
     @Mock private ConnectionRepository connectionRepository;
     @Mock private FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
     @Mock private RoomSensorMetaService metaService;
+    @Mock private NodeConfigValidatorRegistry nodeConfigValidatorRegistry;
 
     private FlowValidator flowValidator;
 
@@ -50,7 +52,8 @@ class FlowServiceTest {
 
     @BeforeEach
     void setUp(){
-        flowValidator = new FlowValidator();
+        lenient().when(nodeConfigValidatorRegistry.validate(any(), any(), any())).thenReturn(List.of());
+        flowValidator = new FlowValidator(nodeConfigValidatorRegistry);
 
         flowService = new FlowService(
                 flowRepository,
@@ -63,10 +66,19 @@ class FlowServiceTest {
     }
 
     private NodeInfo createConditionNode(Long id) {
-        return new NodeInfo(id, "condition", NodeType.THRESHOLD, mock(ThresholdNodeConfig.class), 0);
+        ThresholdNodeConfig nodeConfig = mock(ThresholdNodeConfig.class);
+        lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.THRESHOLD);
+        return new NodeInfo(id, "condition", NodeType.THRESHOLD, nodeConfig, 0);
+    }
+    private NodeInfo createStartNode(Long id) {
+        StartNodeConfig nodeConfig = mock(StartNodeConfig.class);
+        lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.START);
+        return new NodeInfo(id, "start", NodeType.START, nodeConfig, 0);
     }
     private NodeInfo createActionNode(Long id) {
-        return new NodeInfo(id, "action", NodeType.ALERT, mock(AlertNodeConfig.class), 0);
+        AlertNodeConfig nodeConfig = mock(AlertNodeConfig.class);
+        lenient().when(nodeConfig.nodeType()).thenReturn(NodeType.ALERT);
+        return new NodeInfo(id, "action", NodeType.ALERT, nodeConfig, 0);
     }
     private Flow createMockFlow(Long flowId, boolean isTemplate) {
         Flow flow = mock(Flow.class);
@@ -79,11 +91,13 @@ class FlowServiceTest {
     @Test
     @DisplayName("Flow 생성 성공")
     void createFlow_success() {
-        NodeInfo node1 = createConditionNode(1L);
-        NodeInfo node2 = createActionNode(2L);
-        ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
 
-        FlowCreateRequest request = new FlowCreateRequest("testFlow", "desc",true, List.of(node1, node2), List.of(conn));
+        FlowCreateRequest request = new FlowCreateRequest("testFlow", "desc",true, List.of(node1, node2, node3), List.of(conn1, conn2));
         Flow mockFlow = mock(Flow.class);
         when(mockFlow.getId()).thenReturn(100L);
         when(flowRepository.save(any(Flow.class))).thenReturn(mockFlow);
@@ -96,7 +110,7 @@ class FlowServiceTest {
 
         assertThat(response.flowId()).isEqualTo(100L);
         verify(flowRepository).save(any(Flow.class));
-        verify(nodeRepository, times(2)).save(any(Node.class));
+        verify(nodeRepository, times(3)).save(any(Node.class));
         verify(connectionRepository).saveAll(anyList());
     }
 
@@ -112,10 +126,12 @@ class FlowServiceTest {
     @Test
     @DisplayName("액션 노드가 하나도 없음 -> FlowValidationFailed")
     void createFlow_noActionNode() {
-        NodeInfo node1 = createConditionNode(1L);
+        NodeInfo node1 = createStartNode(1L);
         NodeInfo node2 = createConditionNode(2L);
-        ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2), List.of(conn));
+        NodeInfo node3 = createConditionNode(3L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2, node3), List.of(conn1, conn2));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -123,11 +139,13 @@ class FlowServiceTest {
     @Test
     @DisplayName("연결되지 않은 노드 있음 -> FlowValidationFailed")
     void createFlow_isolatedNode() {
-        NodeInfo node1 = createConditionNode(1L);
-        NodeInfo node2 = createActionNode(2L);
-        NodeInfo node3 = createConditionNode(3L);
-        ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2, node3), List.of(conn));
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
+        NodeInfo node4 = createConditionNode(4L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2, node3, node4), List.of(conn1, conn2));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
@@ -135,33 +153,33 @@ class FlowServiceTest {
     @Test
     @DisplayName("순환 구조 -> FlowValidationFailed")
     void createFlow_cycle() {
-        NodeInfo node1 = createConditionNode(1L);
-        NodeInfo node2 = createActionNode(2L);
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
         ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        ConnectionInfo conn2 = new ConnectionInfo(2L, 1L, BranchType.FALSE);
-        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2), List.of(conn1, conn2));
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        ConnectionInfo conn3 = new ConnectionInfo(3L, 1L, BranchType.FALSE);
+        FlowCreateRequest request = new FlowCreateRequest("flow", "desc", true, List.of(node1, node2, node3), List.of(conn1, conn2, conn3));
 
         assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(FlowValidationFailed.class);
     }
 
     @Test
-    @DisplayName("존재하지 않는 노드를 연결하려고 함 -> InvalidConnectionException")
+    @DisplayName("존재하지 않는 노드를 연결하려고 함 -> FlowValidationFailed")
     void createFlow_failsWithInvalidConnection() {
-        NodeInfo node1 = createConditionNode(1L);
-        NodeInfo node2 = createActionNode(2L);
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
 
         ConnectionInfo validConn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        ConnectionInfo invalidConn = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        ConnectionInfo invalidConn = new ConnectionInfo(2L, 99L, BranchType.TRUE);
 
         FlowCreateRequest request = new FlowCreateRequest(
-                "testFlow", "desc", true, List.of(node1, node2), List.of(validConn, invalidConn)
+                "testFlow", "desc", true, List.of(node1, node2, node3), List.of(validConn, invalidConn)
         );
-        Flow mockFlow = createMockFlow(100L, false);
 
-        when(flowRepository.save(any(Flow.class))).thenReturn(mockFlow);
-        when(nodeRepository.save(any(Node.class))).thenReturn(mock(Node.class));
-
-        assertThatThrownBy(() -> flowService.createFlow(1L, request)).isInstanceOf(InvalidConnectionException.class);
+        assertThatThrownBy(() -> flowService.createFlow(1L, request))
+                .isInstanceOf(FlowValidationFailed.class);
     }
 
     @Test
@@ -262,10 +280,12 @@ class FlowServiceTest {
     @Test
     @DisplayName("Flow 수정")
     void updateFlow_success() {
-        NodeInfo node1 = createConditionNode(1L);
-        NodeInfo node2 = createActionNode(2L);
-        ConnectionInfo conn = new ConnectionInfo(1L, 2L, BranchType.TRUE);
-        FlowUpdateRequest request = new FlowUpdateRequest("updated flow", "desc", true, List.of(node1, node2), List.of(conn));
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        FlowUpdateRequest request = new FlowUpdateRequest("updated flow", "desc", true, List.of(node1, node2, node3), List.of(conn1, conn2));
 
         Flow mockFlow = createMockFlow(100L, false);
         when(flowRepository.findByIdAndRoomId(100L, 1L)).thenReturn(Optional.of(mockFlow));
@@ -279,7 +299,7 @@ class FlowServiceTest {
         verify(mockFlow).updateRegular("updated flow", "desc", true);
         verify(connectionRepository).deleteAllByNodeFlowId(100L);
         verify(nodeRepository).deleteAllByFlowId(100L);
-        verify(nodeRepository, times(2)).save(any(Node.class));
+        verify(nodeRepository, times(3)).save(any(Node.class));
         verify(connectionRepository).saveAll(anyList());
 //        verify(flowCacheRepository).evict(1L);
     }

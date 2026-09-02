@@ -2,8 +2,10 @@ package com.nhnacademy.ruleengine.common.advice;
 
 import com.nhnacademy.ruleengine.common.exception.BaseException;
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
+import com.nhnacademy.ruleengine.common.exception.invalid.FlowScheduleValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.common.exception.invalid.NodeConfigValidationFailed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -31,16 +33,51 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("FlowValidationFailed 발생 시 400 상태 코드와 검증 에러 리스트를 반환")
+    @DisplayName("ValidationFailedException 발생 시 해당 에러 코드와 검증 에러 리스트를 반환")
     void handleValidationError_ReturnsValidationError() {
-        List<String> validationErrors = List.of("Node count is invalid", "Cycle detected");
+        List<ValidationErrorResponse.ValidationError> validationErrors = ValidationErrorResponse.ValidationError.ofList( List.of("Node count is invalid", "Cycle detected"));
         FlowValidationFailed exception = new FlowValidationFailed(validationErrors);
 
         ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().errorMessage()).isEqualTo(exception.getMessage());
+        assertThat(response.getBody().code()).isEqualTo(ErrorCode.FLOW_VALIDATION_FAILED.getCode());
+        assertThat(response.getBody().message()).isEqualTo(ErrorCode.FLOW_VALIDATION_FAILED.getMessage());
+        assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
+    }
+
+    @Test
+    @DisplayName("NodeConfigValidationFailed 발생 시 공통 검증 에러 응답을 반환")
+    void handleValidationError_ReturnsNodeConfigValidationError() {
+        List<ValidationErrorResponse.ValidationError> validationErrors = List.of(
+                ValidationErrorResponse.ValidationError.of("nodeConfig", "설정 오류 발생")
+        );
+        NodeConfigValidationFailed exception = new NodeConfigValidationFailed(validationErrors);
+
+        ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(ErrorCode.NODE_CONFIG_VALIDATION_FAILED.getCode());
+        assertThat(response.getBody().message()).isEqualTo(ErrorCode.NODE_CONFIG_VALIDATION_FAILED.getMessage());
+        assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
+    }
+
+    @Test
+    @DisplayName("FlowScheduleValidationFailed 발생 시 공통 검증 에러 응답을 반환")
+    void handleValidationError_ReturnsFlowScheduleValidationError() {
+        List<ValidationErrorResponse.ValidationError> validationErrors = List.of(
+                ValidationErrorResponse.ValidationError.of("startTime", "startTime은 endTime보다 빨라야 합니다.")
+        );
+        FlowScheduleValidationFailed exception = new FlowScheduleValidationFailed(validationErrors);
+
+        ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(ErrorCode.FLOW_SCHEDULE_VALIDATION_FAILED.getCode());
+        assertThat(response.getBody().message()).isEqualTo(ErrorCode.FLOW_SCHEDULE_VALIDATION_FAILED.getMessage());
         assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
     }
 }

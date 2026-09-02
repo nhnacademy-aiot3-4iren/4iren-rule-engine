@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.validator;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.NodeTypeNotFoundException;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
+import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.annotation.PostConstruct;
@@ -23,7 +24,11 @@ public class NodeConfigValidatorRegistry {
         validators.forEach(v -> registry.put(v.supportsNodeType(), v));
     }
 
-    public List<String> validate(NodeType nodeType, NodeConfig nodeconfig, List<SensorMetaInfo> sensorMetaInfoList){
+    public List<NodeConfigValidationResponse.NodeConfigError> validate(
+            NodeType nodeType,
+            NodeConfig nodeconfig,
+            List<SensorMetaInfo> sensorMetaInfoList
+    ){
         NodeConfigValidator nodeConfigValidator = registry.get(nodeType);
         if(nodeConfigValidator == null){
             throw new NodeTypeNotFoundException();
