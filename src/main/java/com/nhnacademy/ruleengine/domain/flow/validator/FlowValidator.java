@@ -10,8 +10,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationRespo
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateConnectionInfo;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class FlowValidator {
     // 플로우 저장/수정 요청의 노드, 연결, 노드 설정 전체 무결성을 검증한다.
     public void validate(
             @NotEmpty List<NodeInfo> nodes,
-            @NotNull List<ConnectionInfo> connections,
+            @NotEmpty List<ConnectionInfo> connections,
             List<SensorMetaInfo> sensorMetaInfos
     ){
         List<ValidationErrorResponse.ValidationError> errors =  new ArrayList<>();
@@ -163,7 +161,7 @@ public class FlowValidator {
                 configErrors.forEach(error -> errors.add(ValidationErrorResponse.ValidationError.of(
                         node.nodeId(),
                         error.field(),
-                        error.detailMessage()
+                        error.message()
                 )));
             }
         }

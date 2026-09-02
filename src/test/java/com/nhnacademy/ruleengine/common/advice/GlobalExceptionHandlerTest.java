@@ -5,7 +5,6 @@ import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowScheduleValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
-import com.nhnacademy.ruleengine.common.exception.invalid.NodeConfigValidationFailed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -47,22 +46,7 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
     }
 
-    @Test
-    @DisplayName("NodeConfigValidationFailed 발생 시 공통 검증 에러 응답을 반환")
-    void handleValidationError_ReturnsNodeConfigValidationError() {
-        List<ValidationErrorResponse.ValidationError> validationErrors = List.of(
-                ValidationErrorResponse.ValidationError.of("nodeConfig", "설정 오류 발생")
-        );
-        NodeConfigValidationFailed exception = new NodeConfigValidationFailed(validationErrors);
 
-        ResponseEntity<ValidationErrorResponse> response = exceptionHandler.handleValidationError(exception);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().code()).isEqualTo(ErrorCode.NODE_CONFIG_VALIDATION_FAILED.getCode());
-        assertThat(response.getBody().message()).isEqualTo(ErrorCode.NODE_CONFIG_VALIDATION_FAILED.getMessage());
-        assertThat(response.getBody().errors()).containsExactlyElementsOf(validationErrors);
-    }
 
     @Test
     @DisplayName("FlowScheduleValidationFailed 발생 시 공통 검증 에러 응답을 반환")

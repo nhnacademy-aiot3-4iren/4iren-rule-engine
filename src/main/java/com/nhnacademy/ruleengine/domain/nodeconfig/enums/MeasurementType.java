@@ -5,6 +5,7 @@ import com.nhnacademy.ruleengine.common.exception.invalid.InvalidMeasurementType
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,5 +40,15 @@ public enum MeasurementType {
             return type;
         }
         throw new InvalidMeasurementTypeException();
+    }
+
+    public static List<String> toNames(List<MeasurementType> measurementTypes) {
+        if (measurementTypes == null || measurementTypes.isEmpty()) {
+            return List.of();
+        }
+
+        return measurementTypes.stream()
+                .map(MeasurementType::name)
+                .toList();
     }
 }

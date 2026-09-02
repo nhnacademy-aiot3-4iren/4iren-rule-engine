@@ -45,7 +45,7 @@ class AverageNodeConfigValidatorTest {
 
         List<NodeConfigError> errors = validator.validate(config, metas);
         assertThat(errors).hasSize(1);
-        assertThat(errors.getFirst().detailMessage()).contains("지원하지 않는 sensorType");
+        assertThat(errors.getFirst().message()).contains("지원하지 않는 sensorType");
     }
 
     @Test
@@ -59,6 +59,6 @@ class AverageNodeConfigValidatorTest {
         List<NodeConfigError> errors = validator.validate(config, metas);
 
         assertThat(errors).hasSize(1);
-        assertThat(errors.getFirst().detailMessage()).contains("windowSec 범위 초과");
+        assertThat(errors.getFirst().message()).contains("windowSec 범위 초과");
     }
 }

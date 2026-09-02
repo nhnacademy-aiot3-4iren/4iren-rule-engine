@@ -15,16 +15,17 @@ public record RoomTemplateResponse(
 
         String description,
 
-        List<MeasurementType> measurementTypes
+        List<String> measurementTypes
 ) {
     public static RoomTemplateResponse from(
-            Flow flowTemplate,   List<MeasurementType> measurementType
+            Flow flowTemplate, List<MeasurementType> measurementTypes
     ){
         return RoomTemplateResponse.builder()
                 .templateId(flowTemplate.getId())
                 .templateName(flowTemplate.getFlowName())
                 .description(flowTemplate.getDescription())
-                .measurementTypes(measurementType).build();
+                .measurementTypes(MeasurementType.toNames(measurementTypes))
+                .build();
     }
 
     public static List<RoomTemplateResponse> fromList(
@@ -38,8 +39,10 @@ public record RoomTemplateResponse(
                             .templateId(f.getId())
                             .templateName(f.getFlowName())
                             .description(f.getDescription())
-                            .measurementTypes(measurementTypeList)
+                            .measurementTypes(MeasurementType.toNames(measurementTypeList))
                             .build();
                 }).toList();
     }
+
+
 }

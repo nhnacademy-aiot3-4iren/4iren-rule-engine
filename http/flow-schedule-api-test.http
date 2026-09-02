@@ -3,7 +3,7 @@
 @port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
-@flowId = 3
+@flowId = 1
 @scheduleId = 2
 @userId = 1
 @userRole = ADMIN
@@ -17,8 +17,8 @@ Accept: application/json
 
 {
   "dayOfWeek": "MONDAY",
-  "startTime": "19:00:30",
-  "endTime": "20:00:00"
+  "startTime": "09:00:00",
+  "endTime": "18:00:00"
 }
 
 > {%
