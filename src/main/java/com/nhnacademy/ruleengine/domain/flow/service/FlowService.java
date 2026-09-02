@@ -12,6 +12,8 @@ import com.nhnacademy.ruleengine.domain.flow.repository.ConnectionRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flow.repository.NodeRepository;
 import com.nhnacademy.ruleengine.domain.flow.validator.FlowValidator;
+import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
+import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.entity.FlowTemplateMeasurementType;
 import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeasurementTypeRepository;
@@ -36,7 +38,7 @@ public class FlowService {
     private final NodeRepository nodeRepository;
     private final ConnectionRepository connectionRepository;
     private final FlowTemplateMeasurementTypeRepository flowTemplateMeasurementTypeRepository;
-
+    private final FlowScheduleRepository flowScheduleRepository;
 
     private final RoomSensorMetaService metaService;
 //    private final FlowCacheRepository flowCacheRepository;
@@ -64,7 +66,14 @@ public class FlowService {
             return FlowListResponse.of(List.of());
         }
 
-        List<FlowResponse> response = FlowResponse.fromList(flowList);
+        List<FlowSchedule> flowScheduleList = flowScheduleRepository.findAllByFlowIdIn(flowList.stream().map(Flow::getId).toList());
+
+        Map<Long, Long> scheduleCountMap = flowScheduleList.stream()
+                .collect(Collectors.groupingBy(
+                        schedule -> schedule.getFlow().getId(),
+                        Collectors.counting()
+                ));
+        List<FlowResponse> response = FlowResponse.fromList(flowList,scheduleCountMap);
         return FlowListResponse.of(response);
     }
 

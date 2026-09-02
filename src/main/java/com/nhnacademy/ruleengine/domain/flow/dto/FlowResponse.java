@@ -6,6 +6,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 public record FlowResponse(
@@ -16,6 +17,8 @@ public record FlowResponse(
         String description,
 
         boolean isActive,
+
+        Long scheduleCount,
 
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime createdAt,
@@ -34,13 +37,14 @@ public record FlowResponse(
                 .updatedAt(flow.getUpdatedAt()).build();
 
     }
-    public static List<FlowResponse> fromList(List<Flow> flowList){
+    public static List<FlowResponse> fromList(List<Flow> flowList, Map<Long, Long> scheduleCountMap){
          return flowList.stream()
                 .map(flow -> FlowResponse.builder()
                         .flowId(flow.getId())
                         .flowName(flow.getFlowName())
                         .description(flow.getDescription())
                         .isActive(flow.getIsActive())
+                        .scheduleCount(scheduleCountMap.getOrDefault(flow.getId(), 0L))
                         .createdAt(flow.getCreatedAt())
                         .updatedAt(flow.getUpdatedAt()).build()
                 ).toList();
