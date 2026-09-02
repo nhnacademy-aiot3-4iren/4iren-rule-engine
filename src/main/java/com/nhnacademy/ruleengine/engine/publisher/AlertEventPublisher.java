@@ -37,29 +37,38 @@ public class AlertEventPublisher {
         Duration alertLockTtl = Duration.ofSeconds(dedupWindowSec);
 
         if(!tryAcquireAlertLock(alertLockKey, alertLockTtl)) {
-            log.debug("[ALERT SKIP]");
+            //false: 락 획득 실패(이미 최근에 같은 알림이 나갔음) → 상위 호출자 입장에서는 예외 없이 그냥 "발행 안 함"으로 끝남
+            log.info("[ALERT SKIP]");
             return;
         }
 
         try {
+            //락 획득 성공시 큐에 메시지 발행, event 객체 자동 직렬화 -> 메시지 바디로 들어감
             rabbitTemplate.convertAndSend(alertExchange, alertRoutingKey, event);
             log.info("[ALERT PUBLISH] roomId({}), eventId({}), title({})", roomId, event.eventId(), event.alertTitle());
         } catch (Exception e) {
+            //실패시 락 지움
             log.error("[ALERT ERROR] roomId({}), error({})", roomId, e.getMessage(), e);
             redisTemplate.delete(alertLockKey);
         }
 
     }
 
+    //락시도,
     private boolean tryAcquireAlertLock(String key, Duration ttl) {
+        //SENTX + TTL 방식의 분살 락
+        //기존 키가 없었으면 "SENT"로 저장하고 true 반환 → 알림 발행 진행
+        //키가 이미 있으면 false 반환 → 스킵
         Boolean isFirst = redisTemplate.opsForValue().setIfAbsent(key, "SENT", ttl);//SETNX: key가 redis에 없을 때만 값을 저장(true 반환).
-        return Boolean.TRUE.equals(isFirst);//최초 알람일 경우 true 반환
+        return Boolean.TRUE.equals(isFirst);//isFirst == null 일경우 false 처리됨
     }
 
+    //락 키 생성, (알림 노드 ID + event history 해시값)
     private String resolveAlertLockKey(AlertEvent event, Long alertNodeId) {
         return DEDUP_KEY_FORMAT.formatted(alertNodeId, createDedupHash(event));
     }
 
+    //이벤트 내용 해싱
     private String createDedupHash(AlertEvent event) {
         String source = normalizedNodeResults(event);
 
@@ -79,7 +88,7 @@ public class AlertEventPublisher {
         return event.nodeResults().stream()
                 .filter(Objects::nonNull)
                 .map(this::normalizeNodeResult)
-                .sorted()
+                .sorted()//정렬이 없으면 같은 내용이 순서만 달라서 해시값이 달라질 수 있음
                 .collect(Collectors.joining(";"));
     }
 
