@@ -9,10 +9,10 @@ public record NodeConfigValidationResponse(
 ) {
     public record NodeConfigError(
             String field,
-            String detailMessage
+            String message
     ){
-        public static NodeConfigError of( String field, String detailMessage){
-            return new NodeConfigError(field, detailMessage);
+        public static NodeConfigError of( String field, String message){
+            return new NodeConfigError(field, message);
         }
     }
     public static NodeConfigValidationResponse success() {

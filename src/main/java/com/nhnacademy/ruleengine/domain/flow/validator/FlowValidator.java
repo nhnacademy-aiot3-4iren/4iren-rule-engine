@@ -10,8 +10,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationRespo
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateConnectionInfo;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateNodeInfo;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -163,7 +161,7 @@ public class FlowValidator {
                 configErrors.forEach(error -> errors.add(ValidationErrorResponse.ValidationError.of(
                         node.nodeId(),
                         error.field(),
-                        error.detailMessage()
+                        error.message()
                 )));
             }
         }
