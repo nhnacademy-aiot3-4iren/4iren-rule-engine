@@ -1,22 +1,48 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.service;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigResponse;
+import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
+import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
+import com.nhnacademy.ruleengine.domain.flow.service.RoomSensorMetaService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.validator.NodeConfigValidatorRegistry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
-public interface NodeConfigService {
+@Transactional(readOnly = true)
+@Service
+@RequiredArgsConstructor
+public class NodeConfigService {
+    private final NodeConfigValidatorRegistry validatorRegistry;
+    private final RoomSensorMetaService roomSensorMetaService;
 
-    //nodeId 있을때 nodeConfig 조회
-    //nodeId 없을 때 nodeConfig 조회
-    //그냥 위의 두 api 합치는 걸로? -> id 음수/양수로 판단
-    NodeConfigResponse getNodeConfigNMeta(Long roomId, Long nodeId, NodeType nodeType);
+    public NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request) {
+        if(request.nodeConfig() == null){
+            throw new InvalidNodeException();
+        }
+        if(request.nodeConfig().nodeType() == null){
+            throw new InvalidNodeException();
+        }
 
-//
-//    //nodeConfig검증 api
-    NodeConfigValidationResponse validate(Long roomId, NodeConfigValidateRequest request);
+        // 액션 노드는 sensorMeta 조회 불필요
+        List<SensorMetaInfo> sensorMetas = request.nodeConfig().nodeType().isActionNode()
+                ? List.of()
+                : roomSensorMetaService.getSensorMetaList(roomId);
 
+        List<NodeConfigValidationResponse.NodeConfigError> errors = validatorRegistry.validate(
+                request.nodeConfig().nodeType(),
+                request.nodeConfig(),
+                sensorMetas
+        );
 
+        if (!errors.isEmpty()) {
+            return NodeConfigValidationResponse.failure(errors);
+        }
+
+        return NodeConfigValidationResponse.success();
+
+    }
 }

@@ -15,9 +15,7 @@ public record NodeResponse (
 
         NodeType nodeType,
 
-        NodeConfig nodeConfig,
-
-        int cooldownSec
+        NodeConfig nodeConfig
 ){
     public static List<NodeResponse> fromList(
             List<Node> nodes
@@ -28,7 +26,7 @@ public record NodeResponse (
                         .nodeName(n.getNodeName())
                         .nodeType(n.getNodeType())
                         .nodeConfig(n.getNodeConfig())
-                        .cooldownSec(n.getCooldownSec()).build()
+                        .build()
                 ).toList();
     }
 

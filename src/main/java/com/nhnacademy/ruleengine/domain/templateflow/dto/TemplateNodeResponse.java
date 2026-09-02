@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.templateflow.dto;
 
-import com.nhnacademy.ruleengine.domain.flow.dto.NodeResponse;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
@@ -16,9 +15,7 @@ public record TemplateNodeResponse(
 
         NodeType nodeType,
 
-        NodeConfig nodeConfig,
-
-        int cooldownSec
+        NodeConfig nodeConfig
 ){
     public static List<TemplateNodeResponse> fromList(
             List<Node> nodes
@@ -29,7 +26,7 @@ public record TemplateNodeResponse(
                         .nodeName(n.getNodeName())
                         .nodeType(n.getNodeType())
                         .nodeConfig(n.getNodeConfig())
-                        .cooldownSec(n.getCooldownSec()).build()
+                        .build()
                 ).toList();
     }
 }

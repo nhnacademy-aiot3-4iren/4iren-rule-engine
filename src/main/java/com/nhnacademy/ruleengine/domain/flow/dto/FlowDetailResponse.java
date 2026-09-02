@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.ruleengine.domain.flow.entity.Connection;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.entity.Node;
@@ -18,21 +19,26 @@ public record FlowDetailResponse (
 
         String description,
 
-        boolean isActive,
+        Boolean isActive,
 
         List<NodeResponse> nodes,
 
         List<ConnectionResponse> connections,
 
+        List<SensorMetaInfo> sensorMetaInfos,
+
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime createdAt,
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         LocalDateTime updatedAt
 ){
 
     public static FlowDetailResponse from(
             Flow flow,
             List<Node> nodes,
-            List<Connection> connections
+            List<Connection> connections,
+            List<SensorMetaInfo> sensorMetaInfos
     ){
         return FlowDetailResponse.builder()
                 .flowId(flow.getId())
@@ -42,6 +48,7 @@ public record FlowDetailResponse (
                 .isActive(flow.getIsActive())
                 .nodes(NodeResponse.fromList(nodes))
                 .connections(ConnectionResponse.fromList(connections))
+                .sensorMetaInfos(sensorMetaInfos)
                 .createdAt(flow.getCreatedAt())
                 .updatedAt(flow.getUpdatedAt()).build();
     }

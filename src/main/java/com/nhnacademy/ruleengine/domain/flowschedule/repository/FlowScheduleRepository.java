@@ -1,11 +1,11 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.repository;
 
-import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
 
     @Query("""
          SELECT COUNT(fs) > 0 FROM FlowSchedule fs
-         WHERE fs.id = :id 
+         WHERE fs.id = :id
          AND fs.flow.id = :flowId
          AND fs.flow.roomId = :roomId
     """)
@@ -25,7 +25,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
 
     @Query("""
          SELECT fs FROM FlowSchedule fs
-         WHERE fs.id = :id 
+         WHERE fs.id = :id
          AND fs.flow.id = :flowId
          AND fs.flow.roomId = :roomId
     """)
@@ -34,4 +34,7 @@ public interface FlowScheduleRepository extends JpaRepository<FlowSchedule,Long>
                                         @Param("roomId") Long roomId);
 
     List<FlowSchedule> findAllByFlowIdIn(List<Long> flowIds);
+
+
+    List<FlowSchedule> findAllByFlowIdAndDayOfWeek(Long flowId, DayOfWeek dayOfWeek);
 }

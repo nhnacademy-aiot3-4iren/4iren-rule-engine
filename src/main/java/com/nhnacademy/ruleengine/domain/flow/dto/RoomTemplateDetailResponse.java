@@ -15,17 +15,21 @@ public record RoomTemplateDetailResponse(
 
         List<NodeResponse> nodes,
 
-        List<ConnectionResponse> connections
+        List<ConnectionResponse> connections,
+
+        List<SensorMetaInfo> sensorMetaInfos
 ){
     public static RoomTemplateDetailResponse from(
-            Flow flowTempalte,
+            Flow flowTemplate,
             List<Node> nodes,
-            List<Connection> connections
+            List<Connection> connections,
+            List<SensorMetaInfo> sensorMetaInfos
     ) {
         return RoomTemplateDetailResponse.builder()
-                .templateName(flowTempalte.getFlowName())
-                .description(flowTempalte.getDescription())
+                .templateName(flowTemplate.getFlowName())
+                .description(flowTemplate.getDescription())
                 .nodes(NodeResponse.fromList(nodes))
-                .connections(ConnectionResponse.fromList(connections)).build();
+                .connections(ConnectionResponse.fromList(connections))
+                .sensorMetaInfos(sensorMetaInfos).build();
     }
 }

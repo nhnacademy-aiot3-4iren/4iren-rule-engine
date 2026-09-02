@@ -2,7 +2,6 @@ package com.nhnacademy.ruleengine.domain.flowschedule.entity;
 
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
-import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleInfo;
 import jakarta.persistence.*;
 import lombok.*;
 

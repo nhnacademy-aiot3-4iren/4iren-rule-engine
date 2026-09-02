@@ -4,13 +4,22 @@ import java.util.List;
 
 public record NodeConfigValidationResponse(
         boolean valid,
-        List<String> errors
+        String message,
+        List<NodeConfigError> errors
 ) {
+    public record NodeConfigError(
+            String field,
+            String message
+    ){
+        public static NodeConfigError of( String field, String message){
+            return new NodeConfigError(field, message);
+        }
+    }
     public static NodeConfigValidationResponse success() {
-        return new NodeConfigValidationResponse(true, List.of());
+        return new NodeConfigValidationResponse(true, "노드 설정이 유효합니다.",List.of());
     }
 
-    public static NodeConfigValidationResponse failure(List<String> errors) {
-        return new NodeConfigValidationResponse(false, errors);
+    public static NodeConfigValidationResponse failure(List<NodeConfigError> errors) {
+        return new NodeConfigValidationResponse(false, "노드 설정을 확인해주세요.",errors);
     }
 }

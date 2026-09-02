@@ -1,9 +1,9 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition;
 
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,7 +28,7 @@ public record ThresholdNodeConfig (
         Operator operator,
 
         @NotNull
-        double threshold
+        Double threshold
 
 )implements NodeConfig {
         @Override

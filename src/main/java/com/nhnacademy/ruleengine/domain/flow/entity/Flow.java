@@ -49,9 +49,6 @@ public class Flow {
     private List<Node> nodes = new ArrayList<>();
 
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Connection> connections = new ArrayList<>();
-
-    @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FlowSchedule> schedules = new ArrayList<>();
 
     @OneToMany(mappedBy = "flow", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -60,13 +57,13 @@ public class Flow {
 
     //일반 플로우 생성용
     @Builder(builderMethodName = "regularBuilder",  builderClassName = "RegularBuilder")
-    public Flow(Long roomId, String flowName, String description){
+    public Flow(Long roomId, boolean isActive, String flowName, String description){
         this.id = null;
         this.createdAt = null;
         this.updatedAt = null;
 
         this.roomId =roomId;
-        this.isActive = true;
+        this.isActive = isActive;
 
         this.flowName = flowName;
         this.description = description;
@@ -100,6 +97,9 @@ public class Flow {
     public void updateTemplate(String flowName, String description) {
         if (flowName != null) this.flowName = flowName;
         if (description != null) this.description = description;
-        if (isActive != null) this.isActive = isActive;
+    }
+
+    public void updateStatus(Boolean isActive){
+        if(isActive != null) this.isActive = isActive;
     }
 }

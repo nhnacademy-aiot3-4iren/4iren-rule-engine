@@ -26,7 +26,11 @@ public record AlertNodeConfig(
     String alertTitle,
 
     @NotNull
-    AlertType alertType
+    AlertType alertType,
+
+    @NotNull
+    @Positive
+    Integer dedupWindowSec
 ) implements NodeConfig {
 
 }

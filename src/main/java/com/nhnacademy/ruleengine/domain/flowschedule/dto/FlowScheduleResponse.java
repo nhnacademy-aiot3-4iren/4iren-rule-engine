@@ -28,13 +28,11 @@ public record FlowScheduleResponse (
             if(schedules == null) {return List.of();}
 
             return schedules.stream().map(
-                    s -> {
-                        return FlowScheduleResponse.builder()
-                                .scheduleId(s.getId())
-                                .dayOfWeek(s.getDayOfWeek())
-                                .startTime(s.getStartTime())
-                                .endTime(s.getEndTime()).build();
-                    }
+                    s -> FlowScheduleResponse.builder()
+                            .scheduleId(s.getId())
+                            .dayOfWeek(s.getDayOfWeek())
+                            .startTime(s.getStartTime())
+                            .endTime(s.getEndTime()).build()
             ).toList();
     }
 }

@@ -1,26 +1,55 @@
 ### 변수 설정
 @hostname = localhost
-@port = 8080
+@port = 8085
 @baseUrl = http://{{hostname}}:{{port}}/api/rule
 @roomId = 1
-@flowId = 2
+@flowId = 1
+@templateId = 2
+@userId = 1
+@userRole = ADMIN
 
-### [플로우 생성] 새로운 플로우 등록 (음수 임시 ID 포함)
+
+### [플로우 빌드 폼 호출]
+GET {{baseUrl}}/rooms/{{roomId}}/flows/form
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
+Accept: application/json
+
+> {%
+    client.test("플로우 빌드 폼 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [플로우 생성] START -> THRESHOLD -> ALERT
 POST {{baseUrl}}/rooms/{{roomId}}/flows
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Content-Type: application/json
+Accept: application/json
 
 {
   "flowName": "강의실 101호 쾌적도 제어 플로우",
   "description": "CO2 농도가 높을 때 텔레그램으로 환기 알림을 보내는 플로우",
+  "isActive": true,
   "nodes": [
     {
       "nodeId": -1,
+      "nodeName": "시작",
+      "nodeType": "START",
+      "nodeConfig": {
+        "nodeType": "START",
+        "x": 0,
+        "y": 150
+      }
+    },
+    {
+      "nodeId": -2,
       "nodeName": "이산화탄소 임계치 판단 노드",
       "nodeType": "THRESHOLD",
-      "cooldownSec": 60,
       "nodeConfig": {
         "nodeType": "THRESHOLD",
-        "x": 100,
+        "x": 160,
         "y": 150,
         "measurementType": "CO2",
         "unit": "ppm",
@@ -29,97 +58,187 @@ Content-Type: application/json
       }
     },
     {
-      "nodeId": -2,
+      "nodeId": -3,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
-      "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 300,
+        "x": 320,
         "y": 150,
         "channel": "TELEGRAM",
-        "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED"
+        "alertTitle": "실내 이산화탄소 수치 초과",
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec": 300
       }
     }
   ],
   "connections": [
     {
       "sourceNodeId": -1,
-      "targetNodeId": -2
+      "targetNodeId": -2,
+      "branchType": "TRUE"
+    },
+    {
+      "sourceNodeId": -2,
+      "targetNodeId": -3,
+      "branchType": "TRUE"
     }
   ]
 }
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("플로우 생성 응답은 201 Created", function() {
         client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("생성 응답에 flowId가 포함됨", function() {
+        client.assert(response.body.flowId !== undefined, "flowId is missing");
     });
 %}
 
-### [플로우 목록 조회] 해당 룸의 전체 플로우 조회
+### [플로우 목록 조회]
 GET {{baseUrl}}/rooms/{{roomId}}/flows
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Accept: application/json
 
-### [강의실별 템플릿 플로우 제안 목록 조회]
-GET {{baseUrl}}/rooms/{{roomId}}/flows/templates
-Accept: application/json
+> {%
+    client.test("플로우 목록 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
 
 ### [플로우 단건 상세 조회 및 수정 폼]
 GET {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Accept: application/json
 
-### [추천 템플릿 플로우 상세 조회] (충돌 방지 경로 적용)
-GET {{baseUrl}}/rooms/{{roomId}}/flows/templates/1
+> {%
+    client.test("플로우 상세 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [강의실별 템플릿 플로우 제안 목록 조회]
+GET {{baseUrl}}/rooms/{{roomId}}/flow-templates
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Accept: application/json
 
-### [플로우 수정] 기존 플로우 정보 및 노드 구조 대치
+> {%
+    client.test("강의실별 템플릿 목록 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [추천 템플릿 플로우 상세 조회]
+GET {{baseUrl}}/rooms/{{roomId}}/flow-templates/{{templateId}}
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
+Accept: application/json
+
+> {%
+    client.test("추천 템플릿 상세 조회 응답은 200 OK", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### [플로우 수정] START -> AVERAGE -> ALERT
 PUT {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
 Content-Type: application/json
+Accept: application/json
 
 {
-  "flowName": "강의실 101호 쾌적도 제어 플로우 (수정)",
-  "description": "평균 온도 감지 기능이 추가된 플로우",
+  "flowName": "강의실 101호 쾌적도 제어 플로우 수정",
+  "description": "평균 온도 감지 조건으로 수정된 플로우",
   "isActive": true,
   "nodes": [
     {
-      "nodeId": 1,
+      "nodeId": -1,
+      "nodeName": "시작",
+      "nodeType": "START",
+      "nodeConfig": {
+        "nodeType": "START",
+        "x": 0,
+        "y": 200
+      }
+    },
+    {
+      "nodeId": -2,
       "nodeName": "온도 평균값 판단 노드",
       "nodeType": "AVERAGE",
-      "cooldownSec": 120,
       "nodeConfig": {
         "nodeType": "AVERAGE",
-        "x": 120,
+        "x": 160,
         "y": 200,
         "measurementType": "TEMPERATURE",
-        "unit": "°C",
+        "unit": "C",
         "operator": "GTE",
         "average": 28.5,
         "windowSec": 600
       }
     },
     {
-      "nodeId": -2,
+      "nodeId": -3,
       "nodeName": "텔레그램 경고 알림 노드",
       "nodeType": "ALERT",
-      "cooldownSec": 300,
       "nodeConfig": {
         "nodeType": "ALERT",
-        "x": 300,
-        "y": 150,
+        "x": 320,
+        "y": 200,
         "channel": "TELEGRAM",
-        "alertTitle": "실내 이산화탄소 수치 초과!",
-        "alertType": "COMFORT_LIMIT_EXCEEDED"
+        "alertTitle": "실내 온도 평균값 초과",
+        "alertType": "COMFORT_LIMIT_EXCEEDED",
+        "dedupWindowSec": 300
       }
     }
   ],
   "connections": [
-      {
-      "sourceNodeId": 1,
-      "targetNodeId": -2
-      }
+    {
+      "sourceNodeId": -1,
+      "targetNodeId": -2,
+      "branchType": "TRUE"
+    },
+    {
+      "sourceNodeId": -2,
+      "targetNodeId": -3,
+      "branchType": "TRUE"
+    }
   ]
 }
 
+> {%
+    client.test("플로우 수정 응답은 204 No Content", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
+
+### [플로우 활성화/비활성화 설정]
+PATCH {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}/active
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+> {%
+    client.test("플로우 활성화 상태 변경 응답은 204 No Content", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
+
+
 ### [플로우 삭제]
 DELETE {{baseUrl}}/rooms/{{roomId}}/flows/{{flowId}}
+X-User-Id: {{userId}}
+X-User-Role: {{userRole}}
+
+> {%
+    client.test("플로우 삭제 응답은 204 No Content", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}

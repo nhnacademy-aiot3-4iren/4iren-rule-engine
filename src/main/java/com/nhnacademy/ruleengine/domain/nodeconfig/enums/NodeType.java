@@ -1,24 +1,29 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.enums;
 
 
+import lombok.Getter;
+
+@Getter
 public enum NodeType {
+    //start
+    START("시작 노드"),
+
     //condition
     THRESHOLD("임계치 판단"),
     GRADIENT("기울기 판단"),
     AVERAGE("평균값 판단"),
-    DURATION("지속시간 핀딘"),
+    DURATION("지속시간 판단"),
+
+    // logical
+    OR("OR 조건"),
 
     //action
-    ALERT("알람(텔레그램)")
-    ;
+    ALERT("알람(텔레그램)");
+
     private final String description;
 
     NodeType(String description) {
         this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean isConditionNode() {
