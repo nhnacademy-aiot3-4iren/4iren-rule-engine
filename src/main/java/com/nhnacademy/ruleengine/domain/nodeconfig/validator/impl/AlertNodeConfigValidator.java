@@ -24,9 +24,7 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         List<NodeConfigValidationResponse.NodeConfigError> errors = new ArrayList<>();
 
         // sensorMetas 불필요 (액션 노드)
-        if (c.channel() == null) {
-            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.channel", "알림 채널을 선택해주세요"));
-        }
+
         if (c.alertTitle() == null || c.alertTitle().isBlank()) {
             errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.alertTitle", "알림 제목을 입력해주세요"));
         }

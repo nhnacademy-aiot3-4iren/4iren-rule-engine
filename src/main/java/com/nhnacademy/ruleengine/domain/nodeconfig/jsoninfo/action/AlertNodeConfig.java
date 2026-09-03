@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertChannel;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.NodeConfig;
@@ -19,8 +18,8 @@ public record AlertNodeConfig(
     @NotNull
     Integer y,
 
-    @NotNull
-    AlertChannel channel,
+//    @NotNull
+//    AlertChannel channel,
 
     @NotBlank
     String alertTitle,

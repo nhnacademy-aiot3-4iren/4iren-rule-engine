@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.*;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.action.AlertNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.engine.converter.SensorPayloadConverter;
@@ -138,7 +141,6 @@ class SensorDataListenerIntegrationTest {
                         NodeType.ALERT,
                         100,
                         0,
-                        AlertChannel.TELEGRAM,
                         "온도 경고",
                         AlertType.COMFORT_LIMIT_EXCEEDED,
                         DEDUP_WINDOW_SEC
