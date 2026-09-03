@@ -21,12 +21,12 @@ public class RoomDeviceCacheService {
 
     @Cacheable(value = "room:devices", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<RoomDeviceInfo> getRoomDevices(Long roomId) {
-        log.info("cache miss roomId = {}, 외부 API 조회", roomId);
+        log.info("room:devices:{} cache miss 외부 API 조회", roomId);
 
         try{
             return roomSensorClient.getRoomDevices(roomId);
         }catch (Exception e){
-            log.info("External API unavailable. Using dummy payload.", e);
+            log.info("외부 api 호출 실패. 더미 데이터 호출.", e);
             return getDummyDevices();
         }
 

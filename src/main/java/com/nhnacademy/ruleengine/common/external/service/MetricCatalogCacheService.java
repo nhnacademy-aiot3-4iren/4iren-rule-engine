@@ -22,7 +22,7 @@ public class MetricCatalogCacheService {
 
     @Cacheable(value = "sensor:catalog", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<MetricCatalogInfo> getMetricCatalog(){
-        log.info("cache miss, 외부 API 조회");
+        log.info("sensor:catalog cache miss, 외부 API 조회");
 
         try{
             return roomSensorClient.getMetricCatalog();
