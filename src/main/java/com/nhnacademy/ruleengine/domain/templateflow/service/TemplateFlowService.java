@@ -162,6 +162,7 @@ public class TemplateFlowService {
                 .map(nodeInfo->nodeInfo.nodeConfig().measurementType()).toList();
 
         List<FlowTemplateMeasurementType> flowTemplateMeasurementTypeList = measurementTypes.stream()
+                .distinct()
                 .map(m -> FlowTemplateMeasurementType.builder().flow(savedTemplateFlow).measurementType(m).build())
                 .toList();
 
