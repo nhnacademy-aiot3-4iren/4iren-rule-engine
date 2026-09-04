@@ -49,7 +49,7 @@ public class RoomSensorMetaService {
                     MetricCatalogInfo catalogInfo = catalogMap.get(key.toUpperCase());
 
                     if(catalogInfo == null){
-                        log.error("MetricCatalog에 존재하지 않는 측정 타입, key: ", key);
+                        log.warn("측정 항목 카탈로그에 존재하지 않는 측정 타입 제외 roomId={}, measurementType={}", roomId, key);
                         return null;
                     }
 
@@ -58,6 +58,7 @@ public class RoomSensorMetaService {
                 .filter(Objects::nonNull)
                 .toList();
 
+        log.info("강의실 센서 메타 조회 완료 roomId={}, sensorMetaCount={}", roomId, sensorMetaInfoList.size());
         return sensorMetaInfoList;
     }
 
@@ -66,27 +67,33 @@ public class RoomSensorMetaService {
         List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
 
         if (roomDeviceInfoList.isEmpty()) {
+            log.info("강의실 장비 옵션 조회 완료 roomId={}, deviceCount=0", roomId);
             return List.of();
         }
 
 
-        return roomDeviceInfoList.stream()
+        List<DeviceInfo> deviceInfos = roomDeviceInfoList.stream()
                 .map(room -> DeviceInfo.of(room.devEui(), room.deviceName()))
                 .distinct()
                 .toList();
+        log.info("강의실 장비 옵션 조회 완료 roomId={}, deviceCount={}", roomId, deviceInfos.size());
+        return deviceInfos;
     }
 
     public List<MeasurementType> getMeasurementTypeOptionsInRoom(Long roomId) {
         List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
         if (roomDeviceInfoList.isEmpty()) {
+            log.info("강의실 측정 타입 옵션 조회 완료 roomId={}, measurementTypeCount=0", roomId);
             return List.of();
         }
 
-        return roomDeviceInfoList.stream()
+        List<MeasurementType> measurementTypes = roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream())
                 .map(MeasurementType::fromString)
                 .distinct()
                 .toList();
+        log.info("강의실 측정 타입 옵션 조회 완료 roomId={}, measurementTypeCount={}", roomId, measurementTypes.size());
+        return measurementTypes;
     }
 
 

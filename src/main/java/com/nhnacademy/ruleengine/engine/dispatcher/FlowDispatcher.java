@@ -25,12 +25,13 @@ public class FlowDispatcher {
 
     public CompletableFuture<Void> dispatch(List<ExecutableFlow> flows, EnvironmentContext environmentContext) {
         Instant triggeredAt = Instant.now();
+        log.info("플로우 비동기 실행 시작 roomId={}, flowCount={}", environmentContext.roomId(), flows.size());
 
         List<CompletableFuture<Void>> futures = flows.stream()
                 .map(flow -> CompletableFuture
                         .runAsync(() -> runFlowPipeline(flow, environmentContext, triggeredAt), flowExecutorService)// runFlowPipeline 작업을 가상 스레드 풀(flowExecutorService)에서 실행하도록 지정
                         .exceptionally(ex -> {
-                            log.error("flow({}) 파이프라인 실행 중 처리되지 않은 예외 발생", flow.flowId(), ex);
+                            log.warn("플로우 파이프라인 실행 실패 flowId={}, roomId={}", flow.flowId(), flow.roomId(), ex);
                             return null;
                         }))
                 .toList();
@@ -40,11 +41,13 @@ public class FlowDispatcher {
 
     private void runFlowPipeline(ExecutableFlow flow, EnvironmentContext environmentContext, Instant triggeredAt) {
         if(!flowScheduleFilter.isSchedulable(flow)) {
-            log.debug("flow({}) - 스케줄 조건 불일치, 실행 스킵", flow.flowId());
+            log.info("flow({}) - 스케줄 조건 불일치, 실행 스킵", flow.flowId());
             return;
         }
         FlowContext context = FlowContext.of(flow, environmentContext, triggeredAt);
+        log.info("플로우 실행 시작 flowId={}, roomId={}", flow.flowId(), flow.roomId());
 
         flowExecutor.execute(context);
+        log.info("플로우 실행 완료 flowId={}, roomId={}", flow.flowId(), flow.roomId());
     }
 }

@@ -17,14 +17,14 @@ public class RoomManagementCacheService {
     private final RoomManagementClient managementClient;
     @Cacheable(value = "management-access", key = "#roomId + ':' + #userId", cacheManager = "roomManagementCacheManager")
     public RoomManagementAccessResponse getManagementAllowed(Long roomId, Long userId){
-        log.info("management-access:{}:{} cache miss, 외부 API 조회", roomId, userId);
+        log.info("강의실 관리 권한 캐시 미스, 외부 API 조회 roomId={}, userId={}", roomId, userId);
 
         try {
             return managementClient.getManagementAccessAllowed(roomId, userId);
         } catch (Exception e){
-        log.info("외부 api 호출 실패. 임시 권한 확인.", e);
-        return new RoomManagementAccessResponse(true);
-    }
+            log.error("강의실 관리 권한 외부 API 호출 실패, 임시 허용 응답 사용 roomId={}, userId={}", roomId, userId, e);
+            return new RoomManagementAccessResponse(true);
+        }
 
     }
 }

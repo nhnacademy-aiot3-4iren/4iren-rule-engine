@@ -25,7 +25,7 @@ public class FlowScheduleFilter {
                 .anyMatch(schedule -> matches(schedule, now.getDayOfWeek(), now.toLocalTime()));
 
         if (!matched) {
-            log.debug("flowId: {} - 등록된 스케줄과 현재 시각({}) 불일치", flow.flowId(), now);
+            log.info("flowId: {} - 등록된 스케줄과 현재 시각({}) 불일치", flow.flowId(), now);
         }
         return matched;
     }

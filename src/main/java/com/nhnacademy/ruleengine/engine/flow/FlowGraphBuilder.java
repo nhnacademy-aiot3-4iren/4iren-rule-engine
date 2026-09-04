@@ -48,9 +48,11 @@ public class FlowGraphBuilder {
         List<ExecutableFlow.ExecutableSchedule> executableSchedules = buildSchedules(flowSchedules);
 
         if(startNodeId == null){
-            log.error("startNodeId가 존재하지 않습니다. 플로우가 유효하지 않음");
+            log.warn("시작 노드를 찾을 수 없어 플로우 그래프를 만들 수 없음 flowId={}", flow.getId());
             throw new InvalidFlowException();
         }
+        log.info("플로우 그래프 조립 완료 flowId={}, nodeCount={}, connectionCount={}, scheduleCount={}",
+                flow.getId(), nodes.size(), connections.size(), flowSchedules.size());
 
         return new ExecutableFlow(
                 flow.getId(),

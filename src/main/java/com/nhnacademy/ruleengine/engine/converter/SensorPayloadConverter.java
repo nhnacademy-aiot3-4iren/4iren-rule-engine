@@ -20,7 +20,8 @@ public class SensorPayloadConverter {
             validate(payload);
             return payload;
         } catch (Exception e) {
-            log.error("EnvironmentContext 파싱 및 검증 실패 - Raw Message: {}", rawMessage, e);
+            log.warn("센서 페이로드 파싱 또는 검증 실패", e);
+            log.info("파싱 실패한 원본 센서 메시지: {}", rawMessage);
             throw new InvalidPayloadException("유효하지 않은 센서 페이로드입니다.", e);
         }
     }

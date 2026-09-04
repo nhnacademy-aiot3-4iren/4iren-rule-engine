@@ -35,7 +35,7 @@ public class OrNodeExecutor implements NodeExecutor {
         LogicalInputKey arrivedKey = new LogicalInputKey(path.fromNodeId(), path.fromBranchType(), orNodeId);
 
         if(!state.markArrived(arrivedKey, path.history())){
-            log.error("OR node({})에 등록되지 않은 경로로 입력이 도착: {}", orNodeId, arrivedKey);
+            log.warn("OR 노드에 등록되지 않은 경로 입력 도착 nodeId={}, arrivedKey={}", orNodeId, arrivedKey);
             return NodeExecutionResult.of(false, path);
         }
 
@@ -44,7 +44,7 @@ public class OrNodeExecutor implements NodeExecutor {
         }
         boolean passed = state.isSatisfied();
 
-        log.debug("node({}) OR 판단 - arrivedKey={}, satisfied={}, ready={}", orNodeId, arrivedKey, passed, state.isReady());
+        log.info("node({}) OR 판단 - arrivedKey={}, satisfied={}, ready={}", orNodeId, arrivedKey, passed, state.isReady());
 
         List<AlertEvent.NodeResult> mergedNodeResults = state.mergeArrivedHistories();
 

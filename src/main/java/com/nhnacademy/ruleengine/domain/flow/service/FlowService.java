@@ -20,6 +20,7 @@ import com.nhnacademy.ruleengine.domain.templateflow.repository.FlowTemplateMeas
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class FlowService {
 
     private final FlowRepository flowRepository;
@@ -47,6 +49,8 @@ public class FlowService {
     @Transactional
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
+        log.info("플로우 생성 처리 시작 roomId={}, flowName={}, nodeCount={}, connectionCount={}",
+                roomId, request.flowName(), request.nodes().size(), request.connections().size());
         Flow flow = Flow.regularBuilder()
                 .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
 
@@ -56,6 +60,8 @@ public class FlowService {
         Map<Long, Long> tempIdMap = saveNodes(savedFlow, request.nodes() );
         saveConnections(savedFlow, request.connections(),tempIdMap);
 
+        log.info("플로우 생성 완료 roomId={}, flowId={}, nodeCount={}, connectionCount={}",
+                roomId, savedFlow.getId(), request.nodes().size(), request.connections().size());
         return FlowCreateResponse.of(savedFlow.getId());
     }
 
@@ -63,6 +69,7 @@ public class FlowService {
         List<Flow> flowList = flowRepository.findAllByRoomId(roomId);
 
         if(flowList.isEmpty()){
+            log.info("플로우 목록 조회 완료 roomId={}, flowCount=0", roomId);
             return FlowListResponse.of(List.of());
         }
 
@@ -72,8 +79,9 @@ public class FlowService {
                 .collect(Collectors.groupingBy(
                         schedule -> schedule.getFlow().getId(),
                         Collectors.counting()
-                ));
+        ));
         List<FlowResponse> response = FlowResponse.fromList(flowList,scheduleCountMap);
+        log.info("플로우 목록 조회 완료 roomId={}, flowCount={}", roomId, response.size());
         return FlowListResponse.of(response);
     }
 
@@ -88,6 +96,8 @@ public class FlowService {
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
 
+        log.info("플로우 상세 조회 완료 roomId={}, flowId={}, nodeCount={}, connectionCount={}",
+                roomId, flowId, nodes.size(), connections.size());
         return FlowDetailResponse.from(flow,nodes,connections, sensorMetaInfoList);
     }
 
@@ -106,6 +116,8 @@ public class FlowService {
                 .map(Map.Entry::getKey).toList();
         List<Flow> templateFlowList = flowRepository.findAllById(availableTemplateIds);
 
+        log.info("강의실 사용 가능 템플릿 조회 완료 roomId={}, totalTemplateCount={}, availableTemplateCount={}",
+                roomId, allTemplateFlowList.size(), templateFlowList.size());
         return RoomTemplateListResponse.from(templateFlowList, measurementTypesByTemplateId);
     }
 
@@ -122,6 +134,8 @@ public class FlowService {
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
 
+        log.info("강의실 템플릿 상세 조회 완료 roomId={}, templateFlowId={}, nodeCount={}, connectionCount={}",
+                roomId, templateFlowId, nodes.size(), connections.size());
         return RoomTemplateDetailResponse.from(templateFlow, nodes, connections, sensorMetaInfoList);
     }
 
@@ -129,6 +143,8 @@ public class FlowService {
     @Transactional
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public void updateFlow(Long roomId, Long flowId, FlowUpdateRequest request) {
+        log.info("플로우 수정 처리 시작 roomId={}, flowId={}, nodeCount={}, connectionCount={}",
+                roomId, flowId, request.nodes().size(), request.connections().size());
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
         flowValidator.validate(request.nodes(), request.connections(), metaService.getSensorMetaList(roomId));
 
@@ -136,6 +152,7 @@ public class FlowService {
 
         //update
         updateNodesNConnections(flow, request.nodes(), request.connections());
+        log.info("플로우 수정 완료 roomId={}, flowId={}, isActive={}", roomId, flowId, request.isActive());
     }
 
     @Transactional
@@ -147,6 +164,7 @@ public class FlowService {
             throw new InvalidFlowException();
         }
         flowRepository.deleteById(flowId);
+        log.info("플로우 삭제 완료 roomId={}, flowId={}", roomId, flowId);
 
 
     }
@@ -158,12 +176,14 @@ public class FlowService {
                 .orElseThrow(UnauthorizedFlowAccessException::new);
 
         flow.updateStatus(request.isActive());
+        log.info("플로우 활성 상태 변경 완료 roomId={}, flowId={}, isActive={}", roomId, flowId, request.isActive());
     }
 
     public FlowBuildFormResponse getFlowBuildForm(Long roomId) {
 
         List<SensorMetaInfo> sensorMetaInfoList = metaService.getSensorMetaList(roomId);
 
+        log.info("플로우 빌드 폼 조회 완료 roomId={}, sensorMetaCount={}", roomId, sensorMetaInfoList.size());
         return FlowBuildFormResponse.of(roomId, sensorMetaInfoList);
     }
 
@@ -177,6 +197,7 @@ public class FlowService {
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });
 
+        log.info("플로우 노드 저장 완료 flowId={}, nodeCount={}", savedFlow.getId(), tempIdMap.size());
         return tempIdMap;
     }
 
@@ -203,13 +224,16 @@ public class FlowService {
                 })
                 .toList();
         connectionRepository.saveAll(connectionList);
+        log.info("플로우 연결 저장 완료 flowId={}, connectionCount={}", savedFlow.getId(), connectionList.size());
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<NodeInfo> nodes, @NotNull List<ConnectionInfo> connections ) {
+        log.info("플로우 노드와 연결 재구성 시작 flowId={}", savedFlow.getId());
         connectionRepository.deleteAllByNodeFlowId(savedFlow.getId());
         nodeRepository.deleteAllByFlowId(savedFlow.getId());
         Map<Long, Long> tempIdMap = saveNodes(savedFlow,nodes);
         saveConnections(savedFlow, connections,tempIdMap);
+        log.info("플로우 노드와 연결 재구성 완료 flowId={}", savedFlow.getId());
 
     }
 
