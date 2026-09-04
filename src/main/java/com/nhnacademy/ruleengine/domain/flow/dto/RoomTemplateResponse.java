@@ -33,7 +33,11 @@ public record RoomTemplateResponse(
     ){
         return flowTemplates.stream()
                 .map(f ->{
-                    List<MeasurementType> measurementTypeList = measurementTypesByFlowId.get(f.getId());
+                    List<MeasurementType> measurementTypeList = measurementTypesByFlowId
+                            .getOrDefault(f.getId(), List.of())
+                            .stream()
+                            .distinct()
+                            .toList();
 
                     return RoomTemplateResponse.builder()
                             .templateId(f.getId())
