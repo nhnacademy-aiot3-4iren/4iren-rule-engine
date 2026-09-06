@@ -15,6 +15,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class RoomSensorMetaService {
     private final RoomDeviceCacheService roomDeviceCacheService;
     private final MetricCatalogCacheService metricCatalogCacheService;
 
+    //강의실에서 측정 가능한 데이터 메타 정보
     public List<SensorMetaInfo> getSensorMetaList(Long roomId){
         List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
         List<MetricCatalogInfo> metricCatalogInfoList = metricCatalogCacheService.getMetricCatalog();
@@ -45,7 +47,12 @@ public class RoomSensorMetaService {
                 .flatMap(room -> room.measurement().keySet().stream())
                 .distinct()
                 .map(key->{
-                    MeasurementType measurementType = MeasurementType.fromString(key);
+                    Optional<MeasurementType> measurementType = MeasurementType.findByExternalCode(key);
+                    if (measurementType.isEmpty()) {
+                        log.warn("룰 엔진에서 지원하지 않는 측정 타입 제외 roomId={}, measurementType={}", roomId, key);
+                        return null;
+                    }
+
                     MetricCatalogInfo catalogInfo = catalogMap.get(key.toUpperCase());
 
                     if(catalogInfo == null){
@@ -53,7 +60,7 @@ public class RoomSensorMetaService {
                         return null;
                     }
 
-                    return SensorMetaInfo.of(measurementType, catalogInfo);
+                    return SensorMetaInfo.of(measurementType.get(), catalogInfo);
                 })
                 .filter(Objects::nonNull)
                 .toList();
@@ -63,23 +70,7 @@ public class RoomSensorMetaService {
     }
 
 
-    public List<DeviceInfo> getDeviceOptionsInRoom(Long roomId) {
-        List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
-
-        if (roomDeviceInfoList.isEmpty()) {
-            log.info("강의실 장비 옵션 조회 완료 roomId={}, deviceCount=0", roomId);
-            return List.of();
-        }
-
-
-        List<DeviceInfo> deviceInfos = roomDeviceInfoList.stream()
-                .map(room -> DeviceInfo.of(room.devEui(), room.deviceName()))
-                .distinct()
-                .toList();
-        log.info("강의실 장비 옵션 조회 완료 roomId={}, deviceCount={}", roomId, deviceInfos.size());
-        return deviceInfos;
-    }
-
+    //roomId rlwns 측정 가능한 List<MeasurementType>
     public List<MeasurementType> getMeasurementTypeOptionsInRoom(Long roomId) {
         List<RoomDeviceInfo> roomDeviceInfoList = roomDeviceCacheService.getRoomDevices(roomId);
         if (roomDeviceInfoList.isEmpty()) {
@@ -89,7 +80,7 @@ public class RoomSensorMetaService {
 
         List<MeasurementType> measurementTypes = roomDeviceInfoList.stream()
                 .flatMap(room -> room.measurement().keySet().stream())
-                .map(MeasurementType::fromString)
+                .flatMap(measurementType -> MeasurementType.findByExternalCode(measurementType).stream())
                 .distinct()
                 .toList();
         log.info("강의실 측정 타입 옵션 조회 완료 roomId={}, measurementTypeCount={}", roomId, measurementTypes.size());
@@ -97,17 +88,5 @@ public class RoomSensorMetaService {
     }
 
 
-    private Map<MeasurementType, List<DeviceInfo>> getDeviceInfoByMeasurementType(List<RoomDeviceInfo> roomDeviceInfoList){
-        return roomDeviceInfoList.stream()
-                .flatMap(room -> room.measurement().keySet().stream()//Stream<MeasurementType>
-                        .map(measurementType -> Map.entry(//Stream<Map.Entry<MeasurementType, DeviceInfo>>
-                                MeasurementType.fromString(measurementType),
-                                DeviceInfo.of(room.devEui(), room.deviceName())
-                        ))
-                ).collect(Collectors.groupingBy(//Map<MeasurementType, List<DeviceInfo>>
-                        Map.Entry::getKey,
-                        ()-> new EnumMap<>(MeasurementType.class),
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-                ));
-    }
+
 }

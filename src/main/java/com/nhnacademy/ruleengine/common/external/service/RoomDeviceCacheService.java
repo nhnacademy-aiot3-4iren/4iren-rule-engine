@@ -71,7 +71,8 @@ public class RoomDeviceCacheService {
                               "co2": "ppm",
                               "temperature": "°C",
                               "humidity": "%",
-                              "pressure": "Pa"
+                              "pressure": "Pa",
+                              "door" : ""
                             }
                           }
                         ]

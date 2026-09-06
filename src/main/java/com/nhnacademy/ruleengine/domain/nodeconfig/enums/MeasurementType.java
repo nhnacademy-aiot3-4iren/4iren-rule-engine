@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,8 @@ public enum MeasurementType {
     ILLUMINATION("주변 조도"),
     TEMPERATURE("온도"),
     PRESSURE("대기압"),
-    TVOC("총유기화합물"),
-    DOOR("문열림");
+    TVOC("총유기화합물");
+//    DOOR("문열림")
 
     private final String sensorDesc;
 
@@ -40,6 +41,14 @@ public enum MeasurementType {
             return type;
         }
         throw new InvalidMeasurementTypeException();
+    }
+
+    public static Optional<MeasurementType> findByExternalCode(String value) {
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(TYPE_MAP.get(value.toUpperCase()));
     }
 
     public static List<String> toNames(List<MeasurementType> measurementTypes) {
