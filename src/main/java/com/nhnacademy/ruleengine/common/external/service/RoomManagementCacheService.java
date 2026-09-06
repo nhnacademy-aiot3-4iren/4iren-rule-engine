@@ -22,8 +22,12 @@ public class RoomManagementCacheService {
         try {
             return managementClient.getManagementAccessAllowed(roomId, userId);
         } catch (Exception e){
-            log.error("강의실 관리 권한 외부 API 호출 실패, 임시 허용 응답 사용 roomId={}, userId={}", roomId, userId, e);
-            return new RoomManagementAccessResponse(true);
+//            log.error("강의실 관리 권한 외부 API 호출 실패, 임시 허용 응답 사용 roomId={}, userId={}", roomId, userId, e);
+//            return new RoomManagementAccessResponse(true);
+
+            log.error("강의실 관리 권한 외부 API 호출 실패, 권한 검증 불가 roomId={}, userId={}", roomId, userId, e);
+            return new RoomManagementAccessResponse(false);
+
         }
 
     }

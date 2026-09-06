@@ -26,8 +26,11 @@ public class RoomDeviceCacheService {
         try{
             return roomSensorClient.getRoomDevices(roomId);
         }catch (Exception e){
-            log.error("강의실 장비 목록 외부 API 호출 실패, 더미 데이터 사용 roomId={}", roomId, e);
-            return getDummyDevices();
+//            log.error("강의실 장비 목록 외부 API 호출 실패, 더미 데이터 사용 roomId={}", roomId, e);
+//            return getDummyDevices();
+
+            log.error("강의실 장비 목 외부 API 호출 실패", e);
+            return List.of();
         }
 
     }

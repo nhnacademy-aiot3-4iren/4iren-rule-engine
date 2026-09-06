@@ -27,8 +27,10 @@ public class MetricCatalogCacheService {
         try{
             return roomSensorClient.getMetricCatalog();
         }catch (Exception e){
-            log.error("측정 항목 카탈로그 외부 API 호출 실패, 더미 데이터 사용", e);
-            return getDummyCatalog();
+//            log.error("측정 항목 카탈로그 외부 API 호출 실패, 더미 데이터 사용", e);
+//            return getDummyCatalog();
+            log.error("측정 항목 카탈로그 외부 API 호출 실패", e);
+            return List.of();
         }
 
     }
