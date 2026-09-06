@@ -32,7 +32,6 @@ public class SensorTimeSeriesRepository {
     /**
      * 센서 측정값 저장 및 슬라이딩 윈도우 만료 데이터 제거
      */
-    @SuppressWarnings("java:S2245") //
     public void save(Long roomId, MeasurementType type, double value, Instant timestamp) {
         String key = getKey(roomId, type);
         long score = timestamp.toEpochMilli();
