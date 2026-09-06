@@ -24,14 +24,14 @@ public class GradientNodeConfigValidator implements NodeConfigValidator {
         List<NodeConfigError> errors = new ArrayList<>();
 
         if (c.measurementType() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.measurementType", "measurementType은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.measurementType", "측정 항목을 선택해야 합니다."));
             return errors;
         }
         if (c.operator() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.operator", "operator는 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.operator", "비교 조건을 선택해야 합니다."));
         }
         if (c.unit() == null || c.unit().isBlank()) {
-            errors.add(NodeConfigError.of("nodeConfig.unit", "unit은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.unit", "단위를 입력해야 합니다."));
         }
 
         // sensorType 존재 여부
@@ -41,23 +41,23 @@ public class GradientNodeConfigValidator implements NodeConfigValidator {
                 .orElse(null);
 
         if (targetMeta == null) {
-            errors.add(NodeConfigError.of("nodeConfig.measurementType", "해당 강의실에서 지원하지 않는 sensorType: " + c.measurementType()));
+            errors.add(NodeConfigError.of("nodeConfig.measurementType", "이 강의실에서 사용할 수 없는 측정 항목입니다: " + c.measurementType().getSensorDesc()));
             return errors;
         }
 
 
         // windowSec 범위 (최소 10초, 최대 1시간)
         if (c.windowSec() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.windowSec", "windowSec은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.windowSec", "계산에 사용할 시간을 설정해야 합니다."));
         } else if (c.windowSec() < 10 || c.windowSec() > 3600) {
-            errors.add(NodeConfigError.of("nodeConfig.windowSec", "windowSec 범위 초과 (10 ~ 3600): " + c.windowSec()));
+            errors.add(NodeConfigError.of("nodeConfig.windowSec", "계산 시간은 10초 이상 1시간 이하로 설정해야 합니다. 현재값: " + c.windowSec() + "초"));
         }
 
         // gradient 0이면 의미 없음
         if (c.gradient() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.gradient", "gradient 값은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.gradient", "기울기를 설정해야 합니다."));
         } else if (c.gradient() == 0) {
-            errors.add(NodeConfigError.of("nodeConfig.gradient", "gradient 값은 0이 될 수 없습니다"));
+            errors.add(NodeConfigError.of("nodeConfig.gradient", "기울기는 0이 아닌 값으로 설정해야 합니다."));
         }
 
         return errors;

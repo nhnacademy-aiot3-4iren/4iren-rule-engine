@@ -140,7 +140,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("행동 노드가 최소 1개"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("알림 노드를 최소 1개"));
                 });
     }
 
@@ -159,7 +159,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("고립 노드"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("연결되지 않은 노드"));
                 });
     }
 
@@ -178,7 +178,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("시작 노드가 없습니다"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("플로우를 시작할 노드를 찾을 수 없습니다"));
                 });
     }
 
@@ -196,7 +196,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("시작노드는 1개여야 합니다"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("플로우를 시작할 수 있는 노드는 1개"));
                 });
     }
 
@@ -214,7 +214,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("존재하지 않는 targetNodeId"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("연결선의 도착 노드를 찾을 수 없습니다"));
                 });
     }
 

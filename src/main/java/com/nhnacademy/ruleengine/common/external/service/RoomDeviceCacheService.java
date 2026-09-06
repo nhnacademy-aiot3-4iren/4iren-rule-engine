@@ -21,20 +21,20 @@ public class RoomDeviceCacheService {
 
     @Cacheable(value = "room:devices", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<RoomDeviceInfo> getRoomDevices(Long roomId) {
-        log.info("cache miss roomId = {}, 외부 API 조회", roomId);
+        log.info("강의실 장비 목록 캐시 미스, 외부 API 조회 roomId={}", roomId);
 
         try{
             return roomSensorClient.getRoomDevices(roomId);
         }catch (Exception e){
-            log.info("외부 API 호출 실패", e);
-            return List.of();
+            log.error("강의실 장비 목록 외부 API 호출 실패, 더미 데이터 사용 roomId={}", roomId, e);
+            return getDummyDevices();
         }
 
     }
     //TODO 테스트용 추후 삭제
     private List<RoomDeviceInfo> getDummyDevices() {
         try {
-            log.info("getDummyDevices");
+            log.info("테스트용 강의실 장비 더미 데이터 생성");
             return objectMapper.readValue("""
                         [
                           {
@@ -71,7 +71,8 @@ public class RoomDeviceCacheService {
                               "co2": "ppm",
                               "temperature": "°C",
                               "humidity": "%",
-                              "pressure": "Pa"
+                              "pressure": "Pa",
+                              "door" : ""
                             }
                           }
                         ]

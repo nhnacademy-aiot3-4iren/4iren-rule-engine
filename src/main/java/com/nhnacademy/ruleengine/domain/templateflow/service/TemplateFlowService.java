@@ -17,6 +17,7 @@ import com.nhnacademy.ruleengine.domain.templateflow.validator.TemplateFlowValid
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Validated
+@Slf4j
 public class TemplateFlowService {
 
     private final FlowRepository flowRepository;
@@ -39,6 +41,8 @@ public class TemplateFlowService {
 
     @Transactional
     public TemplateFlowCreateResponse createTemplateFlow(TemplateFlowCreateRequest request) {
+        log.info("템플릿 플로우 생성 처리 시작 templateName={}, nodeCount={}, connectionCount={}",
+                request.flowName(), request.nodes().size(), request.connections().size());
         Flow flow = Flow.templateBuilder()
                 .flowName(request.flowName()).description(request.description()).build();
 
@@ -50,6 +54,8 @@ public class TemplateFlowService {
         savedFlowTemplateMeasurementType(savedFlow, request.nodes());
 
 
+        log.info("템플릿 플로우 생성 완료 templateId={}, nodeCount={}, connectionCount={}",
+                savedFlow.getId(), request.nodes().size(), request.connections().size());
         return TemplateFlowCreateResponse.of(savedFlow.getId());
     }
 
@@ -57,9 +63,11 @@ public class TemplateFlowService {
         List<Flow> templateList = flowRepository.findAllByIsTemplate(true);
 
         if(templateList.isEmpty()){
+            log.info("템플릿 플로우 목록 조회 완료 templateCount=0");
             return new TemplateListResponse(List.of());
         }
         Map<Long, List<MeasurementType>> measurementTypesByTemplateId = getMeasurementTypesByTemplateIds(templateList);
+        log.info("템플릿 플로우 목록 조회 완료 templateCount={}", templateList.size());
         return TemplateListResponse.of(templateList, measurementTypesByTemplateId);
     }
 
@@ -75,11 +83,15 @@ public class TemplateFlowService {
 
 
 
+        log.info("템플릿 플로우 상세 조회 완료 templateId={}, nodeCount={}, connectionCount={}",
+                templateId, nodes.size(), connections.size());
         return TemplateDetailResponse.from(templateFlow, nodes, connections);
     }
 
     @Transactional
     public void updateTemplate(Long templateId, TemplateFlowUpdateRequest request) {
+        log.info("템플릿 플로우 수정 처리 시작 templateId={}, nodeCount={}, connectionCount={}",
+                templateId, request.nodes().size(), request.connections().size());
         Flow templateFlow = flowRepository.findById(templateId).orElseThrow(FlowNotFoundException::new);
         templateFlowValidator.validate(request.nodes(), request.connections());
 
@@ -89,6 +101,7 @@ public class TemplateFlowService {
 
         templateFlow.updateTemplate(request.flowName(), request.description());
         updateNodesNConnections(templateFlow, request.nodes(), request.connections());
+        log.info("템플릿 플로우 수정 완료 templateId={}", templateId);
     }
 
     @Transactional
@@ -99,6 +112,7 @@ public class TemplateFlowService {
             throw new InvalidFlowException();
         }
         flowRepository.deleteById(templateId);
+        log.info("템플릿 플로우 삭제 완료 templateId={}", templateId);
     }
 
     private Map<Long, Long> saveNodes(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes) {
@@ -116,6 +130,7 @@ public class TemplateFlowService {
                     tempIdMap.put(n.nodeId(), savedNode.getId());
                 });
 
+        log.info("템플릿 플로우 노드 저장 완료 templateId={}, nodeCount={}", savedFlow.getId(), tempIdMap.size());
         return tempIdMap;
     }
 
@@ -142,9 +157,11 @@ public class TemplateFlowService {
                 .toList();
 
         connectionRepository.saveAll(connectionList);
+        log.info("템플릿 플로우 연결 저장 완료 templateId={}, connectionCount={}", savedFlow.getId(), connectionList.size());
     }
 
     private void updateNodesNConnections(Flow savedFlow, @NotEmpty List<TemplateNodeInfo> nodes, @NotNull List<TemplateConnectionInfo> connections ) {
+        log.info("템플릿 플로우 노드와 연결 재구성 시작 templateId={}", savedFlow.getId());
         connectionRepository.deleteAllByNodeFlowId(savedFlow.getId());
         nodeRepository.deleteAllByFlowId(savedFlow.getId());
         flowTemplateMeasurementTypeRepository.deleteAllByFlow(savedFlow);
@@ -152,6 +169,7 @@ public class TemplateFlowService {
         Map<Long, Long> tempIdMap = saveNodes(savedFlow,nodes);
         saveConnections(savedFlow, connections,tempIdMap);
         savedFlowTemplateMeasurementType(savedFlow, nodes);
+        log.info("템플릿 플로우 노드와 연결 재구성 완료 templateId={}", savedFlow.getId());
     }
 
 
@@ -162,10 +180,13 @@ public class TemplateFlowService {
                 .map(nodeInfo->nodeInfo.nodeConfig().measurementType()).toList();
 
         List<FlowTemplateMeasurementType> flowTemplateMeasurementTypeList = measurementTypes.stream()
+                .distinct()
                 .map(m -> FlowTemplateMeasurementType.builder().flow(savedTemplateFlow).measurementType(m).build())
                 .toList();
 
         flowTemplateMeasurementTypeRepository.saveAll(flowTemplateMeasurementTypeList);
+        log.info("템플릿 플로우 측정 항목 저장 완료 templateId={}, measurementTypeCount={}",
+                savedTemplateFlow.getId(), flowTemplateMeasurementTypeList.size());
     }
 
     private Map<Long, List<MeasurementType>> getMeasurementTypesByTemplateIds(List<Flow> templateFlows){

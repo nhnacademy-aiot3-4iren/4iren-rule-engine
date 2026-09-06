@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "4iren-core",
+        contextId = "roomManagementClient",
         path = "/api/core"
 )
 public interface RoomManagementClient {

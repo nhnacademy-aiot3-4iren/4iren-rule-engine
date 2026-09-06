@@ -22,18 +22,19 @@ public class MetricCatalogCacheService {
 
     @Cacheable(value = "sensor:catalog", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<MetricCatalogInfo> getMetricCatalog(){
-        log.info("cache miss, 외부 API 조회");
+        log.info("측정 항목 카탈로그 캐시 미스, 외부 API 조회");
 
         try{
             return roomSensorClient.getMetricCatalog();
         }catch (Exception e){
-            log.info("외부 API 호출 실패", e);
-            return List.of();
+            log.error("측정 항목 카탈로그 외부 API 호출 실패, 더미 데이터 사용", e);
+            return getDummyCatalog();
         }
 
     }
     private List<MetricCatalogInfo> getDummyCatalog() {
         try {
+            log.info("테스트용 측정 항목 카탈로그 더미 데이터 생성");
             return objectMapper.readValue("""
                     [
                       {

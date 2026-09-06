@@ -14,6 +14,7 @@ import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleResponse;
 import com.nhnacademy.ruleengine.domain.flowschedule.entity.FlowSchedule;
 import com.nhnacademy.ruleengine.domain.flowschedule.repository.FlowScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +25,15 @@ import java.util.List;
 @Transactional
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FlowScheduleService {
     private final FlowRepository flowRepository;
     private final FlowScheduleRepository flowScheduleRepository;
 
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
+        log.info("플로우 스케줄 생성 처리 시작 roomId={}, flowId={}, dayOfWeek={}, startTime={}, endTime={}",
+                roomId, flowId, request.dayOfWeek(), request.startTime(), request.endTime());
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
         validateCreateRequest(flowId, request);
@@ -37,6 +41,7 @@ public class FlowScheduleService {
         FlowSchedule flowSchedule = FlowSchedule.create(flow, request);
         FlowSchedule savedFlowSchedule = flowScheduleRepository.save(flowSchedule);
 
+        log.info("플로우 스케줄 생성 완료 roomId={}, flowId={}, scheduleId={}", roomId, flowId, savedFlowSchedule.getId());
         return FlowScheduleCreateResponse.of(savedFlowSchedule.getId());
     }
 
@@ -47,6 +52,8 @@ public class FlowScheduleService {
         }
         List<FlowSchedule> flowScheduleList = flowScheduleRepository.findAllByFlowId(flowId);
 
+        log.info("플로우 스케줄 목록 조회 완료 roomId={}, flowId={}, scheduleCount={}",
+                roomId, flowId, flowScheduleList.size());
         return FlowScheduleListResponse.from(flowId, flowScheduleList);
     }
 
@@ -56,6 +63,7 @@ public class FlowScheduleService {
         FlowSchedule flowSchedule = flowScheduleRepository.findSchedule(scheduleId, flowId, roomId)
                 .orElseThrow(FlowScheduleNotFoundException::new);
 
+        log.info("플로우 스케줄 상세 조회 완료 roomId={}, flowId={}, scheduleId={}", roomId, flowId, scheduleId);
         return FlowScheduleResponse.from(flowSchedule);
     }
 
@@ -65,6 +73,7 @@ public class FlowScheduleService {
             throw new FlowScheduleNotFoundException();
         }
         flowScheduleRepository.deleteById(scheduleId);
+        log.info("플로우 스케줄 삭제 완료 roomId={}, flowId={}, scheduleId={}", roomId, flowId, scheduleId);
     }
 
     //검증 코드
@@ -97,7 +106,7 @@ public class FlowScheduleService {
         if(overlapped){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "같은 요일에 시간이 겹치는 스케줄이 이미 존재합니다."
+                    "같은 요일에 겹치는 실행 시간이 이미 있습니다."
             ));
         }
 
@@ -114,7 +123,7 @@ public class FlowScheduleService {
         if(request.startTime().equals(request.endTime())){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "시작 시간과 종료 시간은 같을 수 없습니다."
+                    "시작 시간과 종료 시간을 다르게 설정해야 합니다."
             ));
             return false;
         }
@@ -122,7 +131,7 @@ public class FlowScheduleService {
         if(request.startTime().isAfter(request.endTime())){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "스케줄 시작시간이 종료 시간보다 늦을 수 없습니다."
+                    "시작 시간은 종료 시간보다 빠르게 설정해야 합니다."
             ));
             return false;
         }

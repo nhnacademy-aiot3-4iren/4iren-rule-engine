@@ -10,6 +10,7 @@ import java.util.List;
 
 @FeignClient(
     name = "4iren-processing",
+    contextId = "roomSensorClient",
     path = "/api/processing"
 )
 public interface RoomSensorClient {
