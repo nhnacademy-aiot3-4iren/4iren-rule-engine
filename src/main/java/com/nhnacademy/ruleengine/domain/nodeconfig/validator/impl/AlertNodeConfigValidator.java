@@ -26,16 +26,16 @@ public class AlertNodeConfigValidator implements NodeConfigValidator {
         // sensorMetas 불필요 (액션 노드)
 
         if (c.alertTitle() == null || c.alertTitle().isBlank()) {
-            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.alertTitle", "알림 제목을 입력해주세요"));
+            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.alertTitle", "알림 제목을 입력해야 합니다."));
         }
         if (c.alertType() == null) {
-            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.alertType", "알림 타입을 선택해주세요"));
+            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.alertType", "알림 종류를 선택해야 합니다."));
         }
 
         if (c.dedupWindowSec() == null) {
-            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.dedupWindowSec","dedupWindowSec은 필수입니다"));
+            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.dedupWindowSec","중복 알림 제한 시간을 설정해야 합니다."));
         } else if (c.dedupWindowSec() <= 0) {
-            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.dedupWindowSec","dedupWindowSec은 0보다 커야 합니다"));
+            errors.add(NodeConfigValidationResponse.NodeConfigError.of("nodeConfig.dedupWindowSec","중복 알림 제한 시간은 1초 이상으로 설정해야 합니다."));
         }
 
 

@@ -54,17 +54,17 @@ public class TemplateFlowValidator {
             List<ValidationErrorResponse.ValidationError> errors
     ) {
         if (nodes == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "nodes는 필수입니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "노드를 추가해야 합니다."));
         }
         if (connections == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of("connections", "connections는 필수입니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("connections", "연결선을 추가해야 합니다."));
         }
     }
 
     // START, 판단 노드, 행동 노드를 포함할 수 있도록 최소 노드 개수를 검증한다.
     private void validateNodeCount( List<TemplateNodeInfo> nodes, List<ValidationErrorResponse.ValidationError> errors){
         if(nodes == null || nodes.size() < 3){
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "노드는 최소 3개 이상이어야 합니다. START, 판단 노드, 행동 노드가 각각 1개 이상 필요합니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "시작, 조건, 알림을 구성하려면 노드를 최소 3개 이상 추가해야 합니다."));
         }
     }
 
@@ -79,13 +79,13 @@ public class TemplateFlowValidator {
                 .anyMatch(node -> node.nodeType() != null && node.nodeType().isActionNode());
 
         if (startNodeCount != 1) {
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "START 노드는 정확히 1개여야 합니다. 현재: " + startNodeCount + "개"));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "시작 노드는 1개만 있어야 합니다. 현재: " + startNodeCount + "개"));
         }
         if (!hasConditionNode) {
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "판단 노드가 최소 1개 이상 필요합니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "조건 노드를 최소 1개 이상 추가해야 합니다."));
         }
         if (!hasActionNode) {
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "행동 노드가 최소 1개 이상 필요합니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "알림 노드를 최소 1개 이상 추가해야 합니다."));
         }
     }
 
@@ -96,24 +96,24 @@ public class TemplateFlowValidator {
                 .map(TemplateNodeInfo::nodeId)
                 .filter(Objects::nonNull)
                 .filter(id -> !seen.add(id))
-                .forEach(id -> errors.add(ValidationErrorResponse.ValidationError.of(id, "nodeId", "중복된 nodeId입니다.")));
+                .forEach(id -> errors.add(ValidationErrorResponse.ValidationError.of(id, "nodeId", "같은 노드가 중복되어 있습니다.")));
     }
 
     // 템플릿 노드의 nodeConfig 필수값과 nodeType 일치 여부를 검증한다.
     private void validateNodeConfig(List<TemplateNodeInfo> nodes, List<ValidationErrorResponse.ValidationError> errors) {
         for (TemplateNodeInfo node : nodes) {
             if (node.nodeConfig() == null) {
-                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig", "nodeConfig는 필수입니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig", "노드 설정을 입력해야 합니다."));
                 continue;
             }
 
             NodeConfig nodeConfig = node.nodeConfig();
             if (nodeConfig.nodeType() == null) {
-                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig.nodeType", "nodeConfig.nodeType은 필수입니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig.nodeType", "노드 종류를 선택해야 합니다."));
                 continue;
             }
             if (node.nodeType() != nodeConfig.nodeType()) {
-                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig.nodeType", "nodeType과 nodeConfig.nodeType이 일치하지 않습니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodeConfig.nodeType", "선택한 노드 종류와 설정의 노드 종류가 일치하지 않습니다."));
             }
         }
     }
@@ -131,10 +131,10 @@ public class TemplateFlowValidator {
             }
 
             if (!nodeMap.containsKey(connection.sourceNodeId())) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "sourceNodeId", "존재하지 않는 sourceNodeId입니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "sourceNodeId", "연결선의 출발 노드를 찾을 수 없습니다."));
             }
             if (!nodeMap.containsKey(connection.targetNodeId())) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.targetNodeId(), "targetNodeId", "존재하지 않는 targetNodeId입니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.targetNodeId(), "targetNodeId", "연결선의 도착 노드를 찾을 수 없습니다."));
             }
             if (Objects.equals(connection.sourceNodeId(), connection.targetNodeId())) {
                 errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "connection", "자기 자신으로 연결할 수 없습니다."));
@@ -142,7 +142,7 @@ public class TemplateFlowValidator {
 
             String key = connection.sourceNodeId() + "->" + connection.targetNodeId() + ":" + connection.branchType();
             if (!seenConnections.add(key)) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "connection", "중복된 connection입니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "connection", "같은 연결선이 중복되어 있습니다."));
             }
         }
     }
@@ -163,31 +163,31 @@ public class TemplateFlowValidator {
 
             if (nodeType == NodeType.START) {
                 if (degree.incoming != 0) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "START 노드는 입력을 가질 수 없습니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "시작 노드에는 들어오는 연결선을 만들 수 없습니다."));
                 }
                 if (degree.outgoing == 0) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "START 노드는 출력이 최소 1개 필요합니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "시작 노드에는 나가는 연결선이 최소 1개 필요합니다."));
                 }
             } else if (nodeType.isConditionNode()) {
                 if (degree.incoming != 1) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "판단 노드는 입력이 정확히 1개여야 합니다. 현재: " + degree.incoming + "개"));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "조건 노드는 들어오는 연결선이 1개여야 합니다. 현재: " + degree.incoming + "개"));
                 }
                 if (degree.outgoing == 0) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "판단 노드는 출력이 최소 1개 필요합니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "조건 노드는 나가는 연결선이 최소 1개 필요합니다."));
                 }
             } else if (nodeType == NodeType.OR) {
                 if (degree.incoming < 1) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "OR 노드는 입력이 최소 1개 필요합니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "합치기 노드는 들어오는 연결선이 최소 1개 필요합니다."));
                 }
                 if (degree.outgoing == 0) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "OR 노드는 출력이 최소 1개 필요합니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "합치기 노드는 나가는 연결선이 최소 1개 필요합니다."));
                 }
             } else if (nodeType.isActionNode()) {
                 if (degree.incoming != 1) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "행동 노드는 입력이 정확히 1개여야 합니다. 현재: " + degree.incoming + "개"));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "incoming", "알림 노드는 들어오는 연결선이 1개여야 합니다. 현재: " + degree.incoming + "개"));
                 }
                 if (degree.outgoing != 0) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "행동 노드는 출력을 가질 수 없습니다."));
+                    errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "outgoing", "알림 노드에는 나가는 연결선을 만들 수 없습니다."));
                 }
             }
         }
@@ -200,13 +200,13 @@ public class TemplateFlowValidator {
             NodeType sourceType = nodeTypeById.get(connection.sourceNodeId());
             NodeType targetType = nodeTypeById.get(connection.targetNodeId());
             if (sourceType == NodeType.START && connection.branchType() != BranchType.TRUE) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "branchType", "START 노드의 출력 connection은 TRUE만 사용할 수 있습니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "branchType", "시작 노드에서 나가는 연결선은 기본 경로만 사용할 수 있습니다."));
             }
             if (sourceType != null && sourceType.isActionNode()) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "sourceNodeId", "행동 노드는 connection의 source가 될 수 없습니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.sourceNodeId(), "sourceNodeId", "알림 노드에서는 다른 노드로 연결할 수 없습니다."));
             }
             if (targetType == NodeType.START) {
-                errors.add(ValidationErrorResponse.ValidationError.of(connection.targetNodeId(), "targetNodeId", "START 노드는 connection의 target이 될 수 없습니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of(connection.targetNodeId(), "targetNodeId", "시작 노드로 들어오는 연결선은 만들 수 없습니다."));
             }
         }
     }
@@ -223,7 +223,7 @@ public class TemplateFlowValidator {
 
         nodes.stream()
                 .filter(node -> !connectionNodeIds.contains(node.nodeId()))
-                .forEach(node -> errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodes", "연결되지 않은 고립 노드가 있습니다: " + node.nodeName())));
+                .forEach(node -> errors.add(ValidationErrorResponse.ValidationError.of(node.nodeId(), "nodes", "연결되지 않은 노드가 있습니다: " + node.nodeName())));
     }
 
     // incoming connection이 없는 시작 지점이 정확히 하나인지 검증한다.
@@ -237,9 +237,9 @@ public class TemplateFlowValidator {
                 .count();
 
         if(startNodeCount == 0){
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "시작 노드가 없습니다. 순환 연결이 의심됩니다."));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "플로우를 시작할 노드를 찾을 수 없습니다. 연결이 순환되는지 확인해주세요."));
         } else if (startNodeCount > 1) {
-            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "시작노드는 1개여야 합니다. 현재: " + startNodeCount + "개"));
+            errors.add(ValidationErrorResponse.ValidationError.of("nodes", "플로우를 시작할 수 있는 노드는 1개여야 합니다. 현재: " + startNodeCount + "개"));
         }
     }
 
@@ -259,7 +259,7 @@ public class TemplateFlowValidator {
 
         for(Long nodeId : adjacency.keySet()){
             if(hasCycle(nodeId, adjacency, visited, inStack)){
-                errors.add(ValidationErrorResponse.ValidationError.of("connections", "순환 연결이 감지되었습니다."));
+                errors.add(ValidationErrorResponse.ValidationError.of("connections", "노드 연결이 순환되어 플로우를 실행할 수 없습니다."));
                 return;
             }
         }

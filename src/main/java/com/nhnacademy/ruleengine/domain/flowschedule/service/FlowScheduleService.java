@@ -106,7 +106,7 @@ public class FlowScheduleService {
         if(overlapped){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "같은 요일에 시간이 겹치는 스케줄이 이미 존재합니다."
+                    "같은 요일에 겹치는 실행 시간이 이미 있습니다."
             ));
         }
 
@@ -123,7 +123,7 @@ public class FlowScheduleService {
         if(request.startTime().equals(request.endTime())){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "시작 시간과 종료 시간은 같을 수 없습니다."
+                    "시작 시간과 종료 시간을 다르게 설정해야 합니다."
             ));
             return false;
         }
@@ -131,7 +131,7 @@ public class FlowScheduleService {
         if(request.startTime().isAfter(request.endTime())){
             errors.add(ValidationErrorResponse.ValidationError.of(
                     "FlowSchedule",
-                    "스케줄 시작시간이 종료 시간보다 늦을 수 없습니다."
+                    "시작 시간은 종료 시간보다 빠르게 설정해야 합니다."
             ));
             return false;
         }
