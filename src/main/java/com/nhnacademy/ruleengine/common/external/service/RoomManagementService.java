@@ -5,19 +5,19 @@ import com.nhnacademy.ruleengine.common.external.client.RoomManagementClient;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomManagementCacheService {
+public class RoomManagementService {
 
     private final RoomManagementClient managementClient;
-    @Cacheable(value = "management-access", key = "#roomId + ':' + #userId", cacheManager = "roomManagementCacheManager")
+//    @Cacheable(value = "management-access", key = "#roomId + ':' + #userId", cacheManager = "roomManagementCacheManager")
     public RoomManagementAccessResponse getManagementAllowed(Long roomId, Long userId){
-        log.info("강의실 관리 권한 캐시 미스, 외부 API 조회 roomId={}, userId={}", roomId, userId);
+//        log.info("강의실 관리 권한 캐시 미스, 외부 API 조회 roomId={}, userId={}", roomId, userId);
+        log.info("강의실 관리 권한 API 조회 roomId={}, userId={}", roomId, userId);
 
         try {
             return managementClient.getManagementAccessAllowed(roomId, userId);

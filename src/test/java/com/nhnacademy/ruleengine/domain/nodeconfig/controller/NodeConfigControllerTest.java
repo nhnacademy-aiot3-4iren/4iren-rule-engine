@@ -4,7 +4,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
-import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementService;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
@@ -49,7 +49,7 @@ class NodeConfigControllerTest {
     private NodeConfigService nodeConfigService;
 
     @MockitoBean
-    private RoomManagementCacheService roomManagementCacheService;
+    private RoomManagementService roomManagementService;
 
     private static final Long ROOM_ID = 1L;
     private static final Long NODE_ID = 1L;
@@ -62,7 +62,7 @@ class NodeConfigControllerTest {
 
     @BeforeEach
     void setUp() {
-        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+        given(roomManagementService.getManagementAllowed(ROOM_ID, USER_ID))
                 .willReturn(new RoomManagementAccessResponse(true));
     }
 

@@ -2,7 +2,7 @@ package com.nhnacademy.ruleengine.domain.flow.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
-import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementService;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
@@ -46,7 +46,7 @@ class FlowControllerTest {
     private FlowService flowService;
 
     @MockitoBean
-    private RoomManagementCacheService roomManagementCacheService;
+    private RoomManagementService roomManagementService;
 
     private static final Long ROOM_ID = 1L;
     private static final Long FLOW_ID = 1L;
@@ -55,7 +55,7 @@ class FlowControllerTest {
 
     @BeforeEach
     void setUp() {
-        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+        given(roomManagementService.getManagementAllowed(ROOM_ID, USER_ID))
                 .willReturn(new RoomManagementAccessResponse(true));
     }
 
