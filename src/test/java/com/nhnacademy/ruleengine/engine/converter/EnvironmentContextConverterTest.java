@@ -52,7 +52,7 @@ class EnvironmentContextConverterTest {
                   "updatedAt": "2026-08-13T05:00:02Z"
                 }
                 """;
-        EnvironmentContext payload = converter.convert(validJson);
+        EnvironmentContext payload = converter.convertIfAssigned(validJson).get();
 
         assertThat(payload).isNotNull();
         assertThat(payload.roomId()).isEqualTo(1L);
@@ -67,14 +67,14 @@ class EnvironmentContextConverterTest {
     void convert_InvalidJsonFormat_ThrowsException() {
         String invalidJson = "{ invalid json string ";
 
-        assertThatThrownBy(() -> converter.convert(invalidJson))
+        assertThatThrownBy(() -> converter.convertIfAssigned(invalidJson).get())
                 .isInstanceOf(InvalidPayloadException.class)
                 .hasMessageContaining("유효하지 않은 센서 페이로드입니다.");
     }
 
     @Test
-    @DisplayName(" roomId가 누락된 경우 InvalidPayloadException 던짐")
-    void convert_MissingRoomId_ThrowsException() {
+    @DisplayName("방 배정 없는 메시지는 Optional.empty 반환")
+    void convertIfAssigned_MissingRoomId_ReturnsEmpty() {
         String jsonWithoutRoomId = """
                 {
                   "metrics": [
@@ -83,32 +83,19 @@ class EnvironmentContextConverterTest {
                       "value": 24.5,
                       "devEui": "A84041B2C3D4E5F6",
                       "updatedAt": "2026-08-13T05:00:00Z"
-                    },
-                    {
-                      "metric": "humidity",
-                      "value": 58.2,
-                      "devEui": "A84041B2C3D4E5F6",
-                      "updatedAt": "2026-08-13T05:00:01Z"
-                    },
-                    {
-                      "metric": "co2",
-                      "value": 642.0,
-                      "devEui": "A84041B2C3D4E5F6",
-                      "updatedAt": "2026-08-13T05:00:02Z"
                     }
                   ],
                   "updatedAt": "2026-08-13T05:00:02Z"
                 }
                 """;
 
-        assertThatThrownBy(() -> converter.convert(jsonWithoutRoomId))
-                .isInstanceOf(InvalidPayloadException.class);
+        assertThat(converter.convertIfAssigned(jsonWithoutRoomId)).isEmpty();
     }
 
     @Test
     @DisplayName("payload가 null인 경우 InvalidPayloadException 던짐")
     void convert_Null_ThrowsException() {
-        assertThatThrownBy(() -> converter.convert(null))
+        assertThatThrownBy(() -> converter.convertIfAssigned(null).get())
                 .isInstanceOf(InvalidPayloadException.class);
     }
 
@@ -122,7 +109,7 @@ class EnvironmentContextConverterTest {
                   "updatedAt": "2026-08-13T05:00:02Z"
                 }
                 """;
-        assertThatThrownBy(() -> converter.convert(jsonWithEmptySensorData))
+        assertThatThrownBy(() -> converter.convertIfAssigned(jsonWithEmptySensorData).get())
                 .isInstanceOf(InvalidPayloadException.class);
     }
 
@@ -154,7 +141,7 @@ class EnvironmentContextConverterTest {
                   ]
                 }
                 """;
-        assertThatThrownBy(() -> converter.convert(jsonWithoutMeasuredAt))
+        assertThatThrownBy(() -> converter.convertIfAssigned(jsonWithoutMeasuredAt).get())
                 .isInstanceOf(InvalidPayloadException.class);
     }
 }

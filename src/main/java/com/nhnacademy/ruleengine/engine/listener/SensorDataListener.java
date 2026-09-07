@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +26,12 @@ public class SensorDataListener {
 
         String rawMessage = new String(message.getBody(), StandardCharsets.UTF_8);
 
-        EnvironmentContext payload = converter.convert(rawMessage);
+        Optional<EnvironmentContext> converted = converter.convertIfAssigned(rawMessage);
+        if (converted.isEmpty()) {
+            return;
+        }
+
+        EnvironmentContext payload = converted.get();
 
         log.info("센서 데이터 변환 완료 roomId={}, 측정값수={}",
                 payload.roomId(),
