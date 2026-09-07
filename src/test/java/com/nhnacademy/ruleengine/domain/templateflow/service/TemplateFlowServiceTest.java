@@ -122,7 +122,7 @@ class TemplateFlowServiceTest {
                 .isInstanceOf(FlowValidationFailed.class)
                 .satisfies(e -> {
                     FlowValidationFailed ex = (FlowValidationFailed) e;
-                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("노드는 최소 3개"));
+                    assertThat(ex.getErrors()).anyMatch(error -> error.message().contains("노드를 최소 3개 이상"));
                 });
     }
 

@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.common.external.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.client.RoomSensorClient;
+import com.nhnacademy.ruleengine.common.external.client.SensorCatalogClient;
 import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ class MetricCatalogCacheServiceTest {
 
     @Mock private RoomSensorClient roomSensorClient;
     @Spy private ObjectMapper objectMapper;
+    @Mock private SensorCatalogClient sensorCatalogClient;
 
 
     @InjectMocks
@@ -44,7 +46,7 @@ class MetricCatalogCacheServiceTest {
         List<MetricCatalogInfo> result = metricCatalogCacheService.getMetricCatalog();
 
         assertThat(result).isEqualTo(apiList);
-        verify(roomSensorClient, times(1)).getMetricCatalog();
+        verify(sensorCatalogClient, times(1)).getMetricCatalog();
     }
 
 }
