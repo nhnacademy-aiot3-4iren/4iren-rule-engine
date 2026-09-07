@@ -10,7 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
@@ -41,7 +44,7 @@ class SensorDataListenerTest {
 
         given(converter.convert(rawMessage)).willReturn(environmentContext);
 
-        listener.receiveSensorData(rawMessage);
+        listener.receiveSensorData(message(rawMessage));
 
         verify(converter).convert(rawMessage);
         verify(handler).process(environmentContext);
@@ -53,9 +56,16 @@ class SensorDataListenerTest {
         String rawMessage = "{\"invalid\": \"json\"}";
         given(converter.convert(anyString())).willThrow(new InvalidPayloadException());
 
-        assertThatThrownBy(() -> listener.receiveSensorData(rawMessage))
+        assertThatThrownBy(() -> listener.receiveSensorData(message(rawMessage)))
                 .isInstanceOf(InvalidPayloadException.class);
 
         verify(converter).convert(rawMessage);
+    }
+
+    private Message message(String rawMessage) {
+        MessageProperties properties = new MessageProperties();
+        properties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+        properties.setContentEncoding(StandardCharsets.UTF_8.name());
+        return new Message(rawMessage.getBytes(StandardCharsets.UTF_8), properties);
     }
 }

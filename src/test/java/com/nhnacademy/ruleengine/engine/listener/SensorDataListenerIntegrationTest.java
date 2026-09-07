@@ -26,6 +26,8 @@ import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +38,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +89,7 @@ class SensorDataListenerIntegrationTest {
         when(valueOperations.setIfAbsent(anyString(), eq("SENT"), eq(Duration.ofSeconds(DEDUP_WINDOW_SEC))))
                 .thenReturn(true);
 
-        listener.receiveSensorData(sensorPayload(31.5));
+        listener.receiveSensorData(message(sensorPayload(31.5)));
 
         ArgumentCaptor<AlertEvent> eventCaptor = ArgumentCaptor.forClass(AlertEvent.class);//AlertEvent타입의 데이터를 캡처하는 객체 선언
         verify(rabbitTemplate).convertAndSend(eq("test.alert.exchange"), eq("test.alert.routing-key"), eventCaptor.capture());
@@ -109,9 +112,9 @@ class SensorDataListenerIntegrationTest {
                 .thenReturn(true, false);
 
         String rawMessage = sensorPayload(31.5);
-        listener.receiveSensorData(rawMessage);
+        listener.receiveSensorData(message(rawMessage));
         String rawMessage2 = sensorPayload(32.5);
-        listener.receiveSensorData(rawMessage2);
+        listener.receiveSensorData(message(rawMessage2));
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(valueOperations, times(2)).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(DEDUP_WINDOW_SEC)));
@@ -181,6 +184,14 @@ class SensorDataListenerIntegrationTest {
                   ]
                 }
                 """.formatted(ROOM_ID, temperature);
+    }
+
+    private Message message(String rawMessage) {
+        MessageProperties properties = new MessageProperties();
+        properties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+        properties.setContentEncoding(StandardCharsets.UTF_8.name());
+        properties.setHeader("__TypeId__", "com.nhnacademy.processing.dto.context.EnvironmentContext");
+        return new Message(rawMessage.getBytes(StandardCharsets.UTF_8), properties);
     }
 
     @Configuration
