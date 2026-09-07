@@ -2,7 +2,7 @@ package com.nhnacademy.ruleengine.domain.flowschedule.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
-import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementService;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateResponse;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleListResponse;
@@ -42,7 +42,7 @@ class FlowScheduleControllerTest {
     private FlowScheduleService flowScheduleService;
 
     @MockitoBean
-    private RoomManagementCacheService roomManagementCacheService;
+    private RoomManagementService roomManagementService;
 
     private static final Long ROOM_ID = 1L;
     private static final Long FLOW_ID = 1L;
@@ -56,7 +56,7 @@ class FlowScheduleControllerTest {
 
     @BeforeEach
     void setUp() {
-        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+        given(roomManagementService.getManagementAllowed(ROOM_ID, USER_ID))
                 .willReturn(new RoomManagementAccessResponse(true));
     }
 

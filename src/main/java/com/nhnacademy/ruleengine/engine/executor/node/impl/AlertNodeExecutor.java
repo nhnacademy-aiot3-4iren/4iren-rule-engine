@@ -44,8 +44,9 @@ public class AlertNodeExecutor implements NodeExecutor {
                 UUID.randomUUID().toString()
         );
 
-        log.info("[ALERT] flowId={} roomId={} title={} type={} channel={} history={}",
-                context.flowId(), context.roomId(), config.alertTitle(), config.alertType(),  path.history());
+        log.info("알림 노드 실행 flowId={}, roomId={}, nodeId={}, title={}, type={}",
+                context.flowId(), context.roomId(), node.nodeId(), config.alertTitle(), config.alertType());
+        log.info("알림 노드 실행 이력 flowId={}, nodeId={}, history={}", context.flowId(), node.nodeId(), path.history());
 
         alertEventPublisher.publish(alertEvent, node.nodeId(), config.dedupWindowSec());
         return NodeExecutionResult.of(true, path);

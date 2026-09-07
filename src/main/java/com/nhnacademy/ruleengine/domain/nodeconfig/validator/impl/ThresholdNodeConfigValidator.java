@@ -24,23 +24,23 @@ public class ThresholdNodeConfigValidator implements NodeConfigValidator {
         List<NodeConfigError> errors = new ArrayList<>();
 
         if (thresholdNodeConfig.measurementType() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.measurementType", "measurementType은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.measurementType", "측정 항목을 선택해야 합니다."));
             return errors;
         }
         if (thresholdNodeConfig.operator() == null) {
-            errors.add(NodeConfigError.of("nodeConfig.operator", "operator는 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.operator", "비교 조건을 선택해야 합니다."));
         }
         if (thresholdNodeConfig.unit() == null || thresholdNodeConfig.unit().isBlank()) {
-            errors.add(NodeConfigError.of("nodeConfig.unit", "unit은 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.unit", "단위를 입력해야 합니다."));
         }
         if(thresholdNodeConfig.threshold() == null){
-            errors.add(NodeConfigError.of("nodeConfig.threshold", "threshold는 필수입니다"));
+            errors.add(NodeConfigError.of("nodeConfig.threshold", "기준값을 입력해야 합니다."));
         }
 
         boolean validMeasurementType = sensorMetaInfoList.stream()
                 .anyMatch(meta -> meta.measurementType() == thresholdNodeConfig.measurementType());
         if (!validMeasurementType) {
-            errors.add(NodeConfigError.of("nodeConfig.measurementType", "해당 강의실에서 지원하지 않는 measurementType: " + thresholdNodeConfig.measurementType()));
+            errors.add(NodeConfigError.of("nodeConfig.measurementType", "이 강의실에서 사용할 수 없는 측정 항목입니다: " + thresholdNodeConfig.measurementType().getSensorDesc()));
             return errors; // 이후 검증 의미 없음
         }
 

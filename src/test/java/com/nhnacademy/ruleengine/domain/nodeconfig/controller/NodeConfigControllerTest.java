@@ -4,7 +4,7 @@ package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidNodeException;
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
-import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementService;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
@@ -49,7 +49,7 @@ class NodeConfigControllerTest {
     private NodeConfigService nodeConfigService;
 
     @MockitoBean
-    private RoomManagementCacheService roomManagementCacheService;
+    private RoomManagementService roomManagementService;
 
     private static final Long ROOM_ID = 1L;
     private static final Long NODE_ID = 1L;
@@ -62,7 +62,7 @@ class NodeConfigControllerTest {
 
     @BeforeEach
     void setUp() {
-        given(roomManagementCacheService.getManagementAllowed(ROOM_ID, USER_ID))
+        given(roomManagementService.getManagementAllowed(ROOM_ID, USER_ID))
                 .willReturn(new RoomManagementAccessResponse(true));
     }
 
@@ -119,8 +119,8 @@ class NodeConfigControllerTest {
         );
 
         List<NodeConfigError> errors = List.of(
-                NodeConfigError.of("nodeConfig.threshold", "threshold 값은 0보다 커야 합니다"),
-                NodeConfigError.of("nodeConfig.measurementType", "measurementType은 필수입니다")
+                NodeConfigError.of("nodeConfig.threshold", "기준값을 입력해야 합니다."),
+                NodeConfigError.of("nodeConfig.measurementType", "측정 항목을 선택해야 합니다.")
         );
 
         given(nodeConfigService.validate(eq(ROOM_ID), any(NodeConfigValidateRequest.class)))
@@ -135,9 +135,9 @@ class NodeConfigControllerTest {
                 .andExpect(jsonPath("$.message").value("노드 설정을 확인해주세요."))
                 .andExpect(jsonPath("$.errors").isArray())
                 .andExpect(jsonPath("$.errors[0].field").value("nodeConfig.threshold"))
-                .andExpect(jsonPath("$.errors[0].message").value("threshold 값은 0보다 커야 합니다"))
+                .andExpect(jsonPath("$.errors[0].message").value("기준값을 입력해야 합니다."))
                 .andExpect(jsonPath("$.errors[1].field").value("nodeConfig.measurementType"))
-                .andExpect(jsonPath("$.errors[1].message").value("measurementType은 필수입니다"));
+                .andExpect(jsonPath("$.errors[1].message").value("측정 항목을 선택해야 합니다."));
     }
     @Test
     @DisplayName("노드 설정 검증 - nodeConfig null이면 400")

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ruleengine.common.external.client.RoomSensorClient;
+import com.nhnacademy.ruleengine.common.external.client.SensorCatalogClient;
 import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,22 +19,27 @@ import java.util.List;
 public class MetricCatalogCacheService {
 
     private final RoomSensorClient roomSensorClient;
+    private final SensorCatalogClient sensorCatalogClient;
     private final ObjectMapper objectMapper;
+
 
     @Cacheable(value = "sensor:catalog", unless = "#result == null || #result.isEmpty()", cacheManager = "sensorCacheManager")
     public List<MetricCatalogInfo> getMetricCatalog(){
-        log.info("cache miss, 외부 API 조회");
+        log.info("측정 항목 카탈로그 캐시 미스, 외부 API 조회");
 
         try{
-            return roomSensorClient.getMetricCatalog();
+            return sensorCatalogClient.getMetricCatalog();
         }catch (Exception e){
-            log.info("외부 API 호출 실패", e);
+//            log.error("측정 항목 카탈로그 외부 API 호출 실패, 더미 데이터 사용", e);
+//            return getDummyCatalog();
+            log.error("측정 항목 카탈로그 외부 API 호출 실패", e);
             return List.of();
         }
 
     }
     private List<MetricCatalogInfo> getDummyCatalog() {
         try {
+            log.info("테스트용 측정 항목 카탈로그 더미 데이터 생성");
             return objectMapper.readValue("""
                     [
                       {

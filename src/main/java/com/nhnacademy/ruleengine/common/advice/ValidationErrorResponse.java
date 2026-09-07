@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.common.advice;
 
 import com.nhnacademy.ruleengine.common.exception.ErrorCode;
 
+import java.io.Serializable;
 import java.util.List;
 
 //
@@ -22,7 +23,7 @@ public record ValidationErrorResponse(
             Long nodeId,//특정 노드와 관련된 노드일결우 해당 노드 ID
             String field,//문제가 발생한 필드 명 ex.nodeConfig.nodrType
             String message//해당 오류 설명
-    ) {
+    ) implements Serializable {
         public static List<ValidationError> ofList(List<String> messages) {
             return messages.stream()
                     .map(m -> new ValidationError(null, null, m))

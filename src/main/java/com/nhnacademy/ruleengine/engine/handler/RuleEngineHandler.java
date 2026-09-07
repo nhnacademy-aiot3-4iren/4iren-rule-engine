@@ -20,18 +20,22 @@ public class RuleEngineHandler {
     public void process(EnvironmentContext environmentContext){
         Long roomId = environmentContext.roomId();
 
-        log.info("센서 데이터 수신 roomId={}", roomId);
+        log.info("룰 엔진 처리 시작 roomId={}, 측정값수={}", roomId, environmentContext.metrics().size());
 
         //1. 플로우 로드
         List<ExecutableFlow> flows = flowLoader.load(roomId);
         if(flows.isEmpty()){
+            log.info("실행할 활성 플로우 없음 roomId={}", roomId);
             return;
         }
+        log.info("실행 대상 플로우 로드 완료 roomId={}, flowCount={}", roomId, flows.size());
 
         dispatcher.dispatch(flows, environmentContext).whenComplete((r, ex)->{
             if(ex != null){
                 log.error("roomId={} 룰 엔진 플로우 실행 중 최종 실패 발생", roomId, ex);
+                return;
             }
+            log.info("룰 엔진 처리 완료 roomId={}, flowCount={}", roomId, flows.size());
         });
 
     }

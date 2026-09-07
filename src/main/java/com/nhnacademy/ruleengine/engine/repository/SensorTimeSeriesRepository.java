@@ -35,7 +35,7 @@ public class SensorTimeSeriesRepository {
     public void save(Long roomId, MeasurementType type, double value, Instant timestamp) {
         String key = getKey(roomId, type);
         long score = timestamp.toEpochMilli();
-        String member = score + ":" + value + ":" + ThreadLocalRandom.current().nextInt();
+            String member = score + ":" + value + ":" + ThreadLocalRandom.current().nextInt();
 
         redisTemplate.opsForZSet().add(key, member, score);
 

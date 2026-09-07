@@ -18,11 +18,11 @@ public class SensorDataListener {
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
     public void receiveSensorData(String rawMessage) {
-        log.debug("RabbitMQ 메시지 수신: {}", rawMessage);
+        log.info("RabbitMQ 메시지 수신: {}", rawMessage);
 
         EnvironmentContext payload = converter.convert(rawMessage);
 
-        log.info("센서 데이터 변환 완료 - RoomID: {}, Device: {}, Metrics Count: {}",
+        log.info("센서 데이터 변환 완료 roomId={}, 측정값수={}",
                 payload.roomId(),
                 payload.metrics().size());
 

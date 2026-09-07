@@ -38,17 +38,17 @@ public class AlertEventPublisher {
 
         if(!tryAcquireAlertLock(alertLockKey, alertLockTtl)) {
             //false: 락 획득 실패(이미 최근에 같은 알림이 나갔음) → 상위 호출자 입장에서는 예외 없이 그냥 "발행 안 함"으로 끝남
-            log.info("[ALERT SKIP]");
+            log.info("중복 알림 발행 스킵 roomId={}, alertNodeId={}, ttlSeconds={}", roomId, alertNodeId, dedupWindowSec);
             return;
         }
 
         try {
             //락 획득 성공시 큐에 메시지 발행, event 객체 자동 직렬화 -> 메시지 바디로 들어감
             rabbitTemplate.convertAndSend(alertExchange, alertRoutingKey, event);
-            log.info("[ALERT PUBLISH] roomId({}), eventId({}), title({})", roomId, event.eventId(), event.alertTitle());
+            log.info("알림 이벤트 발행 완료 roomId={}, eventId={}, title={}", roomId, event.eventId(), event.alertTitle());
         } catch (Exception e) {
             //실패시 락 지움
-            log.error("[ALERT ERROR] roomId({}), error({})", roomId, e.getMessage(), e);
+            log.error("알림 이벤트 발행 실패 roomId={}, eventId={}, message={}", roomId, event.eventId(), e.getMessage(), e);
             redisTemplate.delete(alertLockKey);
         }
 

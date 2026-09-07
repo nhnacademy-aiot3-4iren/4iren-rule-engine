@@ -7,8 +7,8 @@ import java.util.List;
 
 @Getter
 public class ValidationFailedException extends RuntimeException {
-    private final ErrorCode errorCode;
-    private final List<ValidationErrorResponse.ValidationError> errors;
+    private final transient ErrorCode errorCode;
+    private final transient List<ValidationErrorResponse.ValidationError> errors;
 
     public ValidationFailedException(List<ValidationErrorResponse.ValidationError> errors, ErrorCode errorCode) {
         super(errorCode.getMessage());

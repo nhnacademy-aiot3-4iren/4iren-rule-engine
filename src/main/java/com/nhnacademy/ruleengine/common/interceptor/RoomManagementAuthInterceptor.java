@@ -1,7 +1,7 @@
 package com.nhnacademy.ruleengine.common.interceptor;
 
 import com.nhnacademy.ruleengine.common.external.dto.RoomManagementAccessResponse;
-import com.nhnacademy.ruleengine.common.external.service.RoomManagementCacheService;
+import com.nhnacademy.ruleengine.common.external.service.RoomManagementService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class RoomManagementAuthInterceptor implements HandlerInterceptor {
-    private final ObjectProvider<RoomManagementCacheService> roomManagementCacheServiceProvider;
+    private final ObjectProvider<RoomManagementService> roomManagementCacheServiceProvider;
     private static final String X_USER_ID = "X-User-Id";
     private static final String X_USER_ROLE = "X-User-Role";
 

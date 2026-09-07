@@ -34,12 +34,13 @@ public class FlowLoader {
     @Transactional(readOnly = true)
     @Cacheable(value = "flow:room", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "flowCacheManager")
     public List<ExecutableFlow> load(Long roomId){
-        log.info("cache miss roomId = {}, DB 조회", roomId);
+        log.info("플로우 캐시 미스, DB 조회 roomId={}", roomId);
         return loadFromDatabase(roomId);
     }
     private List<ExecutableFlow> loadFromDatabase(Long roomId){
         List<Flow> flows = flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(roomId);
         if (flows.isEmpty()) {
+            log.info("DB에서 활성 플로우를 찾지 못함 roomId={}", roomId);
             return Collections.emptyList();
         }
 
@@ -59,7 +60,7 @@ public class FlowLoader {
         Map<Long, List<FlowSchedule>> schedulesByFlowId = groupByFlowId(allSchedules, fs-> fs.getFlow().getId());
 
         //플로우별 ExecutableFlow 조립
-        return flows.stream()
+        List<ExecutableFlow> executableFlows = flows.stream()
                 .map(flow ->
                     buildSafely(
                             flow,
@@ -69,6 +70,9 @@ public class FlowLoader {
                     )
                 ).filter(Objects::nonNull)
                 .toList();
+        log.info("활성 플로우 조립 완료 roomId={}, totalCount={}, executableCount={}",
+                roomId, flows.size(), executableFlows.size());
+        return executableFlows;
     }
     private ExecutableFlow buildSafely(
             Flow flow,
@@ -79,7 +83,7 @@ public class FlowLoader {
         try{
             return flowGraphBuilder.build(flow, nodes, connections, schedules);
         }catch (Exception e){
-            log.error("플로우 그래프 조립 실패 flowId = {} errors={}", flow.getId(), e.getMessage());
+            log.warn("플로우 그래프 조립 실패, 해당 플로우 실행 제외 flowId={}, message={}", flow.getId(), e.getMessage());
             return null;
         }
     }

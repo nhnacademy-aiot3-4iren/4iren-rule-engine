@@ -1,11 +1,18 @@
 package com.nhnacademy.ruleengine.engine.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidPayloadException;
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -20,7 +27,8 @@ public class SensorPayloadConverter {
             validate(payload);
             return payload;
         } catch (Exception e) {
-            log.error("EnvironmentContext 파싱 및 검증 실패 - Raw Message: {}", rawMessage, e);
+            log.warn("센서 페이로드 파싱 또는 검증 실패", e);
+            log.info("파싱 실패한 원본 센서 메시지: {}", rawMessage);
             throw new InvalidPayloadException("유효하지 않은 센서 페이로드입니다.", e);
         }
     }
