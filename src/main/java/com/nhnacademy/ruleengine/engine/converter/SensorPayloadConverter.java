@@ -17,6 +17,7 @@ public class SensorPayloadConverter {
     private final ObjectMapper objectMapper;
 
 
+    //변수나 객체에 값이 할당되어 있다면, 해당 값을 다른 형식으로 변환
     public Optional<EnvironmentContext> convertIfAssigned(String rawMessage) {
         try {
             EnvironmentContext payload = objectMapper.readValue(rawMessage, EnvironmentContext.class);
