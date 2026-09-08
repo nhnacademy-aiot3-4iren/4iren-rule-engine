@@ -19,9 +19,12 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +48,8 @@ class FlowDispatcherTest {
         dispatcher = new FlowDispatcher(
                 executorService,
                 filter,
-                flowExecutor
+                flowExecutor,
+                100
         );
 
     }
@@ -123,8 +127,8 @@ class FlowDispatcherTest {
     }
 
     @Test
-    @DisplayName("한 flow 실행 중 예외가 발생해도 dispatch 전체는 완료된다")
-    void dispatch_completesEvenWhenOneFlowFails() {
+    @DisplayName("한 flow 실행 중 예외가 발생하면 모든 flow를 시도한 뒤 dispatch를 실패로 완료한다")
+    void dispatch_failsAfterAttemptingAllFlowsWhenOneFlowFails() {
         ExecutableFlow flow1 = createFlow(1L);
         ExecutableFlow flow2 = createFlow(2L);
 
@@ -136,13 +140,45 @@ class FlowDispatcherTest {
                 .execute(argThat(context1 -> context1.flow().flowId().equals(1L)));
 
         CompletableFuture<Void> future = dispatcher.dispatch(List.of(flow1, flow2), context);
-        future.join();
+        assertThatThrownBy(future::join)
+                .isInstanceOf(CompletionException.class)
+                .hasCauseInstanceOf(RuntimeException.class);
 
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow1, context)));
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow2, context)));
-
-
     }
+
+    @Test
+    @DisplayName("설정된 최대 동시 실행 수만큼만 flow를 실행한다")
+    void dispatch_limitsConcurrentFlowExecution() {
+        FlowDispatcher limitedDispatcher = new FlowDispatcher(
+                executorService,
+                filter,
+                flowExecutor,
+                1
+        );
+        ExecutableFlow flow1 = createFlow(1L);
+        ExecutableFlow flow2 = createFlow(2L);
+        AtomicInteger runningCount = new AtomicInteger();
+        AtomicInteger maxRunningCount = new AtomicInteger();
+
+        when(filter.isSchedulable(flow1)).thenReturn(true);
+        when(filter.isSchedulable(flow2)).thenReturn(true);
+        doAnswer(invocation -> {
+            int running = runningCount.incrementAndGet();
+            maxRunningCount.accumulateAndGet(running, Math::max);
+            Thread.sleep(50);
+            runningCount.decrementAndGet();
+            return null;
+        }).when(flowExecutor).execute(any());
+
+        CompletableFuture<Void> future = limitedDispatcher.dispatch(List.of(flow1, flow2), context);
+        future.join();
+
+        verify(flowExecutor, times(2)).execute(any());
+        org.assertj.core.api.Assertions.assertThat(maxRunningCount.get()).isEqualTo(1);
+    }
+
     //helper
     private ArgumentMatcher<FlowContext> contextMatches(
             ExecutableFlow executableFlow,

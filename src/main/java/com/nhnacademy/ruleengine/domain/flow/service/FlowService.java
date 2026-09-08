@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
+import com.nhnacademy.ruleengine.common.exception.conflict.ActiveFlowLimitExceededException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidConnectionException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,12 +47,16 @@ public class FlowService {
     private final RoomSensorMetaService metaService;
 //    private final FlowCacheRepository flowCacheRepository;
     private final FlowValidator flowValidator;
+    private int maxActiveFlows = 10;
 
     @Transactional
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowCreateResponse createFlow(Long roomId, FlowCreateRequest request) {
         log.info("플로우 생성 처리 시작 roomId={}, flowName={}, nodeCount={}, connectionCount={}",
                 roomId, request.flowName(), request.nodes().size(), request.connections().size());
+        if (Boolean.TRUE.equals(request.isActive())) {
+            validateActiveFlowLimit(roomId);
+        }
         Flow flow = Flow.regularBuilder()
                 .roomId(roomId).flowName(request.flowName()).isActive(request.isActive()).description(request.description()).build();
 
@@ -147,6 +153,9 @@ public class FlowService {
                 roomId, flowId, request.nodes().size(), request.connections().size());
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
         flowValidator.validate(request.nodes(), request.connections(), metaService.getSensorMetaList(roomId));
+        if (shouldActivate(flow, request.isActive())) {
+            validateActiveFlowLimit(roomId);
+        }
 
         flow.updateRegular(request.flowName(),request.description(), request.isActive());
 
@@ -175,6 +184,9 @@ public class FlowService {
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId)
                 .orElseThrow(UnauthorizedFlowAccessException::new);
 
+        if (shouldActivate(flow, request.isActive())) {
+            validateActiveFlowLimit(roomId);
+        }
         flow.updateStatus(request.isActive());
         log.info("플로우 활성 상태 변경 완료 roomId={}, flowId={}, isActive={}", roomId, flowId, request.isActive());
     }
@@ -247,5 +259,18 @@ public class FlowService {
                                 Collectors.toList()
                         )
                 ));
+    }
+
+    private boolean shouldActivate(Flow flow, Boolean requestedActive) {
+        return Boolean.TRUE.equals(requestedActive) && !Boolean.TRUE.equals(flow.getIsActive());
+    }
+
+    private void validateActiveFlowLimit(Long roomId) {
+        long activeFlowCount = flowRepository.countByRoomIdAndIsActiveTrueAndIsTemplateFalse(roomId);
+        if (activeFlowCount >= maxActiveFlows) {
+            log.warn("강의실 활성 플로우 제한 초과 roomId={}, activeFlowCount={}, maxActiveFlows={}",
+                    roomId, activeFlowCount, maxActiveFlows);
+            throw new ActiveFlowLimitExceededException();
+        }
     }
 }

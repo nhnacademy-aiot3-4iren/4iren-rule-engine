@@ -44,7 +44,7 @@ public class DurationNodeExecutor implements NodeExecutor {
         Double lastValue = points.isEmpty() ? null : points.getLast().value();
 
         if(points.isEmpty()) {
-            log.info("node({}) - roomId({})에 {} 윈도우({}s) 내 데이터 없음. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.durationSec());
+            log.debug("node({}) - roomId({})에 {} 윈도우({}s) 내 데이터 없음. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.durationSec());
         }
 
         AlertEvent.NodeResult nodeResult= new AlertEvent.NodeResult(

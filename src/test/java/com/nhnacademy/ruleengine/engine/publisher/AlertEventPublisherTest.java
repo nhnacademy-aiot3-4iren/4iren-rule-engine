@@ -36,12 +36,14 @@ class AlertEventPublisherTest {
     private AlertEventPublisher alertEventPublisher;
 
     private final String exchange = "test.exchange";
-    private final String routingKey = "test.routing.key";
+    private final String urgentRoutingKey = "4iren.alert.urgent.comfort-limit-exceeded";
+    private final String digestRoutingKey = "4iren.alert.digest.ventilation-recommend";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(alertEventPublisher, "alertExchange", exchange);
-        ReflectionTestUtils.setField(alertEventPublisher, "alertRoutingKey", routingKey);
+        ReflectionTestUtils.setField(alertEventPublisher, "comfortLimitExceededRoutingKey", urgentRoutingKey);
+        ReflectionTestUtils.setField(alertEventPublisher, "ventilationRecommendRoutingKey", digestRoutingKey);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
@@ -60,9 +62,13 @@ class AlertEventPublisherTest {
     }
 
     private AlertEvent createAlertEvent(Long roomId, List<AlertEvent.NodeResult> nodeResults) {
+        return createAlertEvent(roomId, AlertType.COMFORT_LIMIT_EXCEEDED, nodeResults);
+    }
+
+    private AlertEvent createAlertEvent(Long roomId, AlertType alertType, List<AlertEvent.NodeResult> nodeResults) {
         return new AlertEvent(
                 roomId,
-                AlertType.COMFORT_LIMIT_EXCEEDED,
+                alertType,
                 "온도 초과 경고",
                 "dev-123",
                 "Device A",
@@ -89,7 +95,23 @@ class AlertEventPublisherTest {
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(valueOperations).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(dedupWindowSec)));
         assertThat(keyCaptor.getValue()).startsWith("alert:dedup:node:10:");
-        verify(rabbitTemplate, times(1)).convertAndSend(exchange, routingKey, event);
+        verify(rabbitTemplate, times(1)).convertAndSend(exchange, urgentRoutingKey, event);
+    }
+
+    @Test
+    @DisplayName("VENTILATION_RECOMMEND 알림은 digest routing key로 발행")
+    void publish_ventilationRecommendToDigestRoutingKey() {
+        AlertEvent event = createAlertEvent(101L, AlertType.VENTILATION_RECOMMEND, List.of(
+                new AlertEvent.NodeResult("THRESHOLD", "CO2", "GREATER_THAN", "ppm", 1000.0, 1100.0)
+        ));
+        int dedupWindowSec = 30;
+
+        when(valueOperations.setIfAbsent(anyString(), eq("SENT"), eq(Duration.ofSeconds(dedupWindowSec))))
+                .thenReturn(true);
+
+        alertEventPublisher.publish(event, 10L, dedupWindowSec);
+
+        verify(rabbitTemplate, times(1)).convertAndSend(exchange, digestRoutingKey, event);
     }
 
     @Test
@@ -116,13 +138,13 @@ class AlertEventPublisherTest {
                 .thenReturn(true);
 
         doThrow(new RuntimeException("RabbitMQ Connection Error"))
-                .when(rabbitTemplate).convertAndSend(exchange, routingKey, event);
+                .when(rabbitTemplate).convertAndSend(exchange, urgentRoutingKey, event);
 
         alertEventPublisher.publish(event, 10L, dedupWindowSec);
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(valueOperations).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(dedupWindowSec)));
-        verify(rabbitTemplate, times(1)).convertAndSend(exchange, routingKey, event);
+        verify(rabbitTemplate, times(1)).convertAndSend(exchange, urgentRoutingKey, event);
         verify(redisTemplate, times(1)).delete(keyCaptor.getValue());
     }
 
@@ -146,7 +168,7 @@ class AlertEventPublisherTest {
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(valueOperations, times(2)).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(dedupWindowSec)));
         assertThat(keyCaptor.getAllValues().get(0)).isEqualTo(keyCaptor.getAllValues().get(1));
-        verify(rabbitTemplate, times(1)).convertAndSend(exchange, routingKey, event);
+        verify(rabbitTemplate, times(1)).convertAndSend(exchange, urgentRoutingKey, event);
     }
 
     @Test
@@ -166,6 +188,6 @@ class AlertEventPublisherTest {
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(valueOperations, times(2)).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(dedupWindowSec)));
         assertThat(keyCaptor.getAllValues().get(0)).isNotEqualTo(keyCaptor.getAllValues().get(1));
-        verify(rabbitTemplate, times(2)).convertAndSend(exchange, routingKey, event);
+        verify(rabbitTemplate, times(2)).convertAndSend(exchange, urgentRoutingKey, event);
     }
 }

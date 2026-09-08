@@ -33,7 +33,7 @@ public class ThresholdNodeExecutor implements NodeExecutor {
 
         boolean passed = currentValue != null && OperatorEvaluator.evaluate(config.operator(), currentValue, config.threshold());
         if(currentValue == null) {
-            log.info("node({}) - roomId({})에 {} 최신값 없음. 조건 미충족 처리", node.nodeId(), context.roomId(), config.measurementType());
+            log.debug("node({}) - roomId({})에 {} 최신값 없음. 조건 미충족 처리", node.nodeId(), context.roomId(), config.measurementType());
         }
 
         AlertEvent.NodeResult nodeResult = new AlertEvent.NodeResult(

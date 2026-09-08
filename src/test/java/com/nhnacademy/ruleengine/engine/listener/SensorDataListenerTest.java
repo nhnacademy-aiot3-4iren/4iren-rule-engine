@@ -16,11 +16,14 @@ import org.springframework.amqp.core.MessageProperties;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class SensorDataListenerTest {
@@ -42,11 +45,41 @@ class SensorDataListenerTest {
         EnvironmentContext.MetricInfo metrics = new EnvironmentContext.MetricInfo("temperature", 24.5, "24e124725d081175", Instant.now());
         EnvironmentContext environmentContext = new EnvironmentContext(1L, List.of(metrics), Instant.now());
 
-        given(converter.convert(rawMessage)).willReturn(environmentContext);
+        given(converter.convertIfAssigned(rawMessage)).willReturn(Optional.of(environmentContext));
+        given(handler.process(environmentContext)).willReturn(CompletableFuture.completedFuture(null));
 
         listener.receiveSensorData(message(rawMessage));
 
-        verify(converter).convert(rawMessage);
+        verify(converter).convertIfAssigned(rawMessage);
+        verify(handler).process(environmentContext);
+    }
+
+    @Test
+    @DisplayName("방 배정 없는 메시지는 처리하지 않고 스킵")
+    void receiveSensorData_Skip_WhenRoomIsUnassigned() {
+        String rawMessage = "{\"device\":{\"roomId\":null},\"sensorDataList\":[]}";
+        given(converter.convertIfAssigned(rawMessage)).willReturn(Optional.empty());
+
+        listener.receiveSensorData(message(rawMessage));
+
+        verify(converter).convertIfAssigned(rawMessage);
+        verifyNoInteractions(handler);
+    }
+
+    @Test
+    @DisplayName("비동기 룰 엔진 처리 실패 시 예외를 위로 던져 retry/DLQ 라우팅 유도")
+    void receiveSensorData_ThrowsException_WhenAsyncRuleEngineFails() {
+        String rawMessage = "{\"valid\": \"json\"}";
+        EnvironmentContext environmentContext = new EnvironmentContext(1L, List.of(), Instant.now());
+        RuntimeException cause = new RuntimeException("flow failed");
+
+        given(converter.convertIfAssigned(rawMessage)).willReturn(Optional.of(environmentContext));
+        given(handler.process(environmentContext)).willReturn(CompletableFuture.failedFuture(cause));
+
+        assertThatThrownBy(() -> listener.receiveSensorData(message(rawMessage)))
+                .hasCause(cause);
+
+        verify(converter).convertIfAssigned(rawMessage);
         verify(handler).process(environmentContext);
     }
 
@@ -54,12 +87,12 @@ class SensorDataListenerTest {
     @DisplayName("Converter에서 InvalidPayloadException 발생 시 예외를 위로 던져 DLQ 라우팅 유도")
     void receiveSensorData_ThrowsException_WhenPayloadIsInvalid() {
         String rawMessage = "{\"invalid\": \"json\"}";
-        given(converter.convert(anyString())).willThrow(new InvalidPayloadException());
+        given(converter.convertIfAssigned(anyString())).willThrow(new InvalidPayloadException());
 
         assertThatThrownBy(() -> listener.receiveSensorData(message(rawMessage)))
                 .isInstanceOf(InvalidPayloadException.class);
 
-        verify(converter).convert(rawMessage);
+        verify(converter).convertIfAssigned(rawMessage);
     }
 
     private Message message(String rawMessage) {

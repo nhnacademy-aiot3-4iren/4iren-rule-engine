@@ -44,7 +44,7 @@ public class OrNodeExecutor implements NodeExecutor {
         }
         boolean passed = state.isSatisfied();
 
-        log.info("node({}) OR 판단 - arrivedKey={}, satisfied={}, ready={}", orNodeId, arrivedKey, passed, state.isReady());
+        log.debug("node({}) OR 판단 - arrivedKey={}, satisfied={}, ready={}", orNodeId, arrivedKey, passed, state.isReady());
 
         List<AlertEvent.NodeResult> mergedNodeResults = state.mergeArrivedHistories();
 

@@ -1,6 +1,7 @@
 package com.nhnacademy.ruleengine.domain.flow.service;
 
 import com.nhnacademy.ruleengine.common.exception.invalid.FlowValidationFailed;
+import com.nhnacademy.ruleengine.common.exception.conflict.ActiveFlowLimitExceededException;
 import com.nhnacademy.ruleengine.common.exception.invalid.InvalidFlowException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.unauthorized.UnauthorizedFlowAccessException;
@@ -115,6 +116,24 @@ class FlowServiceTest {
         verify(flowRepository).save(any(Flow.class));
         verify(nodeRepository, times(3)).save(any(Node.class));
         verify(connectionRepository).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("강의실 활성 플로우 제한 초과 시 활성 플로우 생성 실패")
+    void createFlow_failsWhenActiveFlowLimitExceeded() {
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        FlowCreateRequest request = new FlowCreateRequest("testFlow", "desc", true, List.of(node1, node2, node3), List.of(conn1, conn2));
+
+        when(flowRepository.countByRoomIdAndIsActiveTrueAndIsTemplateFalse(1L)).thenReturn(10L);
+
+        assertThatThrownBy(() -> flowService.createFlow(1L, request))
+                .isInstanceOf(ActiveFlowLimitExceededException.class);
+
+        verify(flowRepository, never()).save(any(Flow.class));
     }
 
     @Test
@@ -308,6 +327,27 @@ class FlowServiceTest {
     }
 
     @Test
+    @DisplayName("비활성 플로우 수정 중 활성화 시 강의실 활성 플로우 제한을 검사")
+    void updateFlow_failsWhenActivationExceedsActiveFlowLimit() {
+        NodeInfo node1 = createStartNode(1L);
+        NodeInfo node2 = createConditionNode(2L);
+        NodeInfo node3 = createActionNode(3L);
+        ConnectionInfo conn1 = new ConnectionInfo(1L, 2L, BranchType.TRUE);
+        ConnectionInfo conn2 = new ConnectionInfo(2L, 3L, BranchType.TRUE);
+        FlowUpdateRequest request = new FlowUpdateRequest("updated flow", "desc", true, List.of(node1, node2, node3), List.of(conn1, conn2));
+
+        Flow mockFlow = createMockFlow(100L, false);
+        when(mockFlow.getIsActive()).thenReturn(false);
+        when(flowRepository.findByIdAndRoomId(100L, 1L)).thenReturn(Optional.of(mockFlow));
+        when(flowRepository.countByRoomIdAndIsActiveTrueAndIsTemplateFalse(1L)).thenReturn(10L);
+
+        assertThatThrownBy(() -> flowService.updateFlow(1L, 100L, request))
+                .isInstanceOf(ActiveFlowLimitExceededException.class);
+
+        verify(mockFlow, never()).updateRegular(anyString(), anyString(), any());
+    }
+
+    @Test
     @DisplayName("Flow 삭제")
     void deleteFlow_success() {
         Flow mockFlow = mock(Flow.class);
@@ -351,6 +391,22 @@ class FlowServiceTest {
         verify(flowRepository).findByIdAndRoomId(1L, 100L);
         verify(mockFlow).updateStatus(false);
 
+    }
+
+    @Test
+    @DisplayName("비활성 플로우 활성화 시 강의실 활성 플로우 제한 초과면 실패")
+    void updateFlowStatus_failsWhenActivationExceedsActiveFlowLimit() {
+        UpdateFlowStatusRequest request = new UpdateFlowStatusRequest(true);
+        Flow mockFlow = mock(Flow.class);
+
+        when(mockFlow.getIsActive()).thenReturn(false);
+        when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
+        when(flowRepository.countByRoomIdAndIsActiveTrueAndIsTemplateFalse(100L)).thenReturn(10L);
+
+        assertThatThrownBy(() -> flowService.updateStatus(100L, 1L, request))
+                .isInstanceOf(ActiveFlowLimitExceededException.class);
+
+        verify(mockFlow, never()).updateStatus(any());
     }
 
     @Test
