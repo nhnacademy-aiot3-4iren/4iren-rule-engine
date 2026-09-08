@@ -5,7 +5,6 @@ import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
 import com.nhnacademy.ruleengine.common.external.service.MetricCatalogCacheService;
 import com.nhnacademy.ruleengine.common.external.service.RoomDeviceCacheService;
 import com.nhnacademy.ruleengine.domain.flow.dto.SensorMetaInfo;
-import com.nhnacademy.ruleengine.domain.nodeconfig.dto.DeviceInfo;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 

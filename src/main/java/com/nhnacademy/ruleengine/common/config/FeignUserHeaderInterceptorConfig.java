@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.common.config;
 
 import feign.RequestInterceptor;
-import jakarta.servlet.ServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

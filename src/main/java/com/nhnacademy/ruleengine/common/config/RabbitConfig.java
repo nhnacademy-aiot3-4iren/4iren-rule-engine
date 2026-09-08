@@ -8,7 +8,6 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,9 @@ public class RabbitConfig {
     @Value("${rabbitmq.dlq.routing-key}")
     private String dlqRoutingKey;
 
+    /**
+     * JSON 직렬화/역직렬화를 위한 Jackson ObjectMapper 설정 빈
+     */
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -38,11 +40,16 @@ public class RabbitConfig {
         return mapper;
     }
 
-    @Bean
-    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
+    /**
+     * Spring AMQP에서 Jackson ObjectMapper를 기반으로 메시지를 JSON 형태로 변환하는 컨버터입니다.
+     */
+    private Jackson2JsonMessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
         return new Jackson2JsonMessageConverter(objectMapper);
     }
 
+    /**
+     * RabbitMQ로 메시지를 발행(Publish)할 때 사용하는 메인 템플릿 빈입니다.
+     */
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, ObjectMapper objectMapper) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -50,11 +57,13 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    //센서 데이터를 수신받을 메인 Topic Exchange 생성 빈
     @Bean
     public TopicExchange sensorTopicExchange() {
         return new TopicExchange(exchangeName);
     }
 
+    //센서 데이터를 저장할 메인 Queue 생성 빈
     @Bean
     public Queue sensorQueue() {
         return QueueBuilder.durable(queueName)
@@ -63,6 +72,7 @@ public class RabbitConfig {
                 .build();
     }
 
+    //센서 Queue와 Topic Exchange를 지정한 라우팅 키로 연결(Binding)하는 빈
     @Bean
     public Binding sensorBinding(Queue sensorQueue, TopicExchange sensorTopicExchange) {
         return BindingBuilder.bind(sensorQueue)
@@ -71,16 +81,19 @@ public class RabbitConfig {
     }
 
 
+    //처리 실패한 메시지를 전달받는 Direct 형태의 Dead Letter Exchange(DLX) 생성 빈
     @Bean
     public DirectExchange deadLetterExchange() {
         return new DirectExchange(dlxExchangeName);
     }
 
+    //최종적으로 처리 실패 메시지를 보관할 Dead Letter Queue(DLQ) 생성 빈
     @Bean
     public Queue deadLetterQueue() {
         return QueueBuilder.durable(dlqName).build();
     }
 
+    //DLQ와 DLX를 DLQ 전용 라우팅 키로 연결(Binding)하는 빈
     @Bean
     public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
         return BindingBuilder.bind(deadLetterQueue)

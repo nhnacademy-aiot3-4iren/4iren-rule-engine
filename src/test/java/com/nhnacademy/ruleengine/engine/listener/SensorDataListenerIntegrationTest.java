@@ -53,8 +53,9 @@ import static org.mockito.Mockito.*;
 
 @SpringJUnitConfig(classes = SensorDataListenerIntegrationTest.TestConfig.class)
 @TestPropertySource(properties = {
-        "rabbitmq.exchange.name=test.alert.exchange",
-        "ruleengine.routing-key.alert=test.alert.routing-key"
+        "rabbitmq.alert.exchange=test.alert.exchange",
+        "rabbitmq.alert.routing-key.comfort-limit-exceeded=4iren.alert.urgent.comfort-limit-exceeded",
+        "rabbitmq.alert.routing-key.ventilation-recommend=4iren.alert.digest.ventilation-recommend"
 })
 class SensorDataListenerIntegrationTest {
 
@@ -92,7 +93,7 @@ class SensorDataListenerIntegrationTest {
         listener.receiveSensorData(message(sensorPayload(31.5)));
 
         ArgumentCaptor<AlertEvent> eventCaptor = ArgumentCaptor.forClass(AlertEvent.class);//AlertEvent타입의 데이터를 캡처하는 객체 선언
-        verify(rabbitTemplate).convertAndSend(eq("test.alert.exchange"), eq("test.alert.routing-key"), eventCaptor.capture());
+        verify(rabbitTemplate).convertAndSend(eq("test.alert.exchange"), eq("4iren.alert.urgent.comfort-limit-exceeded"), eventCaptor.capture());
 
         AlertEvent event = eventCaptor.getValue();
         assertThat(event.roomId()).isEqualTo(ROOM_ID);
@@ -120,7 +121,7 @@ class SensorDataListenerIntegrationTest {
         verify(valueOperations, times(2)).setIfAbsent(keyCaptor.capture(), eq("SENT"), eq(Duration.ofSeconds(DEDUP_WINDOW_SEC)));
         assertThat(keyCaptor.getAllValues().get(0)).isEqualTo(keyCaptor.getAllValues().get(1));
         assertThat(keyCaptor.getAllValues().getFirst()).startsWith("alert:dedup:node:%d:".formatted(ALERT_NODE_ID));
-        verify(rabbitTemplate, times(1)).convertAndSend(eq("test.alert.exchange"), eq("test.alert.routing-key"), org.mockito.ArgumentMatchers.any(AlertEvent.class));
+        verify(rabbitTemplate, times(1)).convertAndSend(eq("test.alert.exchange"), eq("4iren.alert.urgent.comfort-limit-exceeded"), org.mockito.ArgumentMatchers.any(AlertEvent.class));
     }
 
     private ExecutableFlow createThresholdToAlertFlow() {

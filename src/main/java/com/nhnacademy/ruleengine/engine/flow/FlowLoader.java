@@ -32,7 +32,7 @@ public class FlowLoader {
     private final FlowGraphBuilder flowGraphBuilder;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "flow:room", key = "#roomId", unless = "#result == null || #result.isEmpty()", cacheManager = "flowCacheManager")
+    @Cacheable(value = "flow:room", key = "#roomId", unless = "#result == null", cacheManager = "flowCacheManager")
     public List<ExecutableFlow> load(Long roomId){
         log.info("플로우 캐시 미스, DB 조회 roomId={}", roomId);
         return loadFromDatabase(roomId);

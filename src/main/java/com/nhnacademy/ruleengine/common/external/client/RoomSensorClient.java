@@ -1,7 +1,6 @@
 package com.nhnacademy.ruleengine.common.external.client;
 
 import com.nhnacademy.ruleengine.common.config.FeignUserHeaderInterceptorConfig;
-import com.nhnacademy.ruleengine.common.external.dto.MetricCatalogInfo;
 import com.nhnacademy.ruleengine.common.external.dto.RoomDeviceInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

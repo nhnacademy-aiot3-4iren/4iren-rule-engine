@@ -30,12 +30,16 @@ public class FlowDispatcher {
         List<CompletableFuture<Void>> futures = flows.stream()
                 .map(flow -> CompletableFuture
                         .runAsync(() -> runFlowPipeline(flow, environmentContext, triggeredAt), flowExecutorService)// runFlowPipeline 작업을 가상 스레드 풀(flowExecutorService)에서 실행하도록 지정
-                        .exceptionally(ex -> {
+                        //플로우 예외 로그 남기고 future는 실패 응답
+                        .whenComplete((r, ex) -> {
+                            if (ex == null) {
+                                return;
+                            }
                             log.warn("플로우 파이프라인 실행 실패 flowId={}, roomId={}", flow.flowId(), flow.roomId(), ex);
-                            return null;
                         }))
                 .toList();
 
+        //인자로 전달된 모든 비동기 작업이 완료될 때까지 대기하는 새로운 CompletableFuture<Void> 반환 (각각의 비동기 실행들을 감시하다 모든 작업이 끝났을 때 Done상태로 바뀜)
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 

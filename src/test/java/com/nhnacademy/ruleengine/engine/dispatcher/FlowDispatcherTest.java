@@ -19,9 +19,11 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,8 +125,8 @@ class FlowDispatcherTest {
     }
 
     @Test
-    @DisplayName("한 flow 실행 중 예외가 발생해도 dispatch 전체는 완료된다")
-    void dispatch_completesEvenWhenOneFlowFails() {
+    @DisplayName("한 flow 실행 중 예외가 발생하면 모든 flow를 시도한 뒤 dispatch를 실패로 완료한다")
+    void dispatch_failsAfterAttemptingAllFlowsWhenOneFlowFails() {
         ExecutableFlow flow1 = createFlow(1L);
         ExecutableFlow flow2 = createFlow(2L);
 
@@ -136,12 +138,12 @@ class FlowDispatcherTest {
                 .execute(argThat(context1 -> context1.flow().flowId().equals(1L)));
 
         CompletableFuture<Void> future = dispatcher.dispatch(List.of(flow1, flow2), context);
-        future.join();
+        assertThatThrownBy(future::join)
+                .isInstanceOf(CompletionException.class)
+                .hasCauseInstanceOf(RuntimeException.class);
 
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow1, context)));
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow2, context)));
-
-
     }
     //helper
     private ArgumentMatcher<FlowContext> contextMatches(
