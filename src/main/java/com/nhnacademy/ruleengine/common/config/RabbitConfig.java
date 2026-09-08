@@ -107,11 +107,13 @@ public class RabbitConfig {
                 .build();
     }
 
+    //센서 데이터를 수신받을 메인 Topic Exchange 생성 빈
     @Bean
     public TopicExchange sensorTopicExchange() {
         return new TopicExchange(exchangeName);
     }
 
+    //센서 데이터를 저장할 메인 Queue 생성 빈
     @Bean
     public Queue sensorQueue() {
         return QueueBuilder.durable(queueName)
@@ -120,6 +122,7 @@ public class RabbitConfig {
                 .build();
     }
 
+    //센서 Queue와 Topic Exchange를 지정한 라우팅 키로 연결(Binding)하는 빈
     @Bean
     public Binding sensorBinding(Queue sensorQueue, TopicExchange sensorTopicExchange) {
         return BindingBuilder.bind(sensorQueue)
@@ -128,16 +131,19 @@ public class RabbitConfig {
     }
 
 
+    //처리 실패한 메시지를 전달받는 Direct 형태의 Dead Letter Exchange(DLX) 생성 빈
     @Bean
     public DirectExchange deadLetterExchange() {
         return new DirectExchange(dlxExchangeName);
     }
 
+    //최종적으로 처리 실패 메시지를 보관할 Dead Letter Queue(DLQ) 생성 빈
     @Bean
     public Queue deadLetterQueue() {
         return QueueBuilder.durable(dlqName).build();
     }
 
+    //DLQ와 DLX를 DLQ 전용 라우팅 키로 연결(Binding)하는 빈
     @Bean
     public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
         return BindingBuilder.bind(deadLetterQueue)

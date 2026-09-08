@@ -37,6 +37,8 @@ public class SensorDataListener {
                 payload.roomId(),
                 payload.metrics().size());
 
-        handler.process(payload);
+        handler.process(payload).join();
+        //비동기로 동작하는 룰 엔진처리가 모두 완료될 때까지 rabbitMQ 리스너 스레드 블로킹
+        // retry는 “비동기 플로우까지 끝난 뒤 실패했는지”를 기준으로 동작
     }
 }

@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -45,6 +46,7 @@ class SensorDataListenerTest {
         EnvironmentContext environmentContext = new EnvironmentContext(1L, List.of(metrics), Instant.now());
 
         given(converter.convertIfAssigned(rawMessage)).willReturn(Optional.of(environmentContext));
+        given(handler.process(environmentContext)).willReturn(CompletableFuture.completedFuture(null));
 
         listener.receiveSensorData(message(rawMessage));
 
@@ -62,6 +64,23 @@ class SensorDataListenerTest {
 
         verify(converter).convertIfAssigned(rawMessage);
         verifyNoInteractions(handler);
+    }
+
+    @Test
+    @DisplayName("비동기 룰 엔진 처리 실패 시 예외를 위로 던져 retry/DLQ 라우팅 유도")
+    void receiveSensorData_ThrowsException_WhenAsyncRuleEngineFails() {
+        String rawMessage = "{\"valid\": \"json\"}";
+        EnvironmentContext environmentContext = new EnvironmentContext(1L, List.of(), Instant.now());
+        RuntimeException cause = new RuntimeException("flow failed");
+
+        given(converter.convertIfAssigned(rawMessage)).willReturn(Optional.of(environmentContext));
+        given(handler.process(environmentContext)).willReturn(CompletableFuture.failedFuture(cause));
+
+        assertThatThrownBy(() -> listener.receiveSensorData(message(rawMessage)))
+                .hasCause(cause);
+
+        verify(converter).convertIfAssigned(rawMessage);
+        verify(handler).process(environmentContext);
     }
 
     @Test
