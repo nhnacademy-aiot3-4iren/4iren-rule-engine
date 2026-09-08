@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.engine.publisher;
 
+import com.nhnacademy.ruleengine.domain.nodeconfig.enums.AlertType;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertEventPublisher {
 
-    @Value("${rabbitmq.exchange.name}")
+    @Value("${rabbitmq.alert.exchange}")
     private String alertExchange;
-    @Value("${ruleengine.routing-key.alert}")
-    private String alertRoutingKey;
+    @Value("${rabbitmq.alert.routing-key.urgent}")
+    private String comfortLimitExceededRoutingKey;
+    @Value("${rabbitmq.alert.routing-key.digest}")
+    private String ventilationRecommendRoutingKey;
 
     private static final String DEDUP_KEY_FORMAT = "alert:dedup:node:%d:%s";
 
@@ -43,15 +46,24 @@ public class AlertEventPublisher {
         }
 
         try {
+            String routingKey = resolveRoutingKey(event.alertType());
             //락 획득 성공시 큐에 메시지 발행, event 객체 자동 직렬화 -> 메시지 바디로 들어감
-            rabbitTemplate.convertAndSend(alertExchange, alertRoutingKey, event);
-            log.info("알림 이벤트 발행 완료 roomId={}, eventId={}, title={}", roomId, event.eventId(), event.alertTitle());
+            rabbitTemplate.convertAndSend(alertExchange, routingKey, event);
+            log.info("알림 이벤트 발행 완료 roomId={}, eventId={}, title={}, routingKey={}",
+                    roomId, event.eventId(), event.alertTitle(), routingKey);
         } catch (Exception e) {
             //실패시 락 지움
             log.error("알림 이벤트 발행 실패 roomId={}, eventId={}, message={}", roomId, event.eventId(), e.getMessage(), e);
             redisTemplate.delete(alertLockKey);
         }
 
+    }
+
+    private String resolveRoutingKey(AlertType alertType) {
+        return switch (alertType) {
+            case COMFORT_LIMIT_EXCEEDED -> comfortLimitExceededRoutingKey;
+            case VENTILATION_RECOMMEND -> ventilationRecommendRoutingKey;
+        };
     }
 
     //락시도,
