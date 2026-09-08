@@ -44,7 +44,7 @@ public class AverageNodeExecutor implements NodeExecutor {
 
         boolean passed = average != null && OperatorEvaluator.evaluate(config.operator(), average, config.average());
         if(average == null) {
-            log.info("node({}) - roomId({})에 {} 윈도우({}s) 내 데이터 없음. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.windowSec());
+            log.debug("node({}) - roomId({})에 {} 윈도우({}s) 내 데이터 없음. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.windowSec());
         }
 
         AlertEvent.NodeResult nodeResult = new AlertEvent.NodeResult(

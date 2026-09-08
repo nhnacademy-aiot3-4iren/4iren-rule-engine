@@ -45,7 +45,7 @@ public class GradientNodeExecutor implements NodeExecutor {
 
         boolean passed = gradient != null && OperatorEvaluator.evaluate(config.operator(), gradient, config.gradient());
         if(gradient == null) {
-            log.info("node({}) - roomId({})에 {} 윈도우({}s) 내 기울기 계산 불가. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.windowSec());
+            log.debug("node({}) - roomId({})에 {} 윈도우({}s) 내 기울기 계산 불가. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.windowSec());
         }
 
         AlertEvent.NodeResult nodeResult = new AlertEvent.NodeResult(
