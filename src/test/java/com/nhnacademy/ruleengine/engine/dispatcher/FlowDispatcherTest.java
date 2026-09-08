@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -47,7 +48,8 @@ class FlowDispatcherTest {
         dispatcher = new FlowDispatcher(
                 executorService,
                 filter,
-                flowExecutor
+                flowExecutor,
+                100
         );
 
     }
@@ -145,6 +147,38 @@ class FlowDispatcherTest {
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow1, context)));
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow2, context)));
     }
+
+    @Test
+    @DisplayName("설정된 최대 동시 실행 수만큼만 flow를 실행한다")
+    void dispatch_limitsConcurrentFlowExecution() {
+        FlowDispatcher limitedDispatcher = new FlowDispatcher(
+                executorService,
+                filter,
+                flowExecutor,
+                1
+        );
+        ExecutableFlow flow1 = createFlow(1L);
+        ExecutableFlow flow2 = createFlow(2L);
+        AtomicInteger runningCount = new AtomicInteger();
+        AtomicInteger maxRunningCount = new AtomicInteger();
+
+        when(filter.isSchedulable(flow1)).thenReturn(true);
+        when(filter.isSchedulable(flow2)).thenReturn(true);
+        doAnswer(invocation -> {
+            int running = runningCount.incrementAndGet();
+            maxRunningCount.accumulateAndGet(running, Math::max);
+            Thread.sleep(50);
+            runningCount.decrementAndGet();
+            return null;
+        }).when(flowExecutor).execute(any());
+
+        CompletableFuture<Void> future = limitedDispatcher.dispatch(List.of(flow1, flow2), context);
+        future.join();
+
+        verify(flowExecutor, times(2)).execute(any());
+        org.assertj.core.api.Assertions.assertThat(maxRunningCount.get()).isEqualTo(1);
+    }
+
     //helper
     private ArgumentMatcher<FlowContext> contextMatches(
             ExecutableFlow executableFlow,

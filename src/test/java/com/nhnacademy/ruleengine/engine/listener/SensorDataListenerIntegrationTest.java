@@ -54,8 +54,8 @@ import static org.mockito.Mockito.*;
 @SpringJUnitConfig(classes = SensorDataListenerIntegrationTest.TestConfig.class)
 @TestPropertySource(properties = {
         "rabbitmq.alert.exchange=test.alert.exchange",
-        "rabbitmq.alert.routing-key.comfort-limit-exceeded=4iren.alert.urgent.comfort-limit-exceeded",
-        "rabbitmq.alert.routing-key.ventilation-recommend=4iren.alert.digest.ventilation-recommend"
+        "rabbitmq.alert.routing-key.urgent=4iren.alert.urgent.comfort-limit-exceeded",
+        "rabbitmq.alert.routing-key.digest=4iren.alert.digest.ventilation-recommend"
 })
 class SensorDataListenerIntegrationTest {
 
@@ -223,7 +223,7 @@ class SensorDataListenerIntegrationTest {
 
         @Bean
         FlowDispatcher flowDispatcher(ExecutorService flowExecutorService, FlowScheduleFilter flowScheduleFilter, FlowExecutor flowExecutor) {
-            return new FlowDispatcher(flowExecutorService, flowScheduleFilter, flowExecutor);
+            return new FlowDispatcher(flowExecutorService, flowScheduleFilter, flowExecutor, 100);
         }
 
         @Bean

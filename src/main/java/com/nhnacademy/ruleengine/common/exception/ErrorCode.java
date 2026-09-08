@@ -37,6 +37,7 @@ public enum ErrorCode {
     //409 conflict
     CONNECTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "CONNECTION_ALREADY_EXISTS", "이미 존재하는 Connection입니다."),
     FLOW_ALREADY_EXISTS(HttpStatus.CONFLICT, "FLOW_ALREADY_EXISTS", "이미 존재하는 Flow입니다."),
+    ACTIVE_FLOW_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "ACTIVE_FLOW_LIMIT_EXCEEDED", "강의실의 활성 플로우 개수 제한을 초과했습니다."),
     FLOW_SCHEDULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "FLOW_SCHEDULE_ALREADY_EXISTS", "이미 존재하는 Flow Schedule입니다."),
     NODE_ALREADY_EXISTS(HttpStatus.CONFLICT, "NODE_ALREADY_EXISTS", "이미 존재하는 Node입니다.");
 
