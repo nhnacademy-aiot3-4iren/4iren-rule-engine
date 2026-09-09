@@ -59,7 +59,11 @@ class DurationNodeExecutorTest {
                 new SensorTimeSeriesRepository.TimeSeriesPoint(now.minusSeconds(30), 27.0),
                 new SensorTimeSeriesRepository.TimeSeriesPoint(now, 28.0)
         );
+        SensorTimeSeriesRepository.TimeSeriesPoint baseline =
+                new SensorTimeSeriesRepository.TimeSeriesPoint(now.minusSeconds(durationSec), 26.0);
         when(repository.getRange(eq(ROOM_ID), eq(MeasurementType.TEMPERATURE), any(), any())).thenReturn(points);
+        when(repository.getLatestBeforeOrAt(eq(ROOM_ID), eq(MeasurementType.TEMPERATURE), eq(now.minusSeconds(durationSec))))
+                .thenReturn(baseline);
 
         NodeExecutionResult result = executor.execute(node, context, ExecutionPath.start(node.nodeId(), null, null), runtime());
 

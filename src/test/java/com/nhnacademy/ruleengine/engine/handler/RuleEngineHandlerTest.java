@@ -117,7 +117,7 @@ class RuleEngineHandlerTest {
                 1L,
                 "gradient",
                 NodeType.GRADIENT,
-                new GradientNodeConfig(NodeType.GRADIENT, 0, 0, MeasurementType.TEMPERATURE, Operator.GT, 0.1, 90)
+                new GradientNodeConfig(NodeType.GRADIENT, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 0.1, 90)
         ));
         when(flowLoader.load(ROOM_ID)).thenReturn(List.of(flow));
         when(dispatcher.dispatch(List.of(flow), context)).thenReturn(CompletableFuture.completedFuture(null));
