@@ -35,7 +35,7 @@ public class AverageNodeExecutor implements NodeExecutor {
         AverageNodeConfig config = (AverageNodeConfig) node.nodeConfig();
         Long roomId = context.roomId();
 
-        Instant to = context.triggeredAt();
+        Instant to = context.roomStateUpdatedAt();
         Instant from = to.minusSeconds(config.windowSec());
 
         List<SensorTimeSeriesRepository.TimeSeriesPoint> points = repository.getRange(roomId, config.measurementType(), from, to);
@@ -47,7 +47,11 @@ public class AverageNodeExecutor implements NodeExecutor {
             log.debug("node({}) - roomId({})에 {} 윈도우({}s) 내 데이터 없음. 조건 미충족 처리", node.nodeId(), roomId, config.measurementType(), config.windowSec());
         }
 
-        AlertEvent.NodeResult nodeResult = new AlertEvent.NodeResult(
+        return NodeExecutionResult.of(passed, path.append(buildNodeResult(node, config, average)));
+    }
+
+    private AlertEvent.NodeResult buildNodeResult(ExecutableFlow.ExecutableNode node, AverageNodeConfig config, Double average) {
+        return new AlertEvent.NodeResult(
                 node.nodeType().name(),
                 config.measurementType().name(),
                 config.operator().getSymbol(),
@@ -55,8 +59,6 @@ public class AverageNodeExecutor implements NodeExecutor {
                 config.average(),
                 average
         );
-
-        return NodeExecutionResult.of(passed, path.append(nodeResult));
     }
 
     private Double calculateAverage(List<SensorTimeSeriesRepository.TimeSeriesPoint> points) {
