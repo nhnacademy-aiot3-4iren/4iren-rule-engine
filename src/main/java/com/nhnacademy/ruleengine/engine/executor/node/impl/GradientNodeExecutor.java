@@ -92,7 +92,7 @@ public class GradientNodeExecutor implements NodeExecutor {
                 node.nodeType().name(),
                 config.measurementType().name(),
                 config.operator().getSymbol(),
-                config.unit(),
+                " 기울기",
                 config.gradient(),
                 truncateToSecondDecimalPlace(gradient)
         );
