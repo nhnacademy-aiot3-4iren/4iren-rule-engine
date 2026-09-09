@@ -9,6 +9,7 @@ import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
+import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,8 @@ class AlertNodeExecutorTest {
                 .trueAdjacencyMap(new HashMap<>())
                 .falseAdjacencyMap(new HashMap<>())
                 .build();
-        return FlowContext.of(flow, null, Instant.now());
+        EnvironmentContext environmentContext = new EnvironmentContext(100L, List.of(), Instant.now());
+        return FlowContext.of(flow, environmentContext);
     }
 
     private FlowRuntime runtime() {
