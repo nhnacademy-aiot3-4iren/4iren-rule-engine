@@ -9,6 +9,7 @@ import com.nhnacademy.ruleengine.engine.executor.FlowContext;
 import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
+import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import com.nhnacademy.ruleengine.engine.repository.SensorTimeSeriesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,11 @@ class DurationNodeExecutorTest {
                 new SensorTimeSeriesRepository.TimeSeriesPoint(now.minusSeconds(30), 27.0),
                 new SensorTimeSeriesRepository.TimeSeriesPoint(now, 28.0)
         );
+        SensorTimeSeriesRepository.TimeSeriesPoint baseline =
+                new SensorTimeSeriesRepository.TimeSeriesPoint(now.minusSeconds(durationSec), 26.0);
         when(repository.getRange(eq(ROOM_ID), eq(MeasurementType.TEMPERATURE), any(), any())).thenReturn(points);
+        when(repository.getLatestBeforeOrAt(eq(ROOM_ID), eq(MeasurementType.TEMPERATURE), eq(now.minusSeconds(durationSec))))
+                .thenReturn(baseline);
 
         NodeExecutionResult result = executor.execute(node, context, ExecutionPath.start(node.nodeId(), null, null), runtime());
 
@@ -135,7 +140,7 @@ class DurationNodeExecutorTest {
         return new ExecutableFlow.ExecutableNode(1L, "durationNode", NodeType.DURATION, config);
     }
 
-    private FlowContext flowContext(Instant triggeredAt) {
+    private FlowContext flowContext(Instant updatedAt) {
         ExecutableFlow flow = ExecutableFlow.builder()
                 .flowId(1L)
                 .flowName("flow")
@@ -146,7 +151,8 @@ class DurationNodeExecutorTest {
                 .trueAdjacencyMap(new HashMap<>())
                 .falseAdjacencyMap(new HashMap<>())
                 .build();
-        return FlowContext.of(flow, null, triggeredAt);
+        EnvironmentContext environmentContext = new EnvironmentContext(ROOM_ID, List.of(), updatedAt);
+        return FlowContext.of(flow, environmentContext);
     }
 
     private FlowRuntime runtime() {

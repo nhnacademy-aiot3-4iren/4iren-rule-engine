@@ -47,11 +47,11 @@ public class DurationNodeConfigValidator implements NodeConfigValidator {
             return errors;
         }
 
-        // durationSec 범위 (최소 10초, 최대 24시간)
+        // durationSec 범위 (최소 10초, 최대 1시간)
         if (c.durationSec() == null) {
             errors.add(NodeConfigError.of("nodeConfig.durationSec", "지속 시간을 설정해야 합니다."));
-        } else if (c.durationSec() < 10 || c.durationSec() > 86400) {
-            errors.add(NodeConfigError.of("nodeConfig.durationSec", "지속 시간은 10초 이상 24시간 이하로 설정해야 합니다. 현재값: " + c.durationSec() + "초"));
+        } else if (c.durationSec() < 10 || c.durationSec() > 3600) {
+            errors.add(NodeConfigError.of("nodeConfig.durationSec", "지속 시간은 10초 이상 1시간 이하로 설정해야 합니다. 현재값: " + c.durationSec() + "초"));
         }
 
         return errors;

@@ -25,12 +25,12 @@ public class SensorPayloadConverter {
                 throw new IllegalArgumentException("Payload가 null입니다.");
             }
             if (payload.roomId() == null) {
-                log.info("방 배정되지 않은 센서 페이로드 스킵: {}", rawMessage);
+                //방 배정되지 않은 센서 페이로드 스킵"
                 return Optional.empty();
             }
 
             validate(payload);
-            log.info("파싱 성공한 원본 메시지: {}", rawMessage);
+            log.info("파싱 성공");
             return Optional.of(payload);
         } catch (Exception e) {
             log.warn("센서 페이로드 파싱 또는 검증 실패", e);

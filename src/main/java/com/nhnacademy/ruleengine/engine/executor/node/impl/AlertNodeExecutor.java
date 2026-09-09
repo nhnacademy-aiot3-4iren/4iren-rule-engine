@@ -40,7 +40,7 @@ public class AlertNodeExecutor implements NodeExecutor {
                 null,
                 null,
                 path.history(),
-                context.triggeredAt(),
+                context.roomStateUpdatedAt(),
                 UUID.randomUUID().toString()
         );
 

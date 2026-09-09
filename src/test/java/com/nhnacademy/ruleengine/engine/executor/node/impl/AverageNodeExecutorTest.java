@@ -10,6 +10,7 @@ import com.nhnacademy.ruleengine.engine.executor.node.NodeExecutionResult;
 import com.nhnacademy.ruleengine.engine.executor.runtimestate.FlowRuntime;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
+import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
 import com.nhnacademy.ruleengine.engine.repository.SensorTimeSeriesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,7 +135,7 @@ class AverageNodeExecutorTest {
         return new ExecutableFlow.ExecutableNode(1L, "averageNode", NodeType.AVERAGE, config);
     }
 
-    private FlowContext flowContext(Instant triggeredAt) {
+    private FlowContext flowContext(Instant updatedAt) {
         ExecutableFlow flow = ExecutableFlow.builder()
                 .flowId(1L)
                 .flowName("flow")
@@ -145,7 +146,8 @@ class AverageNodeExecutorTest {
                 .trueAdjacencyMap(new HashMap<>())
                 .falseAdjacencyMap(new HashMap<>())
                 .build();
-        return FlowContext.of(flow, null, triggeredAt);
+        EnvironmentContext environmentContext = new EnvironmentContext(ROOM_ID, List.of(), updatedAt);
+        return FlowContext.of(flow, environmentContext);
     }
 
     private FlowRuntime runtime() {

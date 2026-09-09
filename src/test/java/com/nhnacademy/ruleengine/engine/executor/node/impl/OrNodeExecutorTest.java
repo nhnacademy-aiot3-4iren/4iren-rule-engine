@@ -11,7 +11,6 @@ import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ class OrNodeExecutorTest {
     void execute_satisfiedWhenOneInputArrives() {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
-        FlowContext context = FlowContext.of(flow, null, Instant.now());
+        FlowContext context = FlowContext.of(flow, null);
         FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
@@ -52,7 +51,7 @@ class OrNodeExecutorTest {
     void execute_reusesSameRuntimeStateAcrossArrivals() {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
-        FlowContext context = FlowContext.of(flow, null, Instant.now());
+        FlowContext context = FlowContext.of(flow, null);
         FlowRuntime runtime = new FlowRuntime( new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
@@ -71,7 +70,7 @@ class OrNodeExecutorTest {
     void execute_appendsNodeResultToHistory() {
         ExecutableFlow flow = twoInputFlow();
         ExecutableFlow.ExecutableNode orNode = flow.nodeMap().get(OR_NODE_ID);
-        FlowContext context = FlowContext.of(flow, null, Instant.now());
+        FlowContext context = FlowContext.of(flow, null);
         FlowRuntime runtime = new FlowRuntime(new HashMap<>());
 
         ExecutionPath arrivedFromTrue = ExecutionPath.start(OR_NODE_ID, TRUE_SOURCE_NODE_ID, BranchType.TRUE);
