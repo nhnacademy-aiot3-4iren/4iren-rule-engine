@@ -187,8 +187,7 @@ class FlowDispatcherTest {
         return context ->
                 context != null
                 && context.flow().equals(executableFlow)
-                && context.environmentContext().equals(environmentContext)
-                && context.triggeredAt() != null;
+                && context.environmentContext().equals(environmentContext);
 
     }
     private ExecutableFlow createFlow(Long flowId){

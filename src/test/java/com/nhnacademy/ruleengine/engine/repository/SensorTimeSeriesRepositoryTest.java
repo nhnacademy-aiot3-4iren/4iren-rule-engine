@@ -34,6 +34,8 @@ class SensorTimeSeriesRepositoryTest {
 
     private static final Long ROOM_ID = 100L;
     private static final String EXPECTED_KEY = "room:100:metric:TEMPERATURE:ts";
+    private static final String DEV_EUI = "dev-eui-1";
+    private static final String EXPECTED_DEVICE_KEY = "room:100:metric:TEMPERATURE:device:dev-eui-1:ts";
 
     @BeforeEach
     void setUp() {
@@ -76,6 +78,24 @@ class SensorTimeSeriesRepositoryTest {
     }
 
     @Test
+    @DisplayName("device save는 room/metric/devEui 키 규칙에 맞춰 저장한다")
+    void saveDevice_addsPointToDeviceSpecificKey() {
+        when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
+        Instant timestamp = Instant.parse("2026-08-18T00:00:00Z");
+
+        repository.save(ROOM_ID, MeasurementType.TEMPERATURE, DEV_EUI, 26.5, timestamp);
+
+        ArgumentCaptor<String> memberCaptor = ArgumentCaptor.forClass(String.class);
+        verify(zSetOperations).add(eq(EXPECTED_DEVICE_KEY), memberCaptor.capture(), eq((double) timestamp.toEpochMilli()));
+        assertThat(memberCaptor.getValue()).matches(timestamp.toEpochMilli() + ":26\\.5:-?\\d+");
+
+        long expectedThreshold = timestamp.minus(SensorTimeSeriesRepository.MAX_RETENTION).toEpochMilli();
+        verify(zSetOperations).removeRangeByScore(EXPECTED_DEVICE_KEY, 0, expectedThreshold);
+
+        verify(redisTemplate).expire(EXPECTED_DEVICE_KEY, SensorTimeSeriesRepository.MAX_RETENTION);
+    }
+
+    @Test
     @DisplayName("getRange는 조회된 데이터를 시간순으로 정렬해서 반환한다")
     void getRange_returnsPointsSortedByTimestamp() {
         when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
@@ -98,6 +118,26 @@ class SensorTimeSeriesRepositoryTest {
                 .containsExactly(10.0, 20.0, 30.0);
         assertThat(result).extracting(p -> p.timestamp().toEpochMilli())
                 .containsExactly(1000L, 2000L, 3000L);
+    }
+
+    @Test
+    @DisplayName("device getRange는 room/metric/devEui 키에서 조회한다")
+    void getRangeDevice_returnsPointsFromDeviceSpecificKey() {
+        when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
+        Instant from = Instant.ofEpochMilli(1_000);
+        Instant to = Instant.ofEpochMilli(3_000);
+
+        Set<ZSetOperations.TypedTuple<String>> tuples = new LinkedHashSet<>();
+        tuples.add(new DefaultTypedTuple<>("1000:10.0:1", 1000.0));
+
+        when(zSetOperations.rangeByScoreWithScores(EXPECTED_DEVICE_KEY, from.toEpochMilli(), to.toEpochMilli()))
+                .thenReturn(tuples);
+
+        List<SensorTimeSeriesRepository.TimeSeriesPoint> result =
+                repository.getRange(ROOM_ID, MeasurementType.TEMPERATURE, DEV_EUI, from, to);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().value()).isEqualTo(10.0);
     }
 
     @Test

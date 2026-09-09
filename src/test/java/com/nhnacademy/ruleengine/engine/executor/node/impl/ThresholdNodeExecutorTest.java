@@ -133,7 +133,7 @@ class ThresholdNodeExecutorTest {
                 .trueAdjacencyMap(new HashMap<>())
                 .falseAdjacencyMap(new HashMap<>())
                 .build();
-        return FlowContext.of(flow, environmentContext, Instant.now());
+        return FlowContext.of(flow, environmentContext);
     }
 
     private FlowRuntime runtime() {

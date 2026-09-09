@@ -23,6 +23,7 @@ import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
 import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
+import com.nhnacademy.ruleengine.engine.repository.SensorTimeSeriesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -217,8 +218,13 @@ class SensorDataListenerIntegrationTest {
         }
 
         @Bean
-        RuleEngineHandler ruleEngineHandler(FlowLoader flowLoader, FlowDispatcher dispatcher) {
-            return new RuleEngineHandler(flowLoader, dispatcher);
+        RuleEngineHandler ruleEngineHandler(FlowLoader flowLoader, FlowDispatcher dispatcher, SensorTimeSeriesRepository timeSeriesRepository) {
+            return new RuleEngineHandler(flowLoader, dispatcher, timeSeriesRepository);
+        }
+
+        @Bean
+        SensorTimeSeriesRepository sensorTimeSeriesRepository(StringRedisTemplate redisTemplate) {
+            return new SensorTimeSeriesRepository(redisTemplate);
         }
 
         @Bean
