@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.nodeconfig.controller;
 
+import com.nhnacademy.ruleengine.domain.nodeconfig.controller.doc.NodeConfigControllerDoc;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidateRequest;
 import com.nhnacademy.ruleengine.domain.nodeconfig.dto.NodeConfigValidationResponse;
 import com.nhnacademy.ruleengine.domain.nodeconfig.service.NodeConfigService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/rule/rooms/{room-id}")
 @RequiredArgsConstructor
 @Slf4j
-public class NodeConfigController {
+public class NodeConfigController implements NodeConfigControllerDoc {
 
     private final NodeConfigService nodeConfigService;
 

@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flow.controller;
 
+import com.nhnacademy.ruleengine.domain.flow.controller.doc.FlowControllerDoc;
 import com.nhnacademy.ruleengine.domain.flow.dto.*;
 import com.nhnacademy.ruleengine.domain.flow.service.FlowService;
 import jakarta.validation.Valid;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/rule/rooms/{room-id}")
 @RequiredArgsConstructor
-public class FlowController {
+public class FlowController implements FlowControllerDoc {
 
     private final FlowService flowService;
 
