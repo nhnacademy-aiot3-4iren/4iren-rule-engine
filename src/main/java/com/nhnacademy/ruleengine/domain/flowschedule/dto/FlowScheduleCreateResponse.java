@@ -1,9 +1,9 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
 public record FlowScheduleCreateResponse(
-        Long scheduleId
+        Long flowId
 ) {
-    public static FlowScheduleCreateResponse of(Long scheduleId) {
-        return new FlowScheduleCreateResponse(scheduleId);
+    public static FlowScheduleCreateResponse of(Long flowId) {
+        return new FlowScheduleCreateResponse(flowId);
     }
 }

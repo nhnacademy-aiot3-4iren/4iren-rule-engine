@@ -16,17 +16,21 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dayOfWeek": "MONDAY",
-  "startTime": "09:00:00",
-  "endTime": "18:00:00"
+  "flowScheduleRequestList": [
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00"
+    }
+  ]
 }
 
 > {%
     client.test("플로우 스케줄 생성 응답은 201 Created", function() {
         client.assert(response.status === 201, "Response status is not 201");
     });
-    client.test("생성 응답에 scheduleId가 포함됨", function() {
-        client.assert(response.body.scheduleId !== undefined, "scheduleId is missing");
+    client.test("생성 응답에 scheduleIds가 포함됨", function() {
+        client.assert(response.body.scheduleIds !== undefined, "scheduleIds is missing");
     });
 %}
 
