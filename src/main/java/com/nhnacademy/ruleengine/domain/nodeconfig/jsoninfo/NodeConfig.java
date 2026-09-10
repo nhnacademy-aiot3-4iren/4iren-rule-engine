@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(
         description = "노드 타입별 설정 정보",
-        discriminatorProperty = "nodeType",//구현체 매핑 기준 필드
-        oneOf = {//NodeConfig자리에 올수 있는 후보 타입 목록 -> Swagger/OpenAPI에게 해당 필드가 단일 고정 dto가 아님을 알림
+        discriminatorProperty = "nodeType",
+        subTypes = {
                 ThresholdNodeConfig.class,
                 GradientNodeConfig.class,
                 AverageNodeConfig.class,
@@ -26,15 +26,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
                 OrNodeConfig.class,
                 AlertNodeConfig.class,
                 StartNodeConfig.class
-        },
-        discriminatorMapping = {
-                @DiscriminatorMapping(value = "THRESHOLD", schema = ThresholdNodeConfig.class),
-                @DiscriminatorMapping(value = "GRADIENT", schema = GradientNodeConfig.class),
-                @DiscriminatorMapping(value = "AVERAGE", schema = AverageNodeConfig.class),
-                @DiscriminatorMapping(value = "DURATION", schema = DurationNodeConfig.class),
-                @DiscriminatorMapping(value = "OR", schema = OrNodeConfig.class),
-                @DiscriminatorMapping(value = "ALERT", schema = AlertNodeConfig.class),
-                @DiscriminatorMapping(value = "START", schema = StartNodeConfig.class)
         }
 )
 @JsonTypeInfo(
