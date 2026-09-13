@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.controller;
 
+import com.nhnacademy.ruleengine.domain.flowschedule.controller.doc.FlowScheduleControllerDoc;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateResponse;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleListResponse;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/rule/rooms/{room-id}/flows/{flow-id}/schedules")
 @RequiredArgsConstructor
 @Slf4j
-public class FlowScheduleController {
+public class FlowScheduleController implements FlowScheduleControllerDoc {
     private final FlowScheduleService flowScheduleService;
 
     //플로우 스케줄 생성

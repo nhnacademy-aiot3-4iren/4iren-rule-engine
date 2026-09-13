@@ -1,5 +1,6 @@
 package com.nhnacademy.ruleengine.domain.templateflow.controller;
 
+import com.nhnacademy.ruleengine.domain.templateflow.controller.doc.TemplateFlowControllerDoc;
 import com.nhnacademy.ruleengine.domain.templateflow.dto.*;
 import com.nhnacademy.ruleengine.domain.templateflow.service.TemplateFlowService;
 import jakarta.validation.Valid;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/rule/templates")
 @Slf4j
-public class TemplateFlowController {
+public class TemplateFlowController implements TemplateFlowControllerDoc {
 
     private final TemplateFlowService templateFlowService;
 
