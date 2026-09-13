@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "플로우 스케줄 생성 응답")
 public record FlowScheduleCreateResponse(
-        @Schema(description = "생성된 스케줄 ID 리스트", example = "1")
+        @Schema(description = "생성된 스케줄 ID 리스트", example = "[1, 2. 3]")
         List<Long> scheduleIds
 
 ) {
