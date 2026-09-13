@@ -5,6 +5,8 @@ import com.nhnacademy.ruleengine.engine.executor.FlowExecutor;
 import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
+import com.nhnacademy.ruleengine.engine.model.FlowFailureEvent;
+import com.nhnacademy.ruleengine.engine.publisher.FlowFailureEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,13 +23,14 @@ public class FlowDispatcher {
     private final ExecutorService flowExecutorService;
     private final FlowScheduleFilter flowScheduleFilter;
     private final FlowExecutor flowExecutor;
+    private final FlowFailureEventPublisher flowFailureEventPublisher;
     private final Semaphore flowExecutionSemaphore;
-    private int flowMaxConcurrency;
 
     public FlowDispatcher(
             ExecutorService flowExecutorService,
             FlowScheduleFilter flowScheduleFilter,
             FlowExecutor flowExecutor,
+            FlowFailureEventPublisher flowFailureEventPublisher,
             @Value("${ruleengine.flow.max-concurrency:100}") int flowMaxConcurrency
     ) {
         if (flowMaxConcurrency < 1) {
@@ -36,6 +39,7 @@ public class FlowDispatcher {
         this.flowExecutorService = flowExecutorService;
         this.flowScheduleFilter = flowScheduleFilter;
         this.flowExecutor = flowExecutor;
+        this.flowFailureEventPublisher = flowFailureEventPublisher;
         this.flowExecutionSemaphore = new Semaphore(flowMaxConcurrency);
     }
 
@@ -48,7 +52,7 @@ public class FlowDispatcher {
 
         List<CompletableFuture<Void>> futures = flows.stream()
                 .map(flow -> runAsyncWithConcurrencyLimit(flow, environmentContext)
-                        // 개별 플로우에서 예외가 나면 로그만 남기고, 실패 상태는 Future에 그대로 전파한다.
+                        // 개별 플로우 실패는 runAsync 내부에서 격리하므로 dispatch 전체 실패로 전파하지 않는다.
                         .whenComplete((r, ex) -> {
                             if (ex == null) {
                                 return;
@@ -72,7 +76,14 @@ public class FlowDispatcher {
         acquireFlowExecutionPermit(flow);
         try {
             return CompletableFuture
-                    .runAsync(() -> runFlowPipeline(flow, environmentContext), flowExecutorService)
+                    .runAsync(() -> {
+                        try {
+                            runFlowPipeline(flow, environmentContext);
+                        } catch (Exception e) {
+                            log.error("플로우 실행 실패 flowId={}, roomId={}", flow.flowId(), flow.roomId(), e);
+                            flowFailureEventPublisher.publish(FlowFailureEvent.of(flow, environmentContext, e));//플로우 실행 실패 이벤트 발행
+                        }
+                    }, flowExecutorService)
                     .whenComplete((r, ex) ->
                             // 성공/실패와 관계없이 실행 슬롯을 반드시 반납한다.
                             flowExecutionSemaphore.release()
@@ -83,6 +94,7 @@ public class FlowDispatcher {
             throw e;
         }
     }
+
 
     /**
      * 비동기 작업을 실행하기 전 Semaphore에서 실행 권한을 얻는다.

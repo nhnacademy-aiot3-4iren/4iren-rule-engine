@@ -5,6 +5,8 @@ import com.nhnacademy.ruleengine.engine.executor.FlowExecutor;
 import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
+import com.nhnacademy.ruleengine.engine.model.FlowFailureEvent;
+import com.nhnacademy.ruleengine.engine.publisher.FlowFailureEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,12 +21,11 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +37,9 @@ class FlowDispatcherTest {
 
     @Mock
     private FlowExecutor flowExecutor;
+
+    @Mock
+    private FlowFailureEventPublisher flowFailureEventPublisher;
 
     private ExecutorService executorService;
     private FlowDispatcher dispatcher;
@@ -49,6 +53,7 @@ class FlowDispatcherTest {
                 executorService,
                 filter,
                 flowExecutor,
+                flowFailureEventPublisher,
                 100
         );
 
@@ -127,8 +132,8 @@ class FlowDispatcherTest {
     }
 
     @Test
-    @DisplayName("한 flow 실행 중 예외가 발생하면 모든 flow를 시도한 뒤 dispatch를 실패로 완료한다")
-    void dispatch_failsAfterAttemptingAllFlowsWhenOneFlowFails() {
+    @DisplayName("한 flow 실행 중 예외가 발생해도 dispatch는 성공하고 실패 이벤트를 발행한다")
+    void dispatch_publishesFailureEventWhenOneFlowFails() {
         ExecutableFlow flow1 = createFlow(1L);
         ExecutableFlow flow2 = createFlow(2L);
 
@@ -140,12 +145,11 @@ class FlowDispatcherTest {
                 .execute(argThat(context1 -> context1.flow().flowId().equals(1L)));
 
         CompletableFuture<Void> future = dispatcher.dispatch(List.of(flow1, flow2), context);
-        assertThatThrownBy(future::join)
-                .isInstanceOf(CompletionException.class)
-                .hasCauseInstanceOf(RuntimeException.class);
+        assertThatCode(future::join).doesNotThrowAnyException();
 
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow1, context)));
         verify(flowExecutor,times(1)).execute(argThat(contextMatches(flow2, context)));
+        verify(flowFailureEventPublisher).publish(any(FlowFailureEvent.class));
     }
 
     @Test
@@ -155,6 +159,7 @@ class FlowDispatcherTest {
                 executorService,
                 filter,
                 flowExecutor,
+                flowFailureEventPublisher,
                 1
         );
         ExecutableFlow flow1 = createFlow(1L);
