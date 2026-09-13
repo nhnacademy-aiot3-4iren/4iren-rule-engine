@@ -54,7 +54,7 @@ public class FlowScheduleService {
                 .toList();
 
         log.info("플로우 스케줄 생성 완료 roomId={}, flowId={}, scheduleCount={}", roomId, flowId, savedFlowScheduleList.size());
-        return FlowScheduleCreateResponse.of(flowId);
+        return FlowScheduleCreateResponse.of(scheduleIds);
     }
 
     @Transactional(readOnly = true)

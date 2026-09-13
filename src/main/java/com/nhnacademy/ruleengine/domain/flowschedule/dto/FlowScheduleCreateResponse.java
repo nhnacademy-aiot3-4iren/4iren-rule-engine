@@ -1,9 +1,11 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
+import java.util.List;
+
 public record FlowScheduleCreateResponse(
-        Long flowId
+        List<Long> flowSchedulrIds
 ) {
-    public static FlowScheduleCreateResponse of(Long flowId) {
-        return new FlowScheduleCreateResponse(flowId);
+    public static FlowScheduleCreateResponse of(List<Long> flowSchedulrIds) {
+        return new FlowScheduleCreateResponse(flowSchedulrIds);
     }
 }
