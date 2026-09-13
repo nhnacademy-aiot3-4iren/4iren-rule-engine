@@ -45,13 +45,17 @@ class FlowScheduleServiceTest {
 
         FlowSchedule mockSchedule = mock(FlowSchedule.class);
         when(mockSchedule.getId()).thenReturn(10L);
-        when(flowScheduleRepository.findAllByFlowIdAndDayOfWeek(1L, DayOfWeek.MONDAY)).thenReturn(List.of());
+        when(flowScheduleRepository.findAllByFlowIdAndDayOfWeekIn(eq(1L), anyCollection())).thenReturn(List.of());
         when(flowScheduleRepository.saveAll(anyList())).thenReturn(List.of(mockSchedule));
 
         FlowScheduleCreateRequest request = sampleCreateRequest();
         FlowScheduleCreateResponse response = flowScheduleService.createFlowSchedule(100L, 1L, request);
 
         assertThat(response.scheduleIds()).containsExactly(10L);
+        verify(flowScheduleRepository).findAllByFlowIdAndDayOfWeekIn(
+                eq(1L),
+                argThat(days -> days.contains(DayOfWeek.MONDAY) && days.size() == 1)
+        );
         verify(flowScheduleRepository).saveAll(anyList());
     }
 
@@ -81,6 +85,32 @@ class FlowScheduleServiceTest {
                         DayOfWeek.MONDAY,
                         LocalTime.of(11, 0),
                         LocalTime.of(13, 0)
+                )
+        ));
+
+        assertThatThrownBy(() -> flowScheduleService.createFlowSchedule(100L, 1L, request))
+                .isInstanceOf(FlowScheduleValidationFailed.class);
+        verify(flowScheduleRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("기존 스케줄과 겹치면 생성 실패")
+    void createFlowSchedule_overlappedWithExistingSchedule() {
+        Flow mockFlow = mock(Flow.class);
+        when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
+
+        FlowSchedule existing = mock(FlowSchedule.class);
+        when(existing.getDayOfWeek()).thenReturn(DayOfWeek.MONDAY);
+        when(existing.getStartTime()).thenReturn(LocalTime.of(10, 0));
+        when(existing.getEndTime()).thenReturn(LocalTime.of(12, 0));
+        when(flowScheduleRepository.findAllByFlowIdAndDayOfWeekIn(eq(1L), anyCollection()))
+                .thenReturn(List.of(existing));
+
+        FlowScheduleCreateRequest request = new FlowScheduleCreateRequest(List.of(
+                new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0),
+                        LocalTime.of(11, 0)
                 )
         ));
 

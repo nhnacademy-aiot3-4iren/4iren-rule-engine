@@ -3,9 +3,9 @@ package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 import java.util.List;
 
 public record FlowScheduleCreateResponse(
-        List<Long> flowSchedulrIds
+        List<Long> scheduleIds
 ) {
-    public static FlowScheduleCreateResponse of(List<Long> flowSchedulrIds) {
-        return new FlowScheduleCreateResponse(flowSchedulrIds);
+    public static FlowScheduleCreateResponse of(List<Long> scheduleIds) {
+        return new FlowScheduleCreateResponse(scheduleIds);
     }
 }

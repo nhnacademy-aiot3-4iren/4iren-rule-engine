@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -36,8 +33,6 @@ public class FlowScheduleService {
 
     @CacheEvict(value = "flow:room", key = "#roomId", cacheManager = "flowCacheManager")
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
-        validateRequestList(request);
-
         log.info("플로우 스케줄 생성 처리 시작 roomId={}, flowId={}, scheduleCount={}",
                 roomId, flowId, request.flowScheduleRequestList().size());
         Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
@@ -89,139 +84,125 @@ public class FlowScheduleService {
     }
 
     //검증 코드
-    private void validateRequestList(FlowScheduleCreateRequest request) {
-        if (request == null || request.flowScheduleRequestList() == null || request.flowScheduleRequestList().isEmpty()) {
-            throw new FlowScheduleValidationFailed(List.of(
-                    ValidationErrorResponse.ValidationError.of(
-                            "flowScheduleRequestList",
-                            "스케줄 목록은 비어 있을 수 없습니다."
-                    )
-            ));
-        }
-    }
-
     private void validateCreateRequest(Long flowId, List<FlowScheduleCreateRequest.FlowScheduleRequest> requests){
         List<ValidationErrorResponse.ValidationError> errors = new ArrayList<>();
 
-        for (int i = 0; i < requests.size(); i++) {
-            FlowScheduleCreateRequest.FlowScheduleRequest request = requests.get(i);
-            validateRequired(i, request, errors);
-            validationTimeRange(i, request, errors);
-        }
+        requests.forEach(request -> validateTimeRange(request, errors));
 
         if(errors.isEmpty()){
             validateNoOverlapInRequest(requests, errors);
-            validateNoOverlap(flowId, requests, errors);
+            validateNoOverlapWithExisting(flowId, requests, errors);
         }
         if (!errors.isEmpty()) {
             throw new FlowScheduleValidationFailed(errors);
         }
     }
 
-    private void validateRequired(int index,
-                                  FlowScheduleCreateRequest.FlowScheduleRequest request,
-                                  List<ValidationErrorResponse.ValidationError> errors) {
-        if (request == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "]",
-                    "스케줄 정보는 비어 있을 수 없습니다."
-            ));
-            return;
-        }
-
-        if (request.dayOfWeek() == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "].dayOfWeek",
-                    "요일은 필수입니다."
-            ));
-        }
-
-        if (request.startTime() == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "].startTime",
-                    "시작 시간은 필수입니다."
-            ));
-        }
-
-        if (request.endTime() == null) {
-            errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "].endTime",
-                    "종료 시간은 필수입니다."
-            ));
-        }
-    }
-
-    //요청 스케줄 리스트 각각의 시간대 중복 검사
-    private void validateNoOverlapInRequest(List<FlowScheduleCreateRequest.FlowScheduleRequest> requests,
-                                            List<ValidationErrorResponse.ValidationError> errors) {
-        Map<DayOfWeek, List<FlowScheduleCreateRequest.FlowScheduleRequest>> schedulesByDay = requests.stream()
-                .collect(Collectors.groupingBy(FlowScheduleCreateRequest.FlowScheduleRequest::dayOfWeek));
-
-        for (Map.Entry<DayOfWeek, List<FlowScheduleCreateRequest.FlowScheduleRequest>> entry : schedulesByDay.entrySet()) {
-            List<FlowScheduleCreateRequest.FlowScheduleRequest> sortedSchedules = entry.getValue().stream()
-                    .sorted(Comparator.comparing(FlowScheduleCreateRequest.FlowScheduleRequest::startTime))
-                    .toList();
-
-            for (int i = 1; i < sortedSchedules.size(); i++) {
-                FlowScheduleCreateRequest.FlowScheduleRequest previous = sortedSchedules.get(i - 1);
-                FlowScheduleCreateRequest.FlowScheduleRequest current = sortedSchedules.get(i);
-
-                if (current.startTime().isBefore(previous.endTime())) {
-                    errors.add(ValidationErrorResponse.ValidationError.of(
-                            "FlowSchedule",
-                            "%s 요청 목록 안에 겹치는 실행 시간이 있습니다.".formatted(entry.getKey())
-                    ));
-                    return;
-                }
-            }
-        }
-    }
-
-    //기존 스케줄 시간대 겹침 여부 검증
-    private void validateNoOverlap(Long flowId,
-                                   List<FlowScheduleCreateRequest.FlowScheduleRequest> requests,
-                                   List<ValidationErrorResponse.ValidationError> errors) {
-        for (FlowScheduleCreateRequest.FlowScheduleRequest request : requests) {
-            List<FlowSchedule> schedules = flowScheduleRepository.findAllByFlowIdAndDayOfWeek(flowId, request.dayOfWeek());
-
-            boolean overlapped = schedules.stream()
-                    .anyMatch(schedule ->
-                                request.startTime().isBefore(schedule.getEndTime())
-                            && request.endTime().isAfter(schedule.getStartTime())
-                    );
-
-            if(overlapped){
-                errors.add(ValidationErrorResponse.ValidationError.of(
-                        "FlowSchedule",
-                        "%s 같은 요일에 겹치는 실행 시간이 이미 있습니다.".formatted(request.dayOfWeek())
-                ));
-                return;
-            }
-        }
-    }
-
     //시작시간 종료시간 범위 검증
-    private void validationTimeRange(int index,
-                                     FlowScheduleCreateRequest.FlowScheduleRequest request,
-                                     List<ValidationErrorResponse.ValidationError> errors) {
-        if(request == null || request.startTime() == null || request.endTime() == null){
-            return;
-        }
-
-
-        if(request.startTime().equals(request.endTime())){
+    private void validateTimeRange(FlowScheduleCreateRequest.FlowScheduleRequest request,
+                                   List<ValidationErrorResponse.ValidationError> errors) {
+        if (request.startTime().equals(request.endTime())) {
             errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "]",
+                    request.dayOfWeek().name(),
                     "시작 시간과 종료 시간을 다르게 설정해야 합니다."
             ));
             return;
         }
 
-        if(request.startTime().isAfter(request.endTime())){
+        if (request.startTime().isAfter(request.endTime())) {
             errors.add(ValidationErrorResponse.ValidationError.of(
-                    "flowScheduleRequestList[" + index + "]",
+                    request.dayOfWeek().name(),
                     "시작 시간은 종료 시간보다 빠르게 설정해야 합니다."
             ));
         }
     }
+
+
+    /**
+     * [요청 내 중복 검사]
+     * 동일한 요청(Request) 리스트 안에 포함된 스케줄 상호 간에 시간이 겹치는지 검증합니다.
+     *
+     * 1. 요일(DayOfWeek)별로 그룹화한 뒤, 시작 시간(startTime) 기준으로 오름차순 정렬합니다.
+     * 2. 연속된 스케줄을 비교하여 '현재 스케줄의 시작 시간 < 이전 스케줄의 종료 시간'인 경우 중복으로 처리합니다.
+     *
+     * @param requests 검증할 스케줄 요청 목록
+     * @param errors   검증 실패 시 에러 정보를 담을 리스트
+     */
+    private void validateNoOverlapInRequest(
+            List<FlowScheduleCreateRequest.FlowScheduleRequest> requests,
+            List<ValidationErrorResponse.ValidationError> errors
+    ) {
+        //요일(DayOfWeek)별로 그룹화
+        Map<DayOfWeek, List<FlowScheduleCreateRequest.FlowScheduleRequest>> schedulesByDay = requests.stream()
+                .collect(Collectors.groupingBy(FlowScheduleCreateRequest.FlowScheduleRequest::dayOfWeek));
+
+
+        schedulesByDay.forEach((day, dayRequests) -> {
+            //시작 시간(startTime) 기준으로 오름차순 정렬
+            List<FlowScheduleCreateRequest.FlowScheduleRequest> sorted = dayRequests.stream()
+                    .sorted(Comparator.comparing(FlowScheduleCreateRequest.FlowScheduleRequest::startTime))
+                    .toList();
+
+            for (int i = 1; i < sorted.size(); i++) {
+                //연속된 스케줄을 비교하여 '현재 스케줄의 시작 시간 < 이전 스케줄의 종료 시간'인 경우 중복으로 처리
+                FlowScheduleCreateRequest.FlowScheduleRequest prev = sorted.get(i - 1);
+                FlowScheduleCreateRequest.FlowScheduleRequest curr = sorted.get(i);
+
+                if (curr.startTime().isBefore(prev.endTime())) {
+                    errors.add(ValidationErrorResponse.ValidationError.of(
+                            day.name(),
+                            "요청 목록 안에 겹치는 실행 시간이 있습니다."
+                    ));
+                    return;
+                }
+            }
+        });
+    }
+
+    /**
+     * [기존 DB 스케줄과 중복 검사]
+     * 요청된 스케줄이 이미 DB에 저장되어 있는 기존 스케줄과 시간이 겹치는지 검증합니다.
+     *
+     * 각 요청 스케줄의 요일별 기존 데이터를 조회하여, 시간 구간(Interval) 겹침 공식인
+     * '(요청 시작 < 기존 종료) AND (요청 종료 > 기존 시작)' 조건 충족 여부를 확인합니다.
+     *
+     * @param flowId   대상 플로우 ID
+     * @param requests 검증할 스케줄 요청 목록
+     * @param errors   검증 실패 시 에러 정보를 담을 리스트
+     */
+    private void validateNoOverlapWithExisting(
+            Long flowId,
+            List<FlowScheduleCreateRequest.FlowScheduleRequest> requests,
+            List<ValidationErrorResponse.ValidationError> errors
+    ) {
+        // 1. 요청받은 요일 목록 추출
+        Set<DayOfWeek> targetDays = requests.stream()
+                .map(FlowScheduleCreateRequest.FlowScheduleRequest::dayOfWeek)
+                .collect(Collectors.toSet());
+
+        // 2. DB 쿼리 1회로 해당 요일들의 기존 스케줄을 한 번에 가져와 요일별로 그룹화
+        Map<DayOfWeek, List<FlowSchedule>> existingSchedulesByDay = flowScheduleRepository
+                .findAllByFlowIdAndDayOfWeekIn(flowId, targetDays).stream()
+                .collect(Collectors.groupingBy(FlowSchedule::getDayOfWeek));
+
+        requests.forEach(request -> {
+            //flowId, 요일 기준 기존 스케줄 목록 조회
+            List<FlowSchedule> existingSchedules = existingSchedulesByDay.getOrDefault(request.dayOfWeek(), List.of());
+
+            boolean isOverlapped = existingSchedules.stream().anyMatch(existing ->
+                    request.startTime().isBefore(existing.getEndTime()) &&
+                    request.endTime().isAfter(existing.getStartTime())
+            );
+
+            if(isOverlapped){
+                errors.add(ValidationErrorResponse.ValidationError.of(
+                        request.dayOfWeek().name(),
+                        "해당 요일에 겹치는 실행 시간이 이미 존재합니다."
+                ));
+            }
+
+        });
+    }
+
+
 }

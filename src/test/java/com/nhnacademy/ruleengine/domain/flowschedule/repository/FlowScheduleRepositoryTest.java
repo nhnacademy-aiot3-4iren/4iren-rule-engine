@@ -129,4 +129,23 @@ class FlowScheduleRepositoryTest {
 
         assertThat(result).hasSize(2);
     }
+
+    @Test
+    @DisplayName("findAllByFlowIdAndDayOfWeekIn - 지정한 플로우와 요일의 스케줄만 조회")
+    void findAllByFlowIdAndDayOfWeekIn_returnsSchedulesOfFlowAndDays() {
+        flowScheduleRepository.save(FlowSchedule.builder()
+                .flow(flow1)
+                .dayOfWeek(DayOfWeek.WEDNESDAY)
+                .startTime(LocalTime.of(13, 0))
+                .endTime(LocalTime.of(15, 0))
+                .build());
+
+        List<FlowSchedule> result = flowScheduleRepository.findAllByFlowIdAndDayOfWeekIn(
+                flow1.getId(),
+                List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)
+        );
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+    }
 }
