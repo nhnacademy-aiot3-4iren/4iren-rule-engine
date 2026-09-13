@@ -31,7 +31,7 @@ public class FlowDispatcher {
             FlowScheduleFilter flowScheduleFilter,
             FlowExecutor flowExecutor,
             FlowFailureEventPublisher flowFailureEventPublisher,
-            @Value("${ruleengine.flow.max-concurrency:100}") int flowMaxConcurrency
+            @Value("${ruleengine.flow.max-concurrency}") int flowMaxConcurrency
     ) {
         if (flowMaxConcurrency < 1) {
             throw new IllegalArgumentException("ruleengine.flow.max-concurrency must be greater than 0");
