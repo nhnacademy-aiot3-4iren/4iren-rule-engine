@@ -11,8 +11,23 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNo
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 
+@Schema(
+        description = "노드 타입별 설정 정보",
+        discriminatorProperty = "nodeType",
+        subTypes = {
+                ThresholdNodeConfig.class,
+                GradientNodeConfig.class,
+                AverageNodeConfig.class,
+                DurationNodeConfig.class,
+                OrNodeConfig.class,
+                AlertNodeConfig.class,
+                StartNodeConfig.class
+        }
+)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
