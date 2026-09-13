@@ -2,6 +2,7 @@ package com.nhnacademy.ruleengine.domain.flowschedule.service;
 
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowScheduleNotFoundException;
+import com.nhnacademy.ruleengine.common.exception.invalid.FlowScheduleValidationFailed;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
@@ -44,23 +45,78 @@ class FlowScheduleServiceTest {
 
         FlowSchedule mockSchedule = mock(FlowSchedule.class);
         when(mockSchedule.getId()).thenReturn(10L);
-        when(flowScheduleRepository.save(any(FlowSchedule.class))).thenReturn(mockSchedule);
+        when(flowScheduleRepository.findAllByFlowIdAndDayOfWeekIn(eq(1L), anyCollection())).thenReturn(List.of());
+        when(flowScheduleRepository.saveAll(anyList())).thenReturn(List.of(mockSchedule));
 
-        FlowScheduleCreateRequest request = new FlowScheduleCreateRequest(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(18, 0));
+        FlowScheduleCreateRequest request = sampleCreateRequest();
         FlowScheduleCreateResponse response = flowScheduleService.createFlowSchedule(100L, 1L, request);
 
-        assertThat(response.scheduleId()).isEqualTo(10L);
-        verify(flowScheduleRepository).save(any(FlowSchedule.class));
+        assertThat(response.scheduleIds()).containsExactly(10L);
+        verify(flowScheduleRepository).findAllByFlowIdAndDayOfWeekIn(
+                eq(1L),
+                argThat(days -> days.contains(DayOfWeek.MONDAY) && days.size() == 1)
+        );
+        verify(flowScheduleRepository).saveAll(anyList());
     }
 
     @Test
     @DisplayName("flow 없음 생성 실패")
     void createFlowSchedule_flowNotFound() {
         when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.empty());
-        FlowScheduleCreateRequest request = new FlowScheduleCreateRequest(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(18, 0));
+        FlowScheduleCreateRequest request = sampleCreateRequest();
 
         assertThatThrownBy(() -> flowScheduleService.createFlowSchedule(100L, 1L, request))
                 .isInstanceOf(FlowNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("요청 목록 내부에 겹치는 스케줄이 있으면 생성 실패")
+    void createFlowSchedule_overlappedInRequest() {
+        Flow mockFlow = mock(Flow.class);
+        when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
+
+        FlowScheduleCreateRequest request = new FlowScheduleCreateRequest(List.of(
+                new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0),
+                        LocalTime.of(12, 0)
+                ),
+                new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(11, 0),
+                        LocalTime.of(13, 0)
+                )
+        ));
+
+        assertThatThrownBy(() -> flowScheduleService.createFlowSchedule(100L, 1L, request))
+                .isInstanceOf(FlowScheduleValidationFailed.class);
+        verify(flowScheduleRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    @DisplayName("기존 스케줄과 겹치면 생성 실패")
+    void createFlowSchedule_overlappedWithExistingSchedule() {
+        Flow mockFlow = mock(Flow.class);
+        when(flowRepository.findByIdAndRoomId(1L, 100L)).thenReturn(Optional.of(mockFlow));
+
+        FlowSchedule existing = mock(FlowSchedule.class);
+        when(existing.getDayOfWeek()).thenReturn(DayOfWeek.MONDAY);
+        when(existing.getStartTime()).thenReturn(LocalTime.of(10, 0));
+        when(existing.getEndTime()).thenReturn(LocalTime.of(12, 0));
+        when(flowScheduleRepository.findAllByFlowIdAndDayOfWeekIn(eq(1L), anyCollection()))
+                .thenReturn(List.of(existing));
+
+        FlowScheduleCreateRequest request = new FlowScheduleCreateRequest(List.of(
+                new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0),
+                        LocalTime.of(11, 0)
+                )
+        ));
+
+        assertThatThrownBy(() -> flowScheduleService.createFlowSchedule(100L, 1L, request))
+                .isInstanceOf(FlowScheduleValidationFailed.class);
+        verify(flowScheduleRepository, never()).saveAll(anyList());
     }
 
     @Test
@@ -113,5 +169,15 @@ class FlowScheduleServiceTest {
 
         assertThatThrownBy(() -> flowScheduleService.deleteFlowSchedule(100L, 1L, 10L))
                 .isInstanceOf(FlowScheduleNotFoundException.class);
+    }
+
+    private FlowScheduleCreateRequest sampleCreateRequest() {
+        return new FlowScheduleCreateRequest(List.of(
+                new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0),
+                        LocalTime.of(18, 0)
+                )
+        ));
     }
 }

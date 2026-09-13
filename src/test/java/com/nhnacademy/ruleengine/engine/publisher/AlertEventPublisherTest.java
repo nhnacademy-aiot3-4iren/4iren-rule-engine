@@ -80,7 +80,7 @@ class AlertEventPublisherTest {
     }
 
     @Test
-    @DisplayName("history 기반 해시 키와 dedupWindowSec TTL로 알림 발행")
+    @DisplayName("history 기반 해시 키와  dedupWindowSec TTL로 알림 발행")
     void publish_success() {
         AlertEvent event = createAlertEvent(101L, List.of(
                 new AlertEvent.NodeResult("THRESHOLD", "TEMPERATURE", "GREATER_THAN", "C", 30.0, 31.5)

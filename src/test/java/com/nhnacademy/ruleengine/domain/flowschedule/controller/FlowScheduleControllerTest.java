@@ -73,23 +73,25 @@ class FlowScheduleControllerTest {
     void createFlowSchedule_success() throws Exception {
         given(flowScheduleService.createFlowSchedule(
                 eq(ROOM_ID), eq(FLOW_ID), any(FlowScheduleCreateRequest.class)))
-                .willReturn(FlowScheduleCreateResponse.of(SCHEDULE_ID));
+                .willReturn(FlowScheduleCreateResponse.of(List.of(SCHEDULE_ID)));
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
                         .with(authHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleCreateRequest())))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.scheduleId").value(SCHEDULE_ID));
+                .andExpect(jsonPath("$.scheduleIds[0]").value(SCHEDULE_ID));
     }
 
     @Test
     @DisplayName("스케줄 생성 - dayOfWeek null이면 400")
     void createFlowSchedule_nullDayOfWeek_400() throws Exception {
         FlowScheduleCreateRequest invalid = new FlowScheduleCreateRequest(
-                null,
-                LocalTime.of(9, 0, 0),
-                LocalTime.of(18, 0, 0)
+                List.of(new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        null,
+                        LocalTime.of(9, 0, 0),
+                        LocalTime.of(18, 0, 0)
+                ))
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
@@ -103,9 +105,11 @@ class FlowScheduleControllerTest {
     @DisplayName("스케줄 생성 - startTime null이면 400")
     void createFlowSchedule_nullStartTime_400() throws Exception {
         FlowScheduleCreateRequest invalid = new FlowScheduleCreateRequest(
-                DayOfWeek.MONDAY,
-                null,
-                LocalTime.of(18, 0, 0)
+                List.of(new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        null,
+                        LocalTime.of(18, 0, 0)
+                ))
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
@@ -119,9 +123,11 @@ class FlowScheduleControllerTest {
     @DisplayName("스케줄 생성 - endTime null이면 400")
     void createFlowSchedule_nullEndTime_400() throws Exception {
         FlowScheduleCreateRequest invalid = new FlowScheduleCreateRequest(
-                DayOfWeek.MONDAY,
-                LocalTime.of(9, 0, 0),
-                null
+                List.of(new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0, 0),
+                        null
+                ))
         );
 
         mockMvc.perform(post(BASE_URL, ROOM_ID, FLOW_ID)
@@ -191,9 +197,11 @@ class FlowScheduleControllerTest {
 
     private FlowScheduleCreateRequest sampleCreateRequest() {
         return new FlowScheduleCreateRequest(
-                DayOfWeek.MONDAY,
-                LocalTime.of(9, 0, 0),
-                LocalTime.of(18, 0, 0)
+                List.of(new FlowScheduleCreateRequest.FlowScheduleRequest(
+                        DayOfWeek.MONDAY,
+                        LocalTime.of(9, 0, 0),
+                        LocalTime.of(18, 0, 0)
+                ))
         );
     }
 
