@@ -41,7 +41,7 @@ public class FlowSchedule {
         this.endTime = endTime;
     }
 
-    public static FlowSchedule create(Flow flow, FlowScheduleCreateRequest request){
+    public static FlowSchedule create(Flow flow, FlowScheduleCreateRequest.FlowScheduleRequest request){
         return FlowSchedule.builder()
                 .flow(flow).dayOfWeek(request.dayOfWeek()).startTime(request.startTime()).endTime(request.endTime()).build();
     }
