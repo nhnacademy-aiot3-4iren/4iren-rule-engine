@@ -1,8 +1,8 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.service;
 
+import com.nhnacademy.ruleengine.common.exception.invalid.FlowScheduleValidationFailed;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowNotFoundException;
 import com.nhnacademy.ruleengine.common.exception.notfound.FlowScheduleNotFoundException;
-import com.nhnacademy.ruleengine.common.exception.invalid.FlowScheduleValidationFailed;
 import com.nhnacademy.ruleengine.domain.flow.entity.Flow;
 import com.nhnacademy.ruleengine.domain.flow.repository.FlowRepository;
 import com.nhnacademy.ruleengine.domain.flowschedule.dto.FlowScheduleCreateRequest;
@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
