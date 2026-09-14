@@ -26,62 +26,11 @@ public class RoomDeviceCacheService {
         try{
             return roomSensorClient.getRoomDevices(roomId);
         }catch (Exception e){
-//            log.error("강의실 장비 목록 외부 API 호출 실패, 더미 데이터 사용 roomId={}", roomId, e);
-//            return getDummyDevices();
 
             log.error("강의실 장비 목록 외부 API 호출 실패", e);
             return List.of();
         }
 
     }
-    //TODO 테스트용 추후 삭제
-    private List<RoomDeviceInfo> getDummyDevices() {
-        try {
-            log.info("테스트용 강의실 장비 더미 데이터 생성");
-            return objectMapper.readValue("""
-                        [
-                          {
-                            "roomId": 101,
-                            "devEui": "24e124126d152862",
-                            "deviceName": "EM500-CO2-152862",
-                            "measurement": {
-                              "co2": "ppm",
-                              "temperature": "°C",
-                              "humidity": "%",
-                              "pressure": "Pa"
-                            }
-                          },
-                          {
-                            "roomId": 101,
-                            "devEui": "24e124128c067999",
-                            "deviceName": "AM107-067999",
-                            "measurement": {
-                              "tvoc": "ppb",
-                              "illumination": "lux",
-                              "co2": "ppm",
-                              "temperature": "°C",
-                              "humidity": "%",
-                              "pressure": "Pa"
-                            }
-                          },
-                          {
-                            "roomId": 101,
-                            "devEui": "24e124128c140101",
-                            "deviceName": "AM107-140101",
-                            "measurement": {
-                              "tvoc": "ppb",
-                              "illumination": "lux",
-                              "co2": "ppm",
-                              "temperature": "°C",
-                              "humidity": "%",
-                              "pressure": "Pa",
-                              "door" : ""
-                            }
-                          }
-                        ]
-                        """,new TypeReference<List<RoomDeviceInfo>>() {});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }
