@@ -41,7 +41,7 @@ public class AlertEventPublisher {
 
         if(!tryAcquireAlertLock(alertLockKey, alertLockTtl)) {
             //false: 락 획득 실패(이미 최근에 같은 알림이 나갔음) → 상위 호출자 입장에서는 예외 없이 그냥 "발행 안 함"으로 끝남
-            log.info("중복 알림 발행 스킵 roomId={}, alertNodeId={}, ttlSeconds={}", roomId, alertNodeId, dedupWindowSec);
+            log.debug("중복 알림 발행 스킵 roomId={}, alertNodeId={}, ttlSeconds={}", roomId, alertNodeId, dedupWindowSec);
             return;
         }
 

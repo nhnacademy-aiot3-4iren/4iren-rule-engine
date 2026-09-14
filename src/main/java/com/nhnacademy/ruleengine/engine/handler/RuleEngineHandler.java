@@ -34,7 +34,7 @@ public class RuleEngineHandler {
             // 실제 비동기 작업을 만들지 않고, 호출자에게는 정상 완료된 Future를 돌려준다.
             return CompletableFuture.completedFuture(null);
         }
-        log.info("실행 대상 플로우 로드 완료 roomId={}, flowCount={}", roomId, flows.size());
+        log.debug("실행 대상 플로우 로드 완료 roomId={}, flowCount={}", roomId, flows.size());
 
         // Average/Duration/Gradient 같은 시간 윈도우 조건이 나중에 조회할 수 있도록 현재 센서값을 먼저 저장한다.
         // 시계열 저장 실패는 영향을 받는 플로우만 실패 이벤트로 분리하고, 나머지 플로우는 계속 실행한다.

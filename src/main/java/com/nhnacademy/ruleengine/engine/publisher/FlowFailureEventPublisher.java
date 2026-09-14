@@ -23,7 +23,7 @@ public class FlowFailureEventPublisher {
     public void publish(FlowFailureEvent event) {
         try {
             rabbitTemplate.convertAndSend(flowFailureExchange, flowFailureRoutingKey, event);
-            log.info("플로우 실패 이벤트 발행 완료 roomId={}, flowId={}", event.roomId(), event.flowId());
+            log.debug("플로우 실패 이벤트 발행 완료 roomId={}, flowId={}", event.roomId(), event.flowId());
         } catch (Exception e) {
             log.error("플로우 실패 이벤트 발행 실패 roomId={}, flowId={}", event.roomId(), event.flowId(), e);
         }
