@@ -21,8 +21,10 @@ import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
+import com.nhnacademy.ruleengine.engine.handler.TimeSeriesPreparationService;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
 import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
+import com.nhnacademy.ruleengine.engine.publisher.FlowFailureEventPublisher;
 import com.nhnacademy.ruleengine.engine.repository.SensorTimeSeriesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -218,8 +220,20 @@ class SensorDataListenerIntegrationTest {
         }
 
         @Bean
-        RuleEngineHandler ruleEngineHandler(FlowLoader flowLoader, FlowDispatcher dispatcher, SensorTimeSeriesRepository timeSeriesRepository) {
-            return new RuleEngineHandler(flowLoader, dispatcher, timeSeriesRepository);
+        RuleEngineHandler ruleEngineHandler(
+                FlowLoader flowLoader,
+                TimeSeriesPreparationService timeSeriesPreparationService,
+                FlowDispatcher dispatcher
+        ) {
+            return new RuleEngineHandler(flowLoader, timeSeriesPreparationService, dispatcher);
+        }
+
+        @Bean
+        TimeSeriesPreparationService timeSeriesPreparationService(
+                SensorTimeSeriesRepository timeSeriesRepository,
+                FlowFailureEventPublisher flowFailureEventPublisher
+        ) {
+            return new TimeSeriesPreparationService(timeSeriesRepository, flowFailureEventPublisher);
         }
 
         @Bean
@@ -228,8 +242,18 @@ class SensorDataListenerIntegrationTest {
         }
 
         @Bean
-        FlowDispatcher flowDispatcher(ExecutorService flowExecutorService, FlowScheduleFilter flowScheduleFilter, FlowExecutor flowExecutor) {
-            return new FlowDispatcher(flowExecutorService, flowScheduleFilter, flowExecutor, 100);
+        FlowDispatcher flowDispatcher(
+                ExecutorService flowExecutorService,
+                FlowScheduleFilter flowScheduleFilter,
+                FlowExecutor flowExecutor,
+                FlowFailureEventPublisher flowFailureEventPublisher
+        ) {
+            return new FlowDispatcher(flowExecutorService, flowScheduleFilter, flowExecutor, flowFailureEventPublisher, 100);
+        }
+
+        @Bean
+        FlowFailureEventPublisher flowFailureEventPublisher(RabbitTemplate rabbitTemplate) {
+            return new FlowFailureEventPublisher(rabbitTemplate);
         }
 
         @Bean

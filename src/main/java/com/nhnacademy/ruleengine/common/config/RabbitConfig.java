@@ -27,6 +27,12 @@ public class RabbitConfig {
     private String dlqName;
     @Value("${rabbitmq.dlq.routing-key}")
     private String dlqRoutingKey;
+    @Value("${rabbitmq.flow-failure.exchange}")
+    private String flowFailureExchangeName;
+    @Value("${rabbitmq.flow-failure.queue}")
+    private String flowFailureQueueName;
+    @Value("${rabbitmq.flow-failure.routing-key}")
+    private String flowFailureRoutingKey;
 
     /**
      * JSON 직렬화/역직렬화를 위한 Jackson ObjectMapper 설정 빈
@@ -93,11 +99,30 @@ public class RabbitConfig {
         return QueueBuilder.durable(dlqName).build();
     }
 
-    //DLQ와 DLX를 DLQ 전용 라우팅 키로 연결(Binding)하는 빈
+    //DLQ와 DLX를전용 라우팅 키로 연결(Binding)하는 빈
     @Bean
     public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
         return BindingBuilder.bind(deadLetterQueue)
                 .to(deadLetterExchange)
                 .with(dlqRoutingKey);
+    }
+
+    //
+    @Bean
+    public DirectExchange flowFailureExchange() {
+        return new DirectExchange(flowFailureExchangeName);
+    }
+
+    //flow-failure 전용 큐 등록
+    @Bean
+    public Queue flowFailureQueue() {
+        return QueueBuilder.durable(flowFailureQueueName).build();
+    }
+
+    @Bean
+    public Binding flowFailureBinding(Queue flowFailureQueue, DirectExchange flowFailureExchange) {
+        return BindingBuilder.bind(flowFailureQueue)
+                .to(flowFailureExchange)
+                .with(flowFailureRoutingKey);
     }
 }
