@@ -35,7 +35,7 @@ public class FlowScheduleService {
     public FlowScheduleCreateResponse createFlowSchedule(Long roomId, Long flowId, FlowScheduleCreateRequest request) {
         log.info("플로우 스케줄 생성 처리 시작 roomId={}, flowId={}, scheduleCount={}",
                 roomId, flowId, request.flowScheduleRequestList().size());
-        Flow flow = flowRepository.findByIdAndRoomId(flowId, roomId).orElseThrow(FlowNotFoundException::new);
+        Flow flow = flowRepository.findByIdAndRoomIdForUpdate(flowId, roomId).orElseThrow(FlowNotFoundException::new);
 
         validateCreateRequest(flowId, request.flowScheduleRequestList());
 
