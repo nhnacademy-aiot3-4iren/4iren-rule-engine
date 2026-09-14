@@ -222,10 +222,10 @@ class SensorDataListenerIntegrationTest {
         @Bean
         RuleEngineHandler ruleEngineHandler(
                 FlowLoader flowLoader,
-                FlowDispatcher dispatcher,
-                TimeSeriesPreparationService timeSeriesPreparationService
+                TimeSeriesPreparationService timeSeriesPreparationService,
+                FlowDispatcher dispatcher
         ) {
-            return new RuleEngineHandler(flowLoader, dispatcher, timeSeriesPreparationService);
+            return new RuleEngineHandler(flowLoader, timeSeriesPreparationService, dispatcher);
         }
 
         @Bean

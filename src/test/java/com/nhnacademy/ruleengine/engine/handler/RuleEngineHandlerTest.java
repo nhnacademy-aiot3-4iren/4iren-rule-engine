@@ -45,7 +45,7 @@ class RuleEngineHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RuleEngineHandler(flowLoader, dispatcher, timeSeriesPreparationService);
+        handler = new RuleEngineHandler(flowLoader, timeSeriesPreparationService, dispatcher);
     }
 
     @Test
