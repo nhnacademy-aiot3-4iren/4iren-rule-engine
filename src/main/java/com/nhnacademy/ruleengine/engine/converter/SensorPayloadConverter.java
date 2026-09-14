@@ -30,7 +30,8 @@ public class SensorPayloadConverter {
             }
 
             validate(payload);
-            log.debug("센서 페이로드 파싱 성공 roomId={}, measurementCount={}", payload.roomId(), payload.metrics().size());
+
+            log.info("센서 페이로드 파싱 성공 roomId={}, measurementCount={}", payload.roomId(), payload.metrics().size());
             return Optional.of(payload);
         } catch (Exception e) {
             log.warn("센서 페이로드 파싱 또는 검증 실패", e);
