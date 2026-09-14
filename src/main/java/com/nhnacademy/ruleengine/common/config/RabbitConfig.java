@@ -107,12 +107,13 @@ public class RabbitConfig {
                 .with(dlqRoutingKey);
     }
 
-    // flow-failure exchange/queue/binding 추가
+    //
     @Bean
     public DirectExchange flowFailureExchange() {
         return new DirectExchange(flowFailureExchangeName);
     }
 
+    //flow-failure 전용 큐 등록
     @Bean
     public Queue flowFailureQueue() {
         return QueueBuilder.durable(flowFailureQueueName).build();

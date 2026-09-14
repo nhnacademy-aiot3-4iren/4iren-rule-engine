@@ -140,9 +140,13 @@ class FlowDispatcherTest {
         when(filter.isSchedulable(flow1)).thenReturn(true);
         when(filter.isSchedulable(flow2)).thenReturn(true);
 
-        doThrow(new RuntimeException("boom"))
-                .when(flowExecutor)
-                .execute(argThat(context1 -> context1.flow().flowId().equals(1L)));
+        doAnswer(invocation -> {
+            FlowContext flowContext = invocation.getArgument(0);
+            if(flowContext.flow().flowId().equals(1L)) {
+                throw new RuntimeException("boom");
+            }
+            return null;
+        }).when(flowExecutor).execute(any());
 
         CompletableFuture<Void> future = dispatcher.dispatch(List.of(flow1, flow2), context);
         assertThatCode(future::join).doesNotThrowAnyException();

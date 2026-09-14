@@ -3,14 +3,11 @@ package com.nhnacademy.ruleengine.engine.handler;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.Operator;
-import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.AverageNodeConfig;
-import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.engine.dispatcher.FlowDispatcher;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import com.nhnacademy.ruleengine.engine.model.EnvironmentContext;
-import com.nhnacademy.ruleengine.engine.repository.SensorTimeSeriesRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,30 +39,56 @@ class RuleEngineHandlerTest {
     private FlowDispatcher dispatcher;
 
     @Mock
-    private SensorTimeSeriesRepository timeSeriesRepository;
+    private TimeSeriesPreparationService timeSeriesPreparationService;
 
     private RuleEngineHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new RuleEngineHandler(flowLoader, dispatcher, timeSeriesRepository);
+        handler = new RuleEngineHandler(flowLoader, dispatcher, timeSeriesPreparationService);
     }
 
     @Test
-    @DisplayName("활성 flow가 없으면 시계열 데이터를 저장하지 않는다")
-    void process_doesNotRecordTimeSeriesWhenNoActiveFlow() {
+    @DisplayName("활성 flow가 없으면 시계열 준비와 dispatch를 하지 않는다")
+    void process_doesNotPrepareTimeSeriesAndDispatchWhenNoActiveFlow() {
         EnvironmentContext context = environmentContext();
         when(flowLoader.load(ROOM_ID)).thenReturn(List.of());
 
         handler.process(context).join();
 
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), anyDouble(), any(Instant.class));
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), any(String.class), anyDouble(), any(Instant.class));
+        verify(timeSeriesPreparationService, never()).prepareAndFilterDispatchableFlows(context, List.of());
+        verify(dispatcher, never()).dispatch(List.of(), context);
     }
 
     @Test
-    @DisplayName("시계열 조건 노드가 없으면 시계열 데이터를 저장하지 않는다")
-    void process_doesNotRecordTimeSeriesForThresholdOnlyFlow() {
+    @DisplayName("시계열 준비 후 실행 가능한 flow만 dispatch 한다")
+    void process_dispatchesOnlyPreparedFlows() {
+        EnvironmentContext context = environmentContext();
+        ExecutableFlow flow1 = flowWithIdAndNode(1L, new ExecutableFlow.ExecutableNode(
+                1L,
+                "threshold",
+                NodeType.THRESHOLD,
+                new ThresholdNodeConfig(NodeType.THRESHOLD, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 25.0)
+        ));
+        ExecutableFlow flow2 = flowWithIdAndNode(2L, new ExecutableFlow.ExecutableNode(
+                2L,
+                "threshold",
+                NodeType.THRESHOLD,
+                new ThresholdNodeConfig(NodeType.THRESHOLD, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.LT, 30.0)
+        ));
+        when(flowLoader.load(ROOM_ID)).thenReturn(List.of(flow1, flow2));
+        when(timeSeriesPreparationService.prepareAndFilterDispatchableFlows(context, List.of(flow1, flow2))).thenReturn(List.of(flow2));
+        when(dispatcher.dispatch(List.of(flow2), context)).thenReturn(CompletableFuture.completedFuture(null));
+
+        handler.process(context).join();
+
+        verify(timeSeriesPreparationService).prepareAndFilterDispatchableFlows(context, List.of(flow1, flow2));
+        verify(dispatcher).dispatch(List.of(flow2), context);
+    }
+
+    @Test
+    @DisplayName("시계열 준비 후 실행 가능한 flow가 없으면 dispatch 하지 않는다")
+    void process_doesNotDispatchWhenNoPreparedFlow() {
         EnvironmentContext context = environmentContext();
         ExecutableFlow flow = flowWithNode(new ExecutableFlow.ExecutableNode(
                 1L,
@@ -77,61 +97,11 @@ class RuleEngineHandlerTest {
                 new ThresholdNodeConfig(NodeType.THRESHOLD, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 25.0)
         ));
         when(flowLoader.load(ROOM_ID)).thenReturn(List.of(flow));
-        when(dispatcher.dispatch(List.of(flow), context)).thenReturn(CompletableFuture.completedFuture(null));
+        when(timeSeriesPreparationService.prepareAndFilterDispatchableFlows(context, List.of(flow))).thenReturn(List.of());
 
         handler.process(context).join();
 
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), anyDouble(), any(Instant.class));
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), any(String.class), anyDouble(), any(Instant.class));
-    }
-
-    @Test
-    @DisplayName("AVERAGE 노드가 요구하는 metric만 room-level 시계열로 저장한다")
-    void process_recordsRoomLevelTimeSeriesForAverageNode() {
-        EnvironmentContext context = environmentContext();
-        ExecutableFlow flow = flowWithNode(new ExecutableFlow.ExecutableNode(
-                1L,
-                "average",
-                NodeType.AVERAGE,
-                new AverageNodeConfig(NodeType.AVERAGE, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 25.0, 120)
-        ));
-        when(flowLoader.load(ROOM_ID)).thenReturn(List.of(flow));
-        when(dispatcher.dispatch(List.of(flow), context)).thenReturn(CompletableFuture.completedFuture(null));
-
-        handler.process(context).join();
-
-        verify(timeSeriesRepository).save(
-                eq(ROOM_ID),
-                eq(MeasurementType.TEMPERATURE),
-                eq(26.5),
-                eq(ROOM_UPDATED_AT)
-        );
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), any(String.class), anyDouble(), any(Instant.class));
-    }
-
-    @Test
-    @DisplayName("GRADIENT 노드가 요구하는 metric만 device-level 시계열로 저장한다")
-    void process_recordsDeviceLevelTimeSeriesForGradientNode() {
-        EnvironmentContext context = environmentContext();
-        ExecutableFlow flow = flowWithNode(new ExecutableFlow.ExecutableNode(
-                1L,
-                "gradient",
-                NodeType.GRADIENT,
-                new GradientNodeConfig(NodeType.GRADIENT, 0, 0, MeasurementType.TEMPERATURE, "C", Operator.GT, 0.1, 90)
-        ));
-        when(flowLoader.load(ROOM_ID)).thenReturn(List.of(flow));
-        when(dispatcher.dispatch(List.of(flow), context)).thenReturn(CompletableFuture.completedFuture(null));
-
-        handler.process(context).join();
-
-        verify(timeSeriesRepository, never()).save(any(Long.class), any(MeasurementType.class), anyDouble(), any(Instant.class));
-        verify(timeSeriesRepository).save(
-                eq(ROOM_ID),
-                eq(MeasurementType.TEMPERATURE),
-                eq(DEV_EUI),
-                eq(26.5),
-                eq(METRIC_UPDATED_AT)
-        );
+        verify(dispatcher, never()).dispatch(List.of(), context);
     }
 
     private EnvironmentContext environmentContext() {
@@ -143,8 +113,12 @@ class RuleEngineHandlerTest {
     }
 
     private ExecutableFlow flowWithNode(ExecutableFlow.ExecutableNode node) {
+        return flowWithIdAndNode(1L, node);
+    }
+
+    private ExecutableFlow flowWithIdAndNode(Long flowId, ExecutableFlow.ExecutableNode node) {
         return ExecutableFlow.builder()
-                .flowId(1L)
+                .flowId(flowId)
                 .flowName("flow")
                 .roomId(ROOM_ID)
                 .schedules(List.of())

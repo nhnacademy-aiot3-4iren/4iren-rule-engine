@@ -21,6 +21,7 @@ import com.nhnacademy.ruleengine.engine.filter.FlowScheduleFilter;
 import com.nhnacademy.ruleengine.engine.flow.ExecutableFlow;
 import com.nhnacademy.ruleengine.engine.flow.FlowLoader;
 import com.nhnacademy.ruleengine.engine.handler.RuleEngineHandler;
+import com.nhnacademy.ruleengine.engine.handler.TimeSeriesPreparationService;
 import com.nhnacademy.ruleengine.engine.model.AlertEvent;
 import com.nhnacademy.ruleengine.engine.publisher.AlertEventPublisher;
 import com.nhnacademy.ruleengine.engine.publisher.FlowFailureEventPublisher;
@@ -219,8 +220,20 @@ class SensorDataListenerIntegrationTest {
         }
 
         @Bean
-        RuleEngineHandler ruleEngineHandler(FlowLoader flowLoader, FlowDispatcher dispatcher, SensorTimeSeriesRepository timeSeriesRepository) {
-            return new RuleEngineHandler(flowLoader, dispatcher, timeSeriesRepository);
+        RuleEngineHandler ruleEngineHandler(
+                FlowLoader flowLoader,
+                FlowDispatcher dispatcher,
+                TimeSeriesPreparationService timeSeriesPreparationService
+        ) {
+            return new RuleEngineHandler(flowLoader, dispatcher, timeSeriesPreparationService);
+        }
+
+        @Bean
+        TimeSeriesPreparationService timeSeriesPreparationService(
+                SensorTimeSeriesRepository timeSeriesRepository,
+                FlowFailureEventPublisher flowFailureEventPublisher
+        ) {
+            return new TimeSeriesPreparationService(timeSeriesRepository, flowFailureEventPublisher);
         }
 
         @Bean
