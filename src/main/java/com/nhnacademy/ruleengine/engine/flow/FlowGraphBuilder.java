@@ -51,7 +51,7 @@ public class FlowGraphBuilder {
             log.warn("시작 노드를 찾을 수 없어 플로우 그래프를 만들 수 없음 flowId={}", flow.getId());
             throw new InvalidFlowException();
         }
-        log.info("플로우 그래프 조립 완료 flowId={}, nodeCount={}, connectionCount={}, scheduleCount={}",
+        log.debug("플로우 그래프 조립 완료 flowId={}, nodeCount={}, connectionCount={}, scheduleCount={}",
                 flow.getId(), nodes.size(), connections.size(), flowSchedules.size());
 
         return new ExecutableFlow(

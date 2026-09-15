@@ -34,13 +34,13 @@ public class FlowLoader {
     @Transactional(readOnly = true)
     @Cacheable(value = "flow:room", key = "#roomId", unless = "#result == null", cacheManager = "flowCacheManager")
     public List<ExecutableFlow> load(Long roomId){
-        log.info("플로우 캐시 미스, DB 조회 roomId={}", roomId);
+        log.debug("플로우 캐시 미스, DB 조회 roomId={}", roomId);
         return loadFromDatabase(roomId);
     }
     private List<ExecutableFlow> loadFromDatabase(Long roomId){
         List<Flow> flows = flowRepository.findAllByRoomIdAndIsActiveTrueAndIsTemplateFalse(roomId);
         if (flows.isEmpty()) {
-            log.info("DB에서 활성 플로우를 찾지 못함 roomId={}", roomId);
+            log.debug("DB에서 활성 플로우를 찾지 못함 roomId={}", roomId);
             return Collections.emptyList();
         }
 
@@ -70,7 +70,7 @@ public class FlowLoader {
                     )
                 ).filter(Objects::nonNull)
                 .toList();
-        log.info("활성 플로우 조립 완료 roomId={}, totalCount={}, executableCount={}",
+        log.debug("활성 플로우 조립 완료 roomId={}, totalCount={}, executableCount={}",
                 roomId, flows.size(), executableFlows.size());
         return executableFlows;
     }

@@ -22,7 +22,7 @@ public class SensorDataListener {
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
     public void receiveSensorData(Message message) {
-        log.info("RabbitMQ 메시지 수신: {}", message);
+        log.debug("RabbitMQ 메시지 수신: {}", message);
 
         String rawMessage = new String(message.getBody(), StandardCharsets.UTF_8);
 
@@ -33,7 +33,7 @@ public class SensorDataListener {
 
         EnvironmentContext payload = converted.get();
 
-        log.info("센서 데이터 변환 완료 roomId={}, 측정값수={}",
+        log.debug("센서 데이터 변환 완료 roomId={}, 측정값수={}",
                 payload.roomId(),
                 payload.metrics().size());
 

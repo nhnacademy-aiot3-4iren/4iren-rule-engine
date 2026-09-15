@@ -1,8 +1,8 @@
 package com.nhnacademy.ruleengine.domain.flowschedule.dto;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 
 @Schema(description = "플로우 스케줄 생성 응답")
 public record FlowScheduleCreateResponse(

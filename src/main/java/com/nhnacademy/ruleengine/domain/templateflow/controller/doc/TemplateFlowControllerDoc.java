@@ -1,10 +1,6 @@
 package com.nhnacademy.ruleengine.domain.templateflow.controller.doc;
 
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateDetailResponse;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateFlowCreateRequest;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateFlowCreateResponse;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateFlowUpdateRequest;
-import com.nhnacademy.ruleengine.domain.templateflow.dto.TemplateListResponse;
+import com.nhnacademy.ruleengine.domain.templateflow.dto.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

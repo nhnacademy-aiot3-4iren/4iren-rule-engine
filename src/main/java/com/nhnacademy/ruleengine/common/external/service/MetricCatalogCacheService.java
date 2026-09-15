@@ -30,92 +30,10 @@ public class MetricCatalogCacheService {
         try{
             return sensorCatalogClient.getMetricCatalog();
         }catch (Exception e){
-//            log.error("측정 항목 카탈로그 외부 API 호출 실패, 더미 데이터 사용", e);
-//            return getDummyCatalog();
+
             log.error("측정 항목 카탈로그 외부 API 호출 실패", e);
             return List.of();
         }
 
-    }
-    private List<MetricCatalogInfo> getDummyCatalog() {
-        try {
-            log.info("테스트용 측정 항목 카탈로그 더미 데이터 생성");
-            return objectMapper.readValue("""
-                    [
-                      {
-                        "metricCode": "co2",
-                        "displayName": "이산화탄소 농도",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 공기 중 이산화탄소 농도",
-                        "ucumCode": "[ppm]",
-                        "unitDisplayName": "백만분율",
-                        "symbol": "ppm"
-                      },
-                      {
-                        "metricCode": "humidity",
-                        "displayName": "상대습도",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 공기의 상대습도",
-                        "ucumCode": "%",
-                        "unitDisplayName": "퍼센트",
-                        "symbol": "%"
-                      },
-                      {
-                        "metricCode": "illumination",
-                        "displayName": "조도",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 조도",
-                        "ucumCode": "lx",
-                        "unitDisplayName": "럭스",
-                        "symbol": "lux"
-                      },
-                      {
-                        "metricCode": "pressure",
-                        "displayName": "기압",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 기압",
-                        "ucumCode": "Pa",
-                        "unitDisplayName": "파스칼",
-                        "symbol": "Pa"
-                      },
-                      {
-                        "metricCode": "temperature",
-                        "displayName": "온도",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 공기의 섭씨 온도",
-                        "ucumCode": "Cel",
-                        "unitDisplayName": "섭씨",
-                        "symbol": "°C"
-                      },
-                      {
-                        "metricCode": "door",
-                        "displayName": "문 열림 여부",
-                        "metricKind": "STATE",
-                        "status": "ACTIVE",
-                        "description": "현재 문 열림/닫힘 상태",
-                        "ucumCode": "1",
-                        "unitDisplayName": "단위없음",
-                        "symbol": ""
-                      },
-                      {
-                        "metricCode": "tvoc",
-                        "displayName": "총휘발성유기화합물",
-                        "metricKind": "GAUGE",
-                        "status": "ACTIVE",
-                        "description": "실내 총휘발성유기화합물(TVOC) 농도",
-                        "ucumCode": "[ppb]",
-                        "unitDisplayName": "십억분율",
-                        "symbol": "ppb"
-                      }
-                    ]
-                    """, new TypeReference<List<MetricCatalogInfo>> (){});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

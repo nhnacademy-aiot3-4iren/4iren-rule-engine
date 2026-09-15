@@ -11,7 +11,6 @@ import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.GradientNo
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.ThresholdNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.logical.OrNodeConfig;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.start.StartNodeConfig;
-import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 

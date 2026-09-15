@@ -1,6 +1,5 @@
 package com.nhnacademy.ruleengine.engine.executor.node.impl;
 
-import com.nhnacademy.ruleengine.domain.nodeconfig.enums.MeasurementType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.enums.NodeType;
 import com.nhnacademy.ruleengine.domain.nodeconfig.jsoninfo.condition.DurationNodeConfig;
 import com.nhnacademy.ruleengine.engine.executor.ExecutionPath;
